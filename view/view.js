@@ -4,7 +4,9 @@ import {
     collection,
     getDocs,
     query,
-    orderBy
+    orderBy,
+    deleteDoc,
+    doc
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 
@@ -15,21 +17,39 @@ import {
 const VIEW_PASSWORD = "123456";
 
 
-const loginScreen = document.getElementById("loginScreen");
-const mainPage = document.getElementById("mainPage");
+/* =========================
+   ELEMENTS
+========================= */
 
-const passwordInput = document.getElementById("password");
-const loginBtn = document.getElementById("loginBtn");
-const loginError = document.getElementById("loginError");
+const loginScreen =
+    document.getElementById("loginScreen");
 
-const submissionsList =
-    document.getElementById("submissionsList");
+const mainPage =
+    document.getElementById("mainPage");
+
+const passwordInput =
+    document.getElementById("password");
+
+const loginBtn =
+    document.getElementById("loginBtn");
+
+const loginError =
+    document.getElementById("loginError");
+
+const submissionsTable =
+    document.getElementById("submissionsTable");
 
 const totalCount =
     document.getElementById("totalCount");
 
 const searchInput =
     document.getElementById("searchInput");
+
+const refreshBtn =
+    document.getElementById("refreshBtn");
+
+const emptyMessage =
+    document.getElementById("emptyMessage");
 
 
 let allSubmissions = [];
@@ -39,47 +59,60 @@ let allSubmissions = [];
    LOGIN
 ========================= */
 
-loginBtn.addEventListener("click", () => {
+loginBtn.addEventListener("click", login);
 
-    const password = passwordInput.value.trim();
+passwordInput.addEventListener("keydown", (event) => {
+
+    if (event.key === "Enter") {
+        login();
+    }
+
+});
+
+
+function login() {
+
+    const password =
+        passwordInput.value.trim();
 
     if (password === VIEW_PASSWORD) {
 
         loginScreen.style.display = "none";
+
         mainPage.style.display = "block";
 
         loadSubmissions();
 
     } else {
 
-        loginError.textContent = "Incorrect password.";
+        loginError.textContent =
+            "Incorrect password.";
+
         passwordInput.value = "";
+
         passwordInput.focus();
 
     }
-});
 
-
-passwordInput.addEventListener("keydown", (e) => {
-
-    if (e.key === "Enter") {
-        loginBtn.click();
-    }
-
-});
+}
 
 
 /* =========================
-   LOAD SUBMISSIONS
+   LOAD DATA
 ========================= */
 
 async function loadSubmissions() {
 
-    submissionsList.innerHTML = `
-        <div class="loading">
-            Loading submissions...
-        </div>
+    submissionsTable.innerHTML = `
+        <tr>
+            <td colspan="7" class="loading">
+                Loading submissions...
+            </td>
+        </tr>
     `;
+
+    emptyMessage.style.display = "none";
+
 
     try {
 
@@ -88,132 +121,254 @@ async function loadSubmissions() {
             orderBy("submittedAt", "desc")
         );
 
-        const snapshot = await getDocs(q);
+        const snapshot =
+            await getDocs(q);
+
 
         allSubmissions = [];
 
-        snapshot.forEach((doc) => {
+        snapshot.forEach((document) => {
 
             allSubmissions.push({
-                id: doc.id,
-                ...doc.data()
+                id: document.id,
+                ...document.data()
             });
 
         });
 
-        totalCount.textContent = allSubmissions.length;
+
+        totalCount.textContent =
+            allSubmissions.length;
+
 
         displaySubmissions(allSubmissions);
 
+
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Error loading submissions:",
+            error
+        );
 
-        submissionsList.innerHTML = `
-            <div class="empty">
-                Unable to load submissions.
-            </div>
+        submissionsTable.innerHTML = `
+            <tr>
+                <td colspan="7" class="loading">
+                    Unable to load submissions.
+                </td>
+            </tr>
         `;
 
     }
+
 }
 
 
 /* =========================
-   DISPLAY
+   DISPLAY TABLE
 ========================= */
 
 function displaySubmissions(data) {
 
     if (data.length === 0) {
 
-        submissionsList.innerHTML = `
-            <div class="empty">
-                No submissions found.
-            </div>
-        `;
+        submissionsTable.innerHTML = "";
 
+        emptyMessage.style.display = "block";
+
+        return;
+
+    }
+
+    emptyMessage.style.display = "none";
+
+
+    submissionsTable.innerHTML =
+        data.map((student, index) => {
+
+            let submittedTime =
+                "Time unavailable";
+
+
+            if (student.submittedAt) {
+
+                try {
+
+                    submittedTime =
+                        student.submittedAt
+                            .toDate()
+                            .toLocaleString(
+                                "en-IN",
+                                {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                }
+                            );
+
+                } catch (error) {
+
+                    submittedTime =
+                        "Time unavailable";
+
+                }
+
+            }
+
+
+            return `
+
+                <tr>
+
+                    <td>
+                        ${index + 1}
+                    </td>
+
+
+                    <td class="name-cell">
+                        ${escapeHTML(
+                            student.name || "-"
+                        )}
+                    </td>
+
+
+                    <td>
+                        ${escapeHTML(
+                            student.phone || "-"
+                        )}
+                    </td>
+
+
+                    <td>
+                        ${escapeHTML(
+                            student.village || "-"
+                        )}
+                    </td>
+
+
+                    <td class="target-cell">
+                        ${escapeHTML(
+                            student.targetPercentage || "-"
+                        )}%
+                    </td>
+
+
+                    <td>
+                        ${submittedTime}
+                    </td>
+
+
+                    <td>
+
+                        <button
+                            class="delete-btn"
+                            data-id="${student.id}"
+                        >
+                            Delete
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }).join("");
+
+
+    /* Attach delete buttons */
+
+    document
+        .querySelectorAll(".delete-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => deleteSubmission(button.dataset.id)
+            );
+
+        });
+
+}
+
+
+/* =========================
+   DELETE
+========================= */
+
+async function deleteSubmission(id) {
+
+    const student =
+        allSubmissions.find(
+            item => item.id === id
+        );
+
+
+    if (!student) {
         return;
     }
 
 
-    submissionsList.innerHTML = data.map(student => {
-
-        let submittedTime = "Time unavailable";
-
-        if (student.submittedAt) {
-
-            submittedTime =
-                student.submittedAt.toDate()
-                .toLocaleString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit"
-                });
-
-        }
+    const confirmed =
+        confirm(
+            `Delete the submission of ${student.name || "this student"}?\n\nThis cannot be undone.`
+        );
 
 
-        return `
-            <div class="submission-card">
-
-                <div class="student-top">
-
-                    <div class="student-name">
-                        ${escapeHTML(student.name || "-")}
-                    </div>
-
-                    <div class="student-time">
-                        ${submittedTime}
-                    </div>
-
-                </div>
+    if (!confirmed) {
+        return;
+    }
 
 
-                <div class="details">
+    try {
 
-                    <div>
-                        <div class="detail-label">
-                            PHONE NUMBER
-                        </div>
-
-                        <div class="detail-value">
-                            ${escapeHTML(student.phone || "-")}
-                        </div>
-                    </div>
+        await deleteDoc(
+            doc(db, "submissions", id)
+        );
 
 
-                    <div>
-                        <div class="detail-label">
-                            VILLAGE
-                        </div>
+        /* Remove locally */
 
-                        <div class="detail-value">
-                            ${escapeHTML(student.village || "-")}
-                        </div>
-                    </div>
+        allSubmissions =
+            allSubmissions.filter(
+                item => item.id !== id
+            );
 
 
-                    <div>
-                        <div class="detail-label">
-                            SSLC TARGET
-                        </div>
+        totalCount.textContent =
+            allSubmissions.length;
 
-                        <div class="detail-value">
-                            <span class="target">
-                                ${escapeHTML(student.targetPercentage || "-")}%
-                            </span>
-                        </div>
-                    </div>
 
-                </div>
+        /* Re-display */
 
-            </div>
-        `;
+        const search =
+            searchInput.value
+                .trim()
+                .toLowerCase();
 
-    }).join("");
+
+        const filtered =
+            filterSubmissions(search);
+
+
+        displaySubmissions(filtered);
+
+
+    } catch (error) {
+
+        console.error(
+            "Delete error:",
+            error
+        );
+
+        alert(
+            "Unable to delete this submission."
+        );
+
+    }
+
 }
 
 
@@ -221,37 +376,85 @@ function displaySubmissions(data) {
    SEARCH
 ========================= */
 
-searchInput.addEventListener("input", () => {
+searchInput.addEventListener(
+    "input",
+    () => {
 
-    const search =
-        searchInput.value.trim().toLowerCase();
+        const search =
+            searchInput.value
+                .trim()
+                .toLowerCase();
 
-    const filtered = allSubmissions.filter(student => {
-
-        return (
-            (student.name || "").toLowerCase().includes(search) ||
-            (student.phone || "").toLowerCase().includes(search) ||
-            (student.village || "").toLowerCase().includes(search)
+        displaySubmissions(
+            filterSubmissions(search)
         );
 
-    });
+    }
+);
 
-    displaySubmissions(filtered);
 
-});
+function filterSubmissions(search) {
+
+    if (!search) {
+        return allSubmissions;
+    }
+
+
+    return allSubmissions.filter(
+        student => {
+
+            return (
+
+                (student.name || "")
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                (student.phone || "")
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                (student.village || "")
+                    .toLowerCase()
+                    .includes(search)
+
+            );
+
+        }
+    );
+
+}
 
 
 /* =========================
-   SECURITY
+   REFRESH
+========================= */
+
+refreshBtn.addEventListener(
+    "click",
+    loadSubmissions
+);
+
+
+/* =========================
+   HTML SECURITY
 ========================= */
 
 function escapeHTML(value) {
 
     return String(value)
+
         .replace(/&/g, "&amp;")
+
         .replace(/</g, "&lt;")
+
         .replace(/>/g, "&gt;")
+
         .replace(/"/g, "&quot;")
+
         .replace(/'/g, "&#039;");
 
 }
