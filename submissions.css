@@ -1,0 +1,446 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --black:#050505;
+    --white:#ffffff;
+    --bg:#f5f5f5;
+    --border:#e2e2e2;
+    --muted:#888;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:var(--bg);
+    color:#111;
+}
+
+button,
+input{
+    font-family:inherit;
+}
+
+
+/* =========================================
+   PAGE
+========================================= */
+
+.page{
+    min-height:100vh;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+}
+
+
+/* =========================================
+   CARD
+========================================= */
+
+.card{
+    width:100%;
+    max-width:430px;
+
+    padding:30px 25px;
+
+    background:#fff;
+
+    border:1px solid var(--border);
+
+    border-radius:24px;
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.06);
+}
+
+
+/* =========================================
+   BRAND
+========================================= */
+
+.brand{
+    display:flex;
+
+    align-items:center;
+
+    gap:11px;
+
+    margin-bottom:30px;
+}
+
+.brand-logo{
+    width:45px;
+    height:45px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#000;
+    color:#fff;
+
+    border-radius:13px;
+
+    font-size:23px;
+    font-weight:800;
+}
+
+.brand h1{
+    font-size:20px;
+
+    font-weight:800;
+
+    letter-spacing:3px;
+}
+
+.brand span{
+    display:block;
+
+    margin-top:1px;
+
+    color:#999;
+
+    font-size:7px;
+
+    letter-spacing:3px;
+}
+
+
+/* =========================================
+   HEADING
+========================================= */
+
+.heading{
+    margin-bottom:24px;
+}
+
+.heading > span{
+    color:#999;
+
+    font-size:8px;
+
+    letter-spacing:2px;
+
+    font-weight:700;
+}
+
+.heading h2{
+    margin-top:3px;
+
+    font-size:24px;
+}
+
+.heading p{
+    margin-top:3px;
+
+    color:#888;
+
+    font-size:10px;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.form-group{
+    margin-bottom:17px;
+}
+
+.form-group label{
+    display:block;
+
+    margin-bottom:7px;
+
+    font-size:10px;
+
+    font-weight:600;
+}
+
+.input-box{
+    height:50px;
+
+    display:flex;
+    align-items:center;
+
+    gap:9px;
+
+    padding:0 13px;
+
+    border:1px solid #ddd;
+
+    border-radius:12px;
+
+    transition:.2s;
+}
+
+.input-box:focus-within{
+    border-color:#000;
+
+    box-shadow:
+        0 0 0 3px rgba(0,0,0,.04);
+}
+
+.input-box > i{
+    color:#777;
+
+    font-size:18px;
+}
+
+.input-box input{
+    width:100%;
+    height:100%;
+
+    border:0;
+    outline:0;
+
+    background:transparent;
+
+    font-size:11px;
+
+    color:#111;
+}
+
+.input-box input::placeholder{
+    color:#aaa;
+}
+
+.percentage-box > span{
+    font-size:12px;
+
+    font-weight:600;
+
+    color:#777;
+}
+
+
+/* Remove number arrows */
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+}
+
+input[type="number"]{
+    appearance:textfield;
+}
+
+
+/* =========================================
+   MESSAGES
+========================================= */
+
+.message{
+    display:none;
+
+    padding:10px 12px;
+
+    margin-bottom:12px;
+
+    border-radius:10px;
+
+    font-size:9px;
+
+    line-height:1.5;
+}
+
+.message.show{
+    display:block;
+}
+
+.error{
+    background:#f2f2f2;
+
+    color:#222;
+}
+
+.success{
+    background:#000;
+
+    color:#fff;
+
+    text-align:center;
+}
+
+
+/* =========================================
+   SUBMIT
+========================================= */
+
+.submit-button{
+    width:100%;
+    height:52px;
+
+    border:0;
+
+    border-radius:13px;
+
+    background:#000;
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:9px;
+
+    font-size:11px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.submit-button:hover{
+    transform:translateY(-1px);
+}
+
+.submit-button:active{
+    transform:scale(.98);
+}
+
+.submit-button:disabled{
+    opacity:.55;
+
+    cursor:not-allowed;
+
+    transform:none;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:480px){
+
+    .page{
+        padding:14px;
+    }
+
+    .card{
+        padding:27px 19px;
+
+        border-radius:21px;
+    }
+
+    .heading h2{
+        font-size:22px;
+    }
+
+}
+/* =========================
+   SUCCESS SCREEN
+========================= */
+
+/* =================================
+   FULL SCREEN SUCCESS
+================================= */
+
+.success-screen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+
+    background: #000 !important;
+    color: #fff !important;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    padding: 30px;
+    box-sizing: border-box;
+
+    z-index: 999999 !important;
+}
+
+.success-screen.show {
+    display: flex !important;
+}
+
+.success-content {
+    width: 100%;
+    max-width: 420px;
+}
+
+.success-check {
+    width: 90px;
+    height: 90px;
+
+    margin: 0 auto 28px;
+
+    border-radius: 50%;
+    background: #22c55e;
+
+    color: #fff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 52px;
+    font-weight: 700;
+
+    animation: checkPop 0.5s ease-out;
+}
+
+.success-content h1 {
+    margin: 0 0 14px;
+
+    color: #fff !important;
+
+    font-size: 32px;
+    line-height: 1.15;
+    font-weight: 700;
+}
+
+.success-content p {
+    margin: 0;
+
+    color: #d4d4d4 !important;
+
+    font-size: 17px;
+    line-height: 1.6;
+}
+
+.success-content span {
+    display: block;
+
+    margin-top: 8px;
+
+    color: #888 !important;
+
+    font-size: 14px;
+}
+
+@keyframes checkPop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    70% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

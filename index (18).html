@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Zenova | Student Submission</title>
+
+    <link rel="stylesheet" href="submissions.css">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <main class="page">
+
+        <div class="card">
+
+            <!-- BRAND -->
+
+            <div class="brand">
+
+                <div class="brand-logo">
+                    Z
+                </div>
+
+                <div>
+                    <h1>ZENOVA</h1>
+                    <span>EDUCATIONS</span>
+                </div>
+
+            </div>
+
+
+            <!-- HEADING -->
+
+            <div class="heading">
+
+                <span>SSLC 2026</span>
+
+                <h2>Student Details</h2>
+
+                <p>
+                    Enter your details below.
+                </p>
+
+            </div>
+
+
+            <!-- FORM -->
+
+            <form id="submissionForm">
+
+
+                <!-- NAME -->
+
+                <div class="form-group">
+
+                    <label for="name">
+                        Name
+                    </label>
+
+                    <div class="input-box">
+
+                        <i class="ri-user-3-line"></i>
+
+                        <input
+                            type="text"
+                            id="name"
+                            placeholder="Enter your name"
+                            autocomplete="name"
+                            required>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- PHONE -->
+
+                <div class="form-group">
+
+                    <label for="phone">
+                        Phone Number
+                    </label>
+
+                    <div class="input-box">
+
+                        <i class="ri-phone-line"></i>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            placeholder="Enter phone number"
+                            inputmode="numeric"
+                            maxlength="10"
+                            required>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- VILLAGE -->
+
+                <div class="form-group">
+
+                    <label for="village">
+                        Village Name
+                    </label>
+
+                    <div class="input-box">
+
+                        <i class="ri-map-pin-line"></i>
+
+                        <input
+                            type="text"
+                            id="village"
+                            placeholder="Enter village name"
+                            required>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- TARGET -->
+
+                <div class="form-group">
+
+                    <label for="targetPercentage">
+                        SSLC Final Exam Target Percentage
+                    </label>
+
+                    <div class="input-box percentage-box">
+
+                        <i class="ri-bar-chart-line"></i>
+
+                        <input
+                            type="number"
+                            id="targetPercentage"
+                            placeholder="Enter target percentage"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            required>
+
+                        <span>%</span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ERROR -->
+
+                <div
+                    id="errorMessage"
+                    class="message error">
+                </div>
+
+
+
+                <!-- SUCCESS -->
+
+                <div
+                    id="successMessage"
+                    class="message success">
+                </div>
+
+
+
+                <!-- SUBMIT -->
+
+                <button
+                    type="submit"
+                    id="submitButton"
+                    class="submit-button">
+
+                    <span>
+                        Submit Details
+                    </span>
+
+                    <i class="ri-arrow-right-line"></i>
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <script
+        type="module"
+        src="submissions.js">
+    </script>
+<!-- SUCCESS SCREEN -->
+<div id="successScreen" class="success-screen">
+    <div class="success-content">
+
+        <div class="success-check">
+            ✓
+        </div>
+
+        <h1>Successfully Submitted</h1>
+
+        <p>
+            Your details have been submitted successfully.
+        </p>
+
+        <span>Thank you for providing your details.</span>
+
+    </div>
+</div>
+</body>
+
+</html>
