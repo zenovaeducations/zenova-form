@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SSLC 2026 - Submissions</title>
+
+    <link rel="stylesheet" href="view.css">
+</head>
+
+<body>
+
+    <!-- PASSWORD SCREEN -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+
+            <div class="logo">ZENOVA</div>
+
+            <h1>View Submissions</h1>
+            <p>Authorized access only</p>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter password"
+            >
+
+            <button id="loginBtn">
+                Continue →
+            </button>
+
+            <div id="loginError"></div>
+
+        </div>
+    </div>
+
+
+    <!-- MAIN PAGE -->
+    <main id="mainPage" class="main-page">
+
+        <header>
+            <div>
+                <div class="brand">ZENOVA</div>
+                <h1>SSLC 2026</h1>
+                <p>Student Submissions</p>
+            </div>
+
+            <div class="total-box">
+                <span>Total</span>
+                <strong id="totalCount">0</strong>
+            </div>
+        </header>
+
+
+        <!-- SEARCH -->
+        <div class="search-box">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search by name, phone or village..."
+            >
+        </div>
+
+
+        <!-- SUBMISSIONS -->
+        <section id="submissionsList" class="submissions-list">
+            <div class="loading">
+                Loading submissions...
+            </div>
+        </section>
+
+    </main>
+
+
+    <script type="module" src="view.js"></script>
+
+</body>
+  </html>
