@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Zenova Educations - SSLC 2026</title>
+
+    <link rel="stylesheet" href="view.css">
+</head>
+
+<body>
+
+    <!-- PASSWORD SCREEN -->
+    <div id="loginScreen" class="login-screen">
+
+        <div class="login-box">
+
+            <div class="logo">ZENOVA</div>
+
+            <h1>View Submissions</h1>
+
+            <p>Authorized access only</p>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter password"
+                autocomplete="off"
+            >
+
+            <button id="loginBtn">
+                Continue →
+            </button>
+
+            <div id="loginError"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MAIN PAGE -->
+    <main id="mainPage" class="main-page">
+
+        <header class="page-header">
+
+            <div>
+                <div class="brand">ZENOVA EDUCATIONS</div>
+
+                <h1>SSLC 2026</h1>
+
+                <p>Student Submissions</p>
+            </div>
+
+            <div class="total-box">
+                <span>Total</span>
+                <strong id="totalCount">0</strong>
+            </div>
+
+        </header>
+
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search name, phone or village..."
+            >
+
+            <button id="refreshBtn">
+                ↻ Refresh
+            </button>
+
+            <button id="excelBtn" class="download-btn">
+                ↓ Excel
+            </button>
+
+            <button id="pdfBtn" class="download-btn">
+                ↓ PDF
+            </button>
+
+        </div>
+
+
+        <!-- TABLE -->
+        <div class="table-wrapper">
+
+            <table id="studentTable">
+
+                <thead>
+
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>SSLC Target %</th>
+                        <th>Coming Tomorrow</th>
+                        <th>Village Stop</th>
+                        <th>Delete</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="submissionsTable">
+
+                    <tr>
+                        <td colspan="7" class="loading">
+                            Loading submissions...
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div id="emptyMessage" class="empty-message">
+            No submissions found.
+        </div>
+
+    </main>
+
+
+    <!-- EXCEL LIBRARY -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- PDF LIBRARY -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+
+    <script type="module" src="view.js"></script>
+
+</body>
+  </html>
