@@ -11,405 +11,432 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 
-/* =========================
-   PASSWORD
-========================= */
+// ===============================
+// SETTINGS
+// ===============================
 
 const VIEW_PASSWORD = "123456";
 
 
-/* =========================
-   ELEMENTS
-========================= */
-
-const loginScreen =
-    document.getElementById("loginScreen");
-
-const mainPage =
-    document.getElementById("mainPage");
-
-const passwordInput =
-    document.getElementById("password");
-
-const loginBtn =
-    document.getElementById("loginBtn");
-
-const loginError =
-    document.getElementById("loginError");
-
-const submissionsTable =
-    document.getElementById("submissionsTable");
-
-const totalCount =
-    document.getElementById("totalCount");
-
-const searchInput =
-    document.getElementById("searchInput");
-
-const refreshBtn =
-    document.getElementById("refreshBtn");
-
-const excelBtn =
-    document.getElementById("excelBtn");
-
-const pdfBtn =
-    document.getElementById("pdfBtn");
-
-const emptyMessage =
-    document.getElementById("emptyMessage");
-
+// ===============================
+// VARIABLES
+// ===============================
 
 let allSubmissions = [];
+let isLoggedIn = false;
 
 
-/* =========================
-   LOGIN
-========================= */
+// ===============================
+// ELEMENTS
+// ===============================
 
-loginBtn.addEventListener(
-    "click",
-    login
-);
+const loginScreen = document.getElementById("loginScreen");
+const mainPage = document.getElementById("mainPage");
+
+const passwordInput = document.getElementById("password");
+const loginBtn = document.getElementById("loginBtn");
+const loginError = document.getElementById("loginError");
+
+const searchInput = document.getElementById("searchInput");
+const refreshBtn = document.getElementById("refreshBtn");
+
+const excelBtn = document.getElementById("excelBtn");
+const pdfBtn = document.getElementById("pdfBtn");
+
+const submissionsTable = document.getElementById("submissionsTable");
+const emptyMessage = document.getElementById("emptyMessage");
+const totalCount = document.getElementById("totalCount");
 
 
-passwordInput.addEventListener(
-    "keydown",
-    event => {
+// ===============================
+// LOGIN
+// ===============================
 
-        if (event.key === "Enter") {
-            login();
-        }
+loginBtn.addEventListener("click", login);
 
+passwordInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        login();
     }
-);
-
+});
 
 function login() {
 
-    if (
-        passwordInput.value.trim()
-        === VIEW_PASSWORD
-    ) {
+    const password = passwordInput.value.trim();
+
+    if (password === VIEW_PASSWORD) {
+
+        isLoggedIn = true;
+
+        loginError.textContent = "";
 
         loginScreen.style.display = "none";
-
         mainPage.style.display = "block";
 
         loadSubmissions();
 
     } else {
 
-        loginError.textContent =
-            "Incorrect password.";
+        loginError.textContent = "Incorrect password.";
 
         passwordInput.value = "";
-
         passwordInput.focus();
-
     }
-
 }
 
 
-/* =========================
-   LOAD
-========================= */
+// ===============================
+// LOAD SUBMISSIONS
+// ===============================
 
 async function loadSubmissions() {
 
     submissionsTable.innerHTML = `
         <tr>
-            <td colspan="7" class="loading">
+            <td colspan="8" class="loading">
                 Loading submissions...
             </td>
         </tr>
     `;
 
+    emptyMessage.style.display = "none";
 
     try {
 
-        const q = query(
-            collection(db, "submissions"),
-            orderBy("submittedAt", "desc")
-        );
+        const submissionsRef = collection(db, "submissions");
 
+        let snapshot;
 
-        const snapshot =
-            await getDocs(q);
+        try {
 
+            const q = query(
+                submissionsRef,
+                orderBy("submittedAt", "desc")
+            );
+
+            snapshot = await getDocs(q);
+
+        } catch (error) {
+
+            console.warn(
+                "Ordered query failed. Loading without order.",
+                error
+            );
+
+            snapshot = await getDocs(submissionsRef);
+        }
 
         allSubmissions = [];
 
+        snapshot.forEach((documentSnapshot) => {
 
-        snapshot.forEach(document => {
+            const data = documentSnapshot.data();
 
             allSubmissions.push({
+                id: documentSnapshot.id,
 
-                id: document.id,
+                name: data.name || "",
 
-                ...document.data()
+                phone: data.phone || "",
 
+                // ORIGINAL VILLAGE ENTERED BY STUDENT
+                village: data.village || "",
+
+                targetPercentage:
+                    data.targetPercentage ?? "",
+
+                // SEPARATE EDITABLE VILLAGE STOP
+                villageStop:
+                    data.villageStop || "",
+
+                comingTomorrow:
+                    data.comingTomorrow === true,
+
+                submittedAt:
+                    data.submittedAt || null
             });
-
         });
 
+        updateTotalCount();
 
-        totalCount.textContent =
-            allSubmissions.length;
-
-
-        displaySubmissions(
-            allSubmissions
-        );
-
+        renderTable(allSubmissions);
 
     } catch (error) {
 
-        console.error(error);
+        console.error("Error loading submissions:", error);
 
         submissionsTable.innerHTML = `
             <tr>
-                <td colspan="7" class="loading">
-                    Unable to load submissions.
+                <td colspan="8" class="loading">
+                    Could not load submissions.
                 </td>
             </tr>
         `;
 
+        alert(
+            "Could not load submissions.\n\n" +
+            error.message
+        );
     }
-
 }
 
 
-/* =========================
-   DISPLAY
-========================= */
+// ===============================
+// TOTAL COUNT
+// ===============================
 
-function displaySubmissions(data) {
+function updateTotalCount() {
 
-    if (!data.length) {
+    totalCount.textContent = allSubmissions.length;
+}
 
-        submissionsTable.innerHTML = "";
 
-        emptyMessage.style.display =
-            "block";
+// ===============================
+// RENDER TABLE
+// ===============================
+
+function renderTable(list) {
+
+    submissionsTable.innerHTML = "";
+
+    if (!list || list.length === 0) {
+
+        emptyMessage.style.display = "block";
 
         return;
-
     }
 
+    emptyMessage.style.display = "none";
 
-    emptyMessage.style.display =
-        "none";
+    list.forEach((student, index) => {
 
+        const row = document.createElement("tr");
 
-    submissionsTable.innerHTML =
-        data.map((student, index) => {
+        const coming =
+            student.comingTomorrow === true;
 
-            let submittedTime =
-                "Time unavailable";
+        row.innerHTML = `
 
+            <!-- NUMBER -->
 
-            if (student.submittedAt) {
-
-                try {
-
-                    submittedTime =
-                        student.submittedAt
-                            .toDate()
-                            .toLocaleString(
-                                "en-IN",
-                                {
-                                    day: "2-digit",
-                                    month: "short",
-                                    year: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit"
-                                }
-                            );
-
-                } catch {}
-
-            }
+            <td class="serial-number">
+                ${index + 1}
+            </td>
 
 
-            const coming =
-                student.comingTomorrow === true;
+            <!-- NAME -->
+
+            <td class="student-name">
+                ${escapeHTML(student.name)}
+            </td>
 
 
-            return `
+            <!-- PHONE -->
 
-                <tr>
+            <td>
 
-                    <td>
-                        ${index + 1}
-                    </td>
+                <div class="phone-cell">
 
+                    <span>
+                        ${escapeHTML(student.phone)}
+                    </span>
 
-                    <td class="name-cell">
-                        ${escapeHTML(
-                            student.name || "-"
-                        )}
-                    </td>
+                    <a
+                        class="call-btn"
+                        href="tel:${escapeAttribute(student.phone)}"
+                        title="Call"
+                    >
+                        ☎
+                    </a>
 
+                </div>
 
-                    <td>
-
-                        <div class="phone-cell">
-
-                            <a
-                                class="call-btn"
-                                href="tel:${escapeHTML(
-                                    student.phone || ""
-                                )}"
-                                title="Call"
-                            >
-                                ☎
-                            </a>
-
-                            <span>
-                                ${escapeHTML(
-                                    student.phone || "-"
-                                )}
-                            </span>
-
-                        </div>
-
-                    </td>
+            </td>
 
 
-                    <td class="target-cell">
+            <!-- ORIGINAL VILLAGE NAME -->
 
-                        ${escapeHTML(
-                            student.targetPercentage || "-"
-                        )}%
+            <td class="village-name">
 
-                    </td>
+                ${escapeHTML(student.village)}
 
-
-                    <td>
-
-                        <div class="coming-toggle">
-
-                            <label class="toggle">
-
-                                <input
-                                    type="checkbox"
-                                    class="coming-checkbox"
-                                    data-id="${student.id}"
-                                    ${coming ? "checked" : ""}
-                                >
-
-                                <span class="slider"></span>
-
-                            </label>
+            </td>
 
 
-                            <span
-                                class="yes-no ${
-                                    coming
-                                        ? "yes"
-                                        : "no"
-                                }"
-                                id="status-${student.id}"
-                            >
+            <!-- SSLC TARGET -->
 
-                                ${coming ? "YES" : "NO"}
+            <td>
 
-                            </span>
+                ${
+                    student.targetPercentage !== ""
+                        ? escapeHTML(
+                            String(student.targetPercentage)
+                          ) + "%"
+                        : ""
+                }
 
-                        </div>
-
-                    </td>
+            </td>
 
 
-                    <td>
+            <!-- COMING TOMORROW -->
+
+            <td>
+
+                <div class="coming-cell">
+
+                    <label class="toggle">
 
                         <input
-                            type="text"
-                            class="village-stop-input"
+                            type="checkbox"
+                            class="coming-checkbox"
                             data-id="${student.id}"
-                            value="${escapeAttribute(
-                                student.villageStop || ""
-                            )}"
-                            placeholder="Enter stop"
+                            ${coming ? "checked" : ""}
                         >
 
-                    </td>
+                        <span class="slider"></span>
+
+                    </label>
 
 
-                    <td>
+                    <span
+                        class="yes-no ${coming ? "yes" : "no"}"
+                        id="status-${student.id}"
+                    >
+                        ${coming ? "YES" : "NO"}
+                    </span>
 
-                        <button
-                            class="delete-btn"
-                            data-id="${student.id}"
-                        >
-                            Delete
-                        </button>
+                </div>
 
-                    </td>
-
-                </tr>
-
-            `;
-
-        }).join("");
+            </td>
 
 
-    /* Coming tomorrow */
+            <!-- VILLAGE STOP -->
+
+            <td>
+
+                <input
+                    type="text"
+                    class="village-stop-input"
+                    data-id="${student.id}"
+                    value="${escapeAttribute(student.villageStop)}"
+                    placeholder="Enter stop"
+                >
+
+            </td>
+
+
+            <!-- DELETE -->
+
+            <td>
+
+                <button
+                    class="delete-btn"
+                    data-id="${student.id}"
+                    title="Delete"
+                >
+                    🗑
+                </button>
+
+            </td>
+
+        `;
+
+        submissionsTable.appendChild(row);
+    });
+
+
+    // ===========================
+    // COMING TOMORROW EVENTS
+    // ===========================
 
     document
         .querySelectorAll(".coming-checkbox")
-        .forEach(checkbox => {
+        .forEach((checkbox) => {
 
             checkbox.addEventListener(
                 "change",
-                () => updateComingTomorrow(
-                    checkbox.dataset.id,
-                    checkbox.checked
-                )
-            );
+                async function () {
 
+                    const id = this.dataset.id;
+
+                    const value = this.checked;
+
+                    await updateComingTomorrow(
+                        id,
+                        value
+                    );
+                }
+            );
         });
 
 
-    /* Village stop */
+    // ===========================
+    // VILLAGE STOP EVENTS
+    // ===========================
 
     document
         .querySelectorAll(".village-stop-input")
-        .forEach(input => {
+        .forEach((input) => {
 
             input.addEventListener(
                 "change",
-                () => updateVillageStop(
-                    input.dataset.id,
-                    input.value.trim()
-                )
+                async function () {
+
+                    const id = this.dataset.id;
+
+                    const value =
+                        this.value.trim();
+
+                    await updateVillageStop(
+                        id,
+                        value
+                    );
+                }
             );
 
+
+            // Also save when pressing Enter
+
+            input.addEventListener(
+                "keydown",
+                async function (event) {
+
+                    if (event.key === "Enter") {
+
+                        event.preventDefault();
+
+                        this.blur();
+                    }
+                }
+            );
         });
 
 
-    /* Delete */
+    // ===========================
+    // DELETE EVENTS
+    // ===========================
 
     document
         .querySelectorAll(".delete-btn")
-        .forEach(button => {
+        .forEach((button) => {
 
             button.addEventListener(
                 "click",
-                () => deleteSubmission(
-                    button.dataset.id
-                )
+                async function () {
+
+                    const id =
+                        this.dataset.id;
+
+                    await deleteSubmission(id);
+                }
             );
-
         });
-
 }
 
 
-/* =========================
-   COMING TOMORROW
-========================= */
+// ===============================
+// UPDATE COMING TOMORROW
+// ===============================
 
 async function updateComingTomorrow(
     id,
@@ -419,67 +446,66 @@ async function updateComingTomorrow(
     try {
 
         await updateDoc(
-            doc(
-                db,
-                "submissions",
-                id
-            ),
+            doc(db, "submissions", id),
             {
                 comingTomorrow: value
             }
         );
 
 
+        // Update local data
+
         const student =
             allSubmissions.find(
-                item => item.id === id
+                (item) => item.id === id
             );
-
 
         if (student) {
 
-            student.comingTomorrow =
-                value;
-
+            student.comingTomorrow = value;
         }
 
+
+        // Update displayed YES / NO
 
         const status =
             document.getElementById(
                 `status-${id}`
             );
 
-
         if (status) {
 
             status.textContent =
                 value ? "YES" : "NO";
 
-
             status.className =
-                `yes-no ${
-                    value ? "yes" : "no"
-                }`;
-
+                `yes-no ${value ? "yes" : "no"}`;
         }
-
 
     } catch (error) {
 
-        console.error(error);
-
-        alert(
-            "Unable to save Coming Tomorrow status."
+        console.error(
+            "Coming Tomorrow save error:",
+            error
         );
 
-    }
+        alert(
+            "Could not save Coming Tomorrow.\n\n" +
+            error.message
+        );
 
+        // Reload to restore original value
+
+        renderTable(
+            getFilteredSubmissions()
+        );
+    }
 }
 
 
-/* =========================
-   VILLAGE STOP
-========================= */
+// ===============================
+// UPDATE VILLAGE STOP
+// ===============================
 
 async function updateVillageStop(
     id,
@@ -489,68 +515,64 @@ async function updateVillageStop(
     try {
 
         await updateDoc(
-            doc(
-                db,
-                "submissions",
-                id
-            ),
+            doc(db, "submissions", id),
             {
                 villageStop: value
             }
         );
 
 
+        // Update local data
+
         const student =
             allSubmissions.find(
-                item => item.id === id
+                (item) => item.id === id
             );
-
 
         if (student) {
 
-            student.villageStop =
-                value;
-
+            student.villageStop = value;
         }
 
+        console.log(
+            "Village Stop saved:",
+            id,
+            value
+        );
 
     } catch (error) {
 
-        console.error(error);
-
-        alert(
-            "Unable to save village stop."
+        console.error(
+            "Village Stop save error:",
+            error
         );
 
+        alert(
+            "Could not save Village Stop.\n\n" +
+            error.message
+        );
     }
-
 }
 
 
-/* =========================
-   DELETE
-========================= */
+// ===============================
+// DELETE SUBMISSION
+// ===============================
 
 async function deleteSubmission(id) {
 
     const student =
         allSubmissions.find(
-            item => item.id === id
+            (item) => item.id === id
         );
 
-
-    if (!student) {
-        return;
-    }
+    const name =
+        student?.name || "this student";
 
 
-    const confirmed =
-        confirm(
-            `Delete the submission of ${
-                student.name || "this student"
-            }?\n\nThis cannot be undone.`
-        );
-
+    const confirmed = confirm(
+        `Are you sure you want to delete ${name}'s submission?\n\nThis cannot be undone.`
+    );
 
     if (!confirmed) {
         return;
@@ -560,124 +582,122 @@ async function deleteSubmission(id) {
     try {
 
         await deleteDoc(
-            doc(
-                db,
-                "submissions",
-                id
-            )
+            doc(db, "submissions", id)
         );
 
 
+        // Remove from local array
+
         allSubmissions =
             allSubmissions.filter(
-                item => item.id !== id
+                (item) => item.id !== id
             );
 
 
-        totalCount.textContent =
-            allSubmissions.length;
+        updateTotalCount();
 
-
-        displaySubmissions(
-            filterSubmissions(
-                searchInput.value
-                    .trim()
-                    .toLowerCase()
-            )
+        renderTable(
+            getFilteredSubmissions()
         );
 
 
     } catch (error) {
 
-        console.error(error);
-
-        alert(
-            "Unable to delete: " +
-            error.message
+        console.error(
+            "Delete error:",
+            error
         );
 
+        alert(
+            "Could not delete submission.\n\n" +
+            error.message
+        );
     }
-
 }
 
 
-/* =========================
-   SEARCH
-========================= */
+// ===============================
+// SEARCH
+// ===============================
 
 searchInput.addEventListener(
     "input",
-    () => {
+    function () {
 
-        const search =
-            searchInput.value
-                .trim()
-                .toLowerCase();
+        const filtered =
+            getFilteredSubmissions();
 
-
-        displaySubmissions(
-            filterSubmissions(search)
-        );
-
+        renderTable(filtered);
     }
 );
 
 
-function filterSubmissions(search) {
+function getFilteredSubmissions() {
+
+    const search =
+        searchInput.value
+            .trim()
+            .toLowerCase();
+
 
     if (!search) {
+
         return allSubmissions;
     }
 
 
     return allSubmissions.filter(
-        student => {
+        (student) => {
+
+            const name =
+                String(student.name || "")
+                    .toLowerCase();
+
+            const phone =
+                String(student.phone || "")
+                    .toLowerCase();
+
+            const village =
+                String(student.village || "")
+                    .toLowerCase();
+
+            const villageStop =
+                String(student.villageStop || "")
+                    .toLowerCase();
+
+            const target =
+                String(student.targetPercentage || "")
+                    .toLowerCase();
+
 
             return (
-
-                (student.name || "")
-                    .toLowerCase()
-                    .includes(search)
-
-                ||
-
-                (student.phone || "")
-                    .toLowerCase()
-                    .includes(search)
-
-                ||
-
-                (student.village || "")
-                    .toLowerCase()
-                    .includes(search)
-
-                ||
-
-                (student.villageStop || "")
-                    .toLowerCase()
-                    .includes(search)
-
+                name.includes(search) ||
+                phone.includes(search) ||
+                village.includes(search) ||
+                villageStop.includes(search) ||
+                target.includes(search)
             );
-
         }
     );
-
 }
 
 
-/* =========================
-   REFRESH
-========================= */
+// ===============================
+// REFRESH
+// ===============================
 
 refreshBtn.addEventListener(
     "click",
-    loadSubmissions
+    () => {
+
+        loadSubmissions();
+    }
 );
 
 
-/* =========================
-   EXCEL DOWNLOAD
-========================= */
+// ===============================
+// EXCEL DOWNLOAD
+// ===============================
 
 excelBtn.addEventListener(
     "click",
@@ -695,45 +715,48 @@ function downloadExcel() {
     }
 
 
-    const rows = allSubmissions.map(
-        (student, index) => ({
+    const rows =
+        allSubmissions.map(
+            (student, index) => ({
 
-            "#":
-                index + 1,
+                "#":
+                    index + 1,
 
-            "Name":
-                student.name || "",
+                "Name":
+                    student.name || "",
 
-            "Phone Number":
-                student.phone || "",
+                "Phone Number":
+                    student.phone || "",
 
-            "SSLC Target %":
-                student.targetPercentage
-                    ? student.targetPercentage + "%"
-                    : "",
+                "Village Name":
+                    student.village || "",
 
-            "Coming Tomorrow":
-                student.comingTomorrow === true
-                    ? "YES"
-                    : "NO",
+                "SSLC Target %":
+                    student.targetPercentage !== ""
+                        ? student.targetPercentage + "%"
+                        : "",
 
-            "Village Stop":
-                student.villageStop || "",
+                "Coming Tomorrow":
+                    student.comingTomorrow === true
+                        ? "YES"
+                        : "NO",
 
-            "Submitted Time":
-                formatSubmittedTime(
-                    student.submittedAt
-                )
+                "Village Stop":
+                    student.villageStop || "",
 
-        })
-    );
+                "Submitted Time":
+                    formatSubmittedTime(
+                        student.submittedAt
+                    )
+            })
+        );
 
 
     const worksheet =
         XLSX.utils.json_to_sheet(rows);
 
 
-    /* Add title rows */
+    // Heading
 
     XLSX.utils.sheet_add_aoa(
         worksheet,
@@ -749,19 +772,6 @@ function downloadExcel() {
     );
 
 
-    worksheet["!cols"] = [
-
-        { wch: 6 },
-        { wch: 25 },
-        { wch: 17 },
-        { wch: 17 },
-        { wch: 20 },
-        { wch: 25 },
-        { wch: 25 }
-
-    ];
-
-
     const workbook =
         XLSX.utils.book_new();
 
@@ -769,21 +779,20 @@ function downloadExcel() {
     XLSX.utils.book_append_sheet(
         workbook,
         worksheet,
-        "SSLC 2026"
+        "Submissions"
     );
 
 
     XLSX.writeFile(
         workbook,
-        "Zenova_SSLC_2026_Submissions.xlsx"
+        "ZENOVA_SSLC_2026_SUBMISSIONS.xlsx"
     );
-
 }
 
 
-/* =========================
-   PDF DOWNLOAD
-========================= */
+// ===============================
+// PDF DOWNLOAD
+// ===============================
 
 pdfBtn.addEventListener(
     "click",
@@ -814,11 +823,11 @@ function downloadPDF() {
         });
 
 
-    /* Heading */
+    // ===========================
+    // TITLE
+    // ===========================
 
-    pdf.setFontSize(20);
-
-    pdf.setFont(undefined, "bold");
+    pdf.setFontSize(18);
 
     pdf.text(
         "ZENOVA EDUCATIONS",
@@ -830,7 +839,7 @@ function downloadPDF() {
     );
 
 
-    pdf.setFontSize(14);
+    pdf.setFontSize(13);
 
     pdf.text(
         "SSLC 2026 - STUDENT SUBMISSIONS",
@@ -844,8 +853,6 @@ function downloadPDF() {
 
     pdf.setFontSize(10);
 
-    pdf.setFont(undefined, "normal");
-
     pdf.text(
         "Coming Tomorrow / Village Stop List",
         148,
@@ -856,7 +863,30 @@ function downloadPDF() {
     );
 
 
-    const tableRows =
+    // ===========================
+    // TABLE
+    // ===========================
+
+    const headers = [
+
+        "#",
+
+        "Name",
+
+        "Phone",
+
+        "Village Name",
+
+        "SSLC Target %",
+
+        "Coming Tomorrow",
+
+        "Village Stop"
+
+    ];
+
+
+    const body =
         allSubmissions.map(
             (student, index) => [
 
@@ -866,7 +896,9 @@ function downloadPDF() {
 
                 student.phone || "",
 
-                student.targetPercentage
+                student.village || "",
+
+                student.targetPercentage !== ""
                     ? student.targetPercentage + "%"
                     : "",
 
@@ -874,11 +906,7 @@ function downloadPDF() {
                     ? "YES"
                     : "NO",
 
-                student.villageStop || "",
-
-                formatSubmittedTime(
-                    student.submittedAt
-                )
+                student.villageStop || ""
 
             ]
         );
@@ -886,56 +914,83 @@ function downloadPDF() {
 
     pdf.autoTable({
 
+        head: [headers],
+
+        body: body,
+
         startY: 36,
-
-        head: [[
-
-            "#",
-            "Name",
-            "Phone",
-            "SSLC Target %",
-            "Coming Tomorrow",
-            "Village Stop",
-            "Submitted Time"
-
-        ]],
-
-        body: tableRows,
 
         theme: "grid",
 
         styles: {
+
             fontSize: 8,
-            cellPadding: 3,
-            overflow: "linebreak"
+
+            cellPadding: 2,
+
+            overflow: "linebreak",
+
+            valign: "middle"
+
         },
 
         headStyles: {
+
+            fontSize: 8,
+
             fontStyle: "bold"
+
         },
 
-        margin: {
-            left: 8,
-            right: 8
-        }
+        columnStyles: {
 
+            0: {
+                cellWidth: 10
+            },
+
+            1: {
+                cellWidth: 40
+            },
+
+            2: {
+                cellWidth: 32
+            },
+
+            3: {
+                cellWidth: 40
+            },
+
+            4: {
+                cellWidth: 25
+            },
+
+            5: {
+                cellWidth: 35
+            },
+
+            6: {
+                cellWidth: 45
+            }
+
+        }
     });
 
 
-    pdf.save(
-        "Zenova_SSLC_2026_Submissions.pdf"
-    );
+    // ===========================
+    // SAVE
+    // ===========================
 
+    pdf.save(
+        "ZENOVA_SSLC_2026_SUBMISSIONS.pdf"
+    );
 }
 
 
-/* =========================
-   TIME
-========================= */
+// ===============================
+// FORMAT DATE / TIME
+// ===============================
 
-function formatSubmittedTime(
-    timestamp
-) {
+function formatSubmittedTime(timestamp) {
 
     if (!timestamp) {
         return "";
@@ -944,59 +999,96 @@ function formatSubmittedTime(
 
     try {
 
-        return timestamp
-            .toDate()
-            .toLocaleString(
-                "en-IN",
-                {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }
-            );
+        let date;
 
-    } catch {
+
+        // Firestore Timestamp
+
+        if (
+            timestamp &&
+            typeof timestamp.toDate === "function"
+        ) {
+
+            date =
+                timestamp.toDate();
+
+        }
+
+        // JavaScript Date
+
+        else if (
+            timestamp instanceof Date
+        ) {
+
+            date = timestamp;
+
+        }
+
+        // String / number
+
+        else {
+
+            date =
+                new Date(timestamp);
+        }
+
+
+        if (
+            !date ||
+            isNaN(date.getTime())
+        ) {
+
+            return "";
+        }
+
+
+        return date.toLocaleString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Date formatting error:",
+            error
+        );
 
         return "";
-
     }
-
 }
 
 
-/* =========================
-   SECURITY
-========================= */
+// ===============================
+// HTML ESCAPE
+// ===============================
 
 function escapeHTML(value) {
 
-    return String(value)
-
+    return String(value ?? "")
         .replace(/&/g, "&amp;")
-
         .replace(/</g, "&lt;")
-
         .replace(/>/g, "&gt;")
-
         .replace(/"/g, "&quot;")
-
         .replace(/'/g, "&#039;");
-
 }
 
 
+// ===============================
+// ATTRIBUTE ESCAPE
+// ===============================
+
 function escapeAttribute(value) {
 
-    return String(value)
-
+    return String(value ?? "")
         .replace(/&/g, "&amp;")
-
         .replace(/"/g, "&quot;")
-
         .replace(/</g, "&lt;")
-
         .replace(/>/g, "&gt;");
-
-      }
+            }
