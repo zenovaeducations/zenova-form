@@ -618,3 +618,36 @@ tbody tr:hover {
     }
 
 }
+.whatsapp-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 90px;
+
+    height: 36px;
+
+    padding: 0 12px;
+
+    border-radius: 8px;
+
+    background: #25D366;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    transition: 0.2s;
+}
+
+.whatsapp-button:hover {
+    transform: translateY(-1px);
+
+    opacity: 0.9;
+}
