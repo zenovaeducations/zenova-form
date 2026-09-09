@@ -4,17 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Zenova Educations - SSLC 2026</title>
+    <title>Zenova Educations - Submissions</title>
 
-    <link rel="stylesheet" href="vieww.css">
+    <link rel="stylesheet" href="view.css">
 </head>
 
 <body>
 
-    <!-- PASSWORD SCREEN -->
-    <div id="loginScreen" class="login-screen">
+    <!-- =========================
+         LOGIN
+    ========================== -->
 
-        <div class="login-box">
+    <section id="loginScreen" class="login-screen">
+
+        <div class="login-card">
 
             <div class="logo">ZENOVA</div>
 
@@ -24,12 +27,12 @@
 
             <input
                 type="password"
-                id="password"
+                id="passwordInput"
                 placeholder="Enter password"
                 autocomplete="off"
             >
 
-            <button id="loginBtn">
+            <button id="loginButton">
                 Continue →
             </button>
 
@@ -37,32 +40,45 @@
 
         </div>
 
-    </div>
+    </section>
 
 
-    <!-- MAIN PAGE -->
+    <!-- =========================
+         MAIN
+    ========================== -->
+
     <main id="mainPage" class="main-page">
 
-        <header class="page-header">
+        <header class="header">
 
             <div>
-                <div class="brand">ZENOVA EDUCATIONS</div>
+                <div class="brand">
+                    ZENOVA EDUCATIONS
+                </div>
 
                 <h1>SSLC 2026</h1>
 
                 <p>Student Submissions</p>
             </div>
 
-            <div class="total-box">
-                <span>Total</span>
-                <strong id="totalCount">0</strong>
+            <div class="total-card">
+
+                <span>Total Students</span>
+
+                <strong id="totalCount">
+                    0
+                </strong>
+
             </div>
 
         </header>
 
 
-        <!-- TOOLBAR -->
-        <div class="toolbar">
+        <!-- =========================
+             TOOLBAR
+        ========================== -->
+
+        <section class="toolbar">
 
             <input
                 type="text"
@@ -70,36 +86,49 @@
                 placeholder="Search name, phone or village..."
             >
 
-            <button id="refreshBtn">
+            <button id="refreshButton">
                 ↻ Refresh
             </button>
 
-            <button id="excelBtn" class="download-btn">
+            <button id="excelButton">
                 ↓ Excel
             </button>
 
-            <button id="pdfBtn" class="download-btn">
+            <button id="pdfButton">
                 ↓ PDF
             </button>
 
-        </div>
+        </section>
 
 
-        <!-- TABLE -->
-        <div class="table-wrapper">
+        <!-- =========================
+             TABLE
+        ========================== -->
 
-            <table id="studentTable">
+        <section class="table-container">
+
+            <table>
 
                 <thead>
 
                     <tr>
+
                         <th>#</th>
+
                         <th>Name</th>
+
                         <th>Phone</th>
+
                         <th>SSLC Target %</th>
+
                         <th>Coming Tomorrow</th>
+
                         <th>Village Stop</th>
+
+                        <th>Village</th>
+
                         <th>Delete</th>
+
                     </tr>
 
                 </thead>
@@ -107,35 +136,51 @@
                 <tbody id="submissionsTable">
 
                     <tr>
-                        <td colspan="7" class="loading">
+
+                        <td
+                            colspan="8"
+                            class="loading"
+                        >
                             Loading submissions...
                         </td>
+
                     </tr>
 
                 </tbody>
 
             </table>
 
-        </div>
+        </section>
 
 
-        <div id="emptyMessage" class="empty-message">
+        <div
+            id="emptyMessage"
+            class="empty-message"
+        >
             No submissions found.
         </div>
 
     </main>
 
 
-    <!-- EXCEL LIBRARY -->
+    <!-- Excel -->
+
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-    <!-- PDF LIBRARY -->
+
+    <!-- PDF -->
+
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 
 
-    <script type="module" src="vieww.js"></script>
+    <!-- Main JS -->
+
+    <script
+        type="module"
+        src="view.js"
+    ></script>
 
 </body>
 </html>
