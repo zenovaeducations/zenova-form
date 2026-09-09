@@ -288,7 +288,21 @@ function displaySubmissions(data) {
                         </div>
 
                     </td>
+<!-- WHATSAPP -->
 
+<td>
+
+    <a
+        href="${getWhatsAppLink(student.phone)}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="whatsapp-button"
+        title="Send WhatsApp message"
+    >
+        <span>WhatsApp</span>
+    </a>
+
+</td>
 
                     <!-- TARGET -->
 
@@ -987,4 +1001,27 @@ function escapeAttribute(value) {
 
     return escapeHTML(value);
 
+}
+function getWhatsAppLink(phone) {
+
+    const cleanPhone = String(phone || "")
+        .replace(/\D/g, "");
+
+    let whatsappNumber = cleanPhone;
+
+    // If Indian number is stored as 10 digits,
+    // automatically add +91.
+    if (whatsappNumber.length === 10) {
+        whatsappNumber = "91" + whatsappNumber;
+    }
+
+    const message =
+        "Hello, We are from Zenova Educations kindly fill this form https://zenovaeducations.github.io/zenova-form/submissions";
+
+    return (
+        "https://wa.me/" +
+        whatsappNumber +
+        "?text=" +
+        encodeURIComponent(message)
+    );
 }
