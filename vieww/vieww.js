@@ -375,22 +375,21 @@ function displaySubmissions(data) {
                             placeholder="Enter stop"
                         >
 
-                    </td>
+                 <td>
 
+    <input
+        type="text"
+        class="village-input"
+        data-id="${student.id}"
+        value="${escapeAttribute(
+            student.village ||
+            student.villageName ||
+            ""
+        )}"
+        placeholder="Enter village"
+    >
 
-                    <!-- VILLAGE -->
-
-                    <td class="village-cell">
-
-                        ${
-                            village
-                                ? escapeHTML(village)
-                                : "-"
-                        }
-
-                    </td>
-
-
+</td>
                     <!-- DELETE -->
 
                     <td>
