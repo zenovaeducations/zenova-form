@@ -485,7 +485,23 @@ function attachRowEvents() {
         });
 
 }
+document
+    .querySelectorAll(".village-input")
+    .forEach((input) => {
 
+        input.addEventListener(
+            "change",
+            function () {
+
+                updateVillage(
+                    input.dataset.id,
+                    input.value.trim()
+                );
+
+            }
+        );
+
+    });
 
 /* =========================================
    UPDATE COMING TOMORROW
@@ -1023,4 +1039,47 @@ function getWhatsAppLink(phone) {
         "?text=" +
         encodeURIComponent(message)
     );
+}
+async function updateVillage(id, value) {
+
+    try {
+
+        await updateDoc(
+            doc(
+                db,
+                "submissions",
+                id
+            ),
+            {
+                village: value
+            }
+        );
+
+
+        const student =
+            allSubmissions.find(
+                item => item.id === id
+            );
+
+
+        if (student) {
+
+            student.village = value;
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Error updating village:",
+            error
+        );
+
+        alert(
+            "Unable to save Village."
+        );
+
+    }
+
 }
