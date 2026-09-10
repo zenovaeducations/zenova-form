@@ -19,7 +19,27 @@ body {
 
     color: #111827;
 }
+.village-input {
+    width: 170px;
 
+    height: 38px;
+
+    padding: 0 10px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    outline: none;
+
+    font-size: 14px;
+
+    background: white;
+}
+
+.village-input:focus {
+    border-color: #111827;
+}
 
 /* =========================
    LOGIN
