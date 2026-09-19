@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -107,6 +106,34 @@
 
 
         <!-- =========================
+             ADD VILLAGE AREA
+        ========================== -->
+
+        <section
+            id="addVillageArea"
+            class="add-village-area"
+            style="display:none;"
+        >
+
+            <input
+                type="text"
+                id="villageNameInput"
+                placeholder="Enter village name"
+                autocomplete="off"
+            >
+
+            <button id="saveVillageButton">
+                Save Village
+            </button>
+
+            <button id="cancelVillageButton">
+                Cancel
+            </button>
+
+        </section>
+
+
+        <!-- =========================
              TABLE
         ========================== -->
 
@@ -132,7 +159,11 @@
 
                         <th>Village Stop</th>
 
+                        <!-- EXISTING VILLAGE -->
                         <th>Village</th>
+
+                        <!-- NEW COLUMN -->
+                        <th>Assigned Village</th>
 
                         <th>Delete</th>
 
@@ -145,7 +176,7 @@
                     <tr>
 
                         <td
-                            colspan="9"
+                            colspan="10"
                             class="loading"
                         >
                             Loading submissions...
@@ -158,60 +189,6 @@
             </table>
 
         </section>
-
-
-        <!-- =========================
-             ADD VILLAGE MODAL
-        ========================== -->
-
-        <div
-            id="villageModal"
-            class="village-modal"
-        >
-
-            <div class="village-modal-card">
-
-                <h2>Add Village</h2>
-
-                <p>
-                    Enter a village name and save it.
-                </p>
-
-                <input
-                    type="text"
-                    id="villageNameInput"
-                    placeholder="Enter village name"
-                    autocomplete="off"
-                >
-
-                <div
-                    id="villageError"
-                    class="village-error"
-                ></div>
-
-                <div class="village-modal-actions">
-
-                    <button
-                        id="cancelVillageButton"
-                        type="button"
-                        class="cancel-village-button"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        id="saveVillageButton"
-                        type="button"
-                        class="save-village-button"
-                    >
-                        Save Village
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
 
 
         <div
