@@ -1,4 +1,3 @@
-```javascript
 import { db } from "../firebase-config.js";
 
 import {
@@ -57,14 +56,16 @@ const excelButton =
 const pdfButton =
     document.getElementById("pdfButton");
 
-const emptyMessage =
-    document.getElementById("emptyMessage");
+
+/* =========================================
+   VILLAGE ELEMENTS
+========================================= */
 
 const addVillageButton =
     document.getElementById("addVillageButton");
 
-const villageModal =
-    document.getElementById("villageModal");
+const addVillageArea =
+    document.getElementById("addVillageArea");
 
 const villageNameInput =
     document.getElementById("villageNameInput");
@@ -75,13 +76,18 @@ const saveVillageButton =
 const cancelVillageButton =
     document.getElementById("cancelVillageButton");
 
-const villageError =
-    document.getElementById("villageError");
 
+const emptyMessage =
+    document.getElementById("emptyMessage");
+
+
+/* =========================================
+   DATA
+========================================= */
 
 let allSubmissions = [];
 
-let allVillages = [];
+let villages = [];
 
 
 /* =========================================
@@ -99,7 +105,9 @@ passwordInput.addEventListener(
     function (event) {
 
         if (event.key === "Enter") {
+
             login();
+
         }
 
     }
@@ -138,47 +146,42 @@ function login() {
 
 
 /* =========================================
-   VILLAGES
+   LOAD VILLAGES
 ========================================= */
 
 async function loadVillages() {
 
     try {
 
-        const snapshot =
-            await getDocs(
-                collection(db, "villages")
+        const villagesQuery =
+            query(
+                collection(db, "villages"),
+                orderBy("name", "asc")
             );
 
-        allVillages = [];
+
+        const snapshot =
+            await getDocs(villagesQuery);
+
+
+        villages = [];
+
 
         snapshot.forEach(
             (firebaseDocument) => {
 
-                const data =
-                    firebaseDocument.data();
+                villages.push({
 
-                if (data.name) {
+                    id:
+                        firebaseDocument.id,
 
-                    allVillages.push({
+                    ...firebaseDocument.data()
 
-                        id:
-                            firebaseDocument.id,
-
-                        name:
-                            data.name
-
-                    });
-
-                }
+                });
 
             }
         );
 
-        allVillages.sort(
-            (a, b) =>
-                a.name.localeCompare(b.name)
-        );
 
         displaySubmissions(
             filterSubmissions(
@@ -188,6 +191,7 @@ async function loadVillages() {
             )
         );
 
+
     } catch (error) {
 
         console.error(
@@ -195,22 +199,76 @@ async function loadVillages() {
             error
         );
 
-        allVillages = [];
-
     }
 
 }
 
 
+/* =========================================
+   ADD VILLAGE UI
+========================================= */
+
+addVillageButton.addEventListener(
+    "click",
+    function () {
+
+        addVillageArea.style.display =
+            "flex";
+
+        villageNameInput.focus();
+
+    }
+);
+
+
+cancelVillageButton.addEventListener(
+    "click",
+    function () {
+
+        addVillageArea.style.display =
+            "none";
+
+        villageNameInput.value = "";
+
+    }
+);
+
+
+saveVillageButton.addEventListener(
+    "click",
+    saveVillage
+);
+
+
+villageNameInput.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (event.key === "Enter") {
+
+            saveVillage();
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   SAVE VILLAGE
+========================================= */
+
 async function saveVillage() {
 
-    const villageName =
+    const name =
         villageNameInput.value.trim();
 
-    if (!villageName) {
 
-        villageError.textContent =
-            "Please enter a village name.";
+    if (!name) {
+
+        alert(
+            "Please enter a village name."
+        );
 
         villageNameInput.focus();
 
@@ -220,61 +278,65 @@ async function saveVillage() {
 
 
     const alreadyExists =
-        allVillages.some(
+        villages.some(
             village =>
-                village.name.toLowerCase() ===
-                villageName.toLowerCase()
+                String(village.name || "")
+                    .trim()
+                    .toLowerCase() ===
+                name.toLowerCase()
         );
 
 
     if (alreadyExists) {
 
-        villageError.textContent =
-            "This village is already added.";
+        alert(
+            "This village already exists."
+        );
 
         return;
 
     }
 
 
-    saveVillageButton.disabled = true;
-
-    villageError.textContent = "";
-
-
     try {
 
-        const villageDoc =
+        const villageDocument =
             await addDoc(
-                collection(db, "villages"),
+                collection(
+                    db,
+                    "villages"
+                ),
                 {
-                    name: villageName
+                    name: name,
+
+                    createdAt:
+                        new Date()
                 }
             );
 
 
-        allVillages.push({
+        villages.push({
 
-            id:
-                villageDoc.id,
+            id: villageDocument.id,
 
-            name:
-                villageName
+            name: name
 
         });
 
 
-        allVillages.sort(
+        villages.sort(
             (a, b) =>
-                a.name.localeCompare(b.name)
+                String(a.name)
+                    .localeCompare(
+                        String(b.name)
+                    )
         );
 
 
         villageNameInput.value = "";
 
-        villageModal.classList.remove(
-            "show"
-        );
+        addVillageArea.style.display =
+            "none";
 
 
         displaySubmissions(
@@ -283,6 +345,11 @@ async function saveVillage() {
                     .trim()
                     .toLowerCase()
             )
+        );
+
+
+        alert(
+            `"${name}" added successfully.`
         );
 
 
@@ -293,91 +360,15 @@ async function saveVillage() {
             error
         );
 
-        villageError.textContent =
-            "Unable to save village.";
 
-    } finally {
-
-        saveVillageButton.disabled = false;
+        alert(
+            "Unable to save village:\n" +
+            error.message
+        );
 
     }
 
 }
-
-
-function openVillageModal() {
-
-    villageError.textContent = "";
-
-    villageNameInput.value = "";
-
-    villageModal.classList.add("show");
-
-    villageNameInput.focus();
-
-}
-
-
-function closeVillageModal() {
-
-    villageModal.classList.remove(
-        "show"
-    );
-
-    villageError.textContent = "";
-
-}
-
-
-addVillageButton.addEventListener(
-    "click",
-    openVillageModal
-);
-
-
-saveVillageButton.addEventListener(
-    "click",
-    saveVillage
-);
-
-
-cancelVillageButton.addEventListener(
-    "click",
-    closeVillageModal
-);
-
-
-villageNameInput.addEventListener(
-    "keydown",
-    function (event) {
-
-        if (event.key === "Enter") {
-            saveVillage();
-        }
-
-        if (event.key === "Escape") {
-            closeVillageModal();
-        }
-
-    }
-);
-
-
-villageModal.addEventListener(
-    "click",
-    function (event) {
-
-        if (
-            event.target ===
-            villageModal
-        ) {
-
-            closeVillageModal();
-
-        }
-
-    }
-);
 
 
 /* =========================================
@@ -389,7 +380,7 @@ async function loadSubmissions() {
     submissionsTable.innerHTML = `
         <tr>
             <td
-                colspan="9"
+                colspan="10"
                 class="loading"
             >
                 Loading submissions...
@@ -462,7 +453,7 @@ async function loadSubmissions() {
         submissionsTable.innerHTML = `
             <tr>
                 <td
-                    colspan="9"
+                    colspan="10"
                     class="loading"
                 >
                     Unable to load submissions.
@@ -508,14 +499,24 @@ function displaySubmissions(data) {
             (student, index) => {
 
                 const coming =
-                    student.comingTomorrow ===
-                    true;
+                    student.comingTomorrow === true;
 
 
-                const villageStop =
-                    student.villageStop ||
+                /* EXISTING VILLAGE */
+
+                const village =
+                    student.village ||
+                    student.villageName ||
                     "";
 
+
+                /* EXISTING VILLAGE STOP */
+
+                const villageStop =
+                    student.villageStop || "";
+
+
+                /* TARGET */
 
                 const target =
                     student.targetPercentage ??
@@ -523,212 +524,231 @@ function displaySubmissions(data) {
                     "";
 
 
-                const selectedVillage =
-                    student.village ||
-                    student.villageName ||
+                /* NEW ASSIGNED VILLAGE */
+
+                const assignedVillage =
+                    student.assignedVillage ||
                     "";
 
 
                 return `
 
-                <tr>
+                    <tr>
 
-                    <!-- NUMBER -->
+                        <!-- NUMBER -->
 
-                    <td>
-                        ${index + 1}
-                    </td>
-
-
-                    <!-- NAME -->
-
-                    <td class="name-cell">
-
-                        ${escapeHTML(
-                            student.name || "-"
-                        )}
-
-                    </td>
+                        <td>
+                            ${index + 1}
+                        </td>
 
 
-                    <!-- PHONE -->
+                        <!-- NAME -->
 
-                    <td>
+                        <td class="name-cell">
 
-                        <div class="phone-cell">
+                            ${escapeHTML(
+                                student.name || "-"
+                            )}
+
+                        </td>
+
+
+                        <!-- PHONE -->
+
+                        <td>
+
+                            <div class="phone-cell">
+
+                                <a
+                                    href="tel:${escapeAttribute(
+                                        student.phone || ""
+                                    )}"
+                                    class="call-button"
+                                    title="Call student"
+                                >
+                                    ☎
+                                </a>
+
+                                <span>
+                                    ${escapeHTML(
+                                        student.phone || "-"
+                                    )}
+                                </span>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- WHATSAPP -->
+
+                        <td>
 
                             <a
-                                href="tel:${escapeAttribute(
-                                    student.phone || ""
+                                href="${getWhatsAppLink(
+                                    student.phone
                                 )}"
-                                class="call-button"
-                                title="Call student"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="whatsapp-button"
+                                title="Send WhatsApp message"
                             >
-                                ☎
+                                <span>
+                                    WhatsApp
+                                </span>
                             </a>
 
-                            <span>
-                                ${escapeHTML(
-                                    student.phone || "-"
-                                )}
-                            </span>
-
-                        </div>
-
-                    </td>
+                        </td>
 
 
-                    <!-- WHATSAPP -->
+                        <!-- TARGET -->
 
-                    <td>
+                        <td class="target-cell">
 
-                        <a
-                            href="${getWhatsAppLink(
-                                student.phone
-                            )}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="whatsapp-button"
-                            title="Send WhatsApp message"
-                        >
-                            <span>
-                                WhatsApp
-                            </span>
-                        </a>
+                            ${
+                                target !== ""
+                                    ? escapeHTML(target) + "%"
+                                    : "-"
+                            }
 
-                    </td>
+                        </td>
 
 
-                    <!-- TARGET -->
+                        <!-- COMING TOMORROW -->
 
-                    <td class="target-cell">
+                        <td>
 
-                        ${
-                            target !== ""
-                                ? escapeHTML(
-                                    target
-                                ) + "%"
-                                : "-"
-                        }
+                            <div class="coming-wrapper">
 
-                    </td>
+                                <label class="toggle">
+
+                                    <input
+                                        type="checkbox"
+                                        class="coming-checkbox"
+                                        data-id="${student.id}"
+                                        ${
+                                            coming
+                                                ? "checked"
+                                                : ""
+                                        }
+                                    >
+
+                                    <span class="slider"></span>
+
+                                </label>
 
 
-                    <!-- COMING TOMORROW -->
+                                <span
+                                    class="status ${
+                                        coming
+                                            ? "yes"
+                                            : "no"
+                                    }"
+                                    id="status-${student.id}"
+                                >
 
-                    <td>
-
-                        <div class="coming-wrapper">
-
-                            <label class="toggle">
-
-                                <input
-                                    type="checkbox"
-                                    class="coming-checkbox"
-                                    data-id="${student.id}"
                                     ${
                                         coming
-                                            ? "checked"
-                                            : ""
+                                            ? "YES"
+                                            : "NO"
                                     }
-                                >
 
-                                <span class="slider"></span>
+                                </span>
 
-                            </label>
+                            </div>
+
+                        </td>
 
 
-                            <span
-                                class="status ${
-                                    coming
-                                        ? "yes"
-                                        : "no"
-                                }"
-                                id="status-${student.id}"
+                        <!-- VILLAGE STOP -->
+
+                        <td>
+
+                            <input
+                                type="text"
+                                class="village-stop-input"
+                                data-id="${student.id}"
+                                value="${escapeAttribute(
+                                    villageStop
+                                )}"
+                                placeholder="Enter stop"
                             >
-                                ${
-                                    coming
-                                        ? "YES"
-                                        : "NO"
-                                }
-                            </span>
 
-                        </div>
-
-                    </td>
+                        </td>
 
 
-                    <!-- VILLAGE STOP -->
+                        <!-- EXISTING VILLAGE -->
 
-                    <td>
+                        <td class="village-cell">
 
-                        <input
-                            type="text"
-                            class="village-stop-input"
-                            data-id="${student.id}"
-                            value="${escapeAttribute(
-                                villageStop
-                            )}"
-                            placeholder="Enter stop"
-                        >
+                            ${escapeHTML(
+                                village || "-"
+                            )}
 
-                    </td>
+                        </td>
 
 
-                    <!-- VILLAGE -->
+                        <!-- NEW ASSIGNED VILLAGE -->
 
-                    <td>
+                        <td>
 
-                        <select
-                            class="village-select"
-                            data-id="${student.id}"
-                        >
+                            <select
+                                class="assigned-village-select"
+                                data-id="${student.id}"
+                            >
 
-                            <option value="">
-                                Select village
-                            </option>
-
-                            ${allVillages.map(
-                                (village) => `
-
-                                <option
-                                    value="${escapeAttribute(
-                                        village.name
-                                    )}"
-                                    ${
-                                        selectedVillage ===
-                                        village.name
-                                            ? "selected"
-                                            : ""
-                                    }
-                                >
-                                    ${escapeHTML(
-                                        village.name
-                                    )}
+                                <option value="">
+                                    Select village
                                 </option>
 
-                            `
-                            ).join("")}
+                                ${villages.map(
+                                    villageItem => {
 
-                        </select>
+                                        const selected =
+                                            String(
+                                                villageItem.name
+                                            ) ===
+                                            String(
+                                                assignedVillage
+                                            )
+                                                ? "selected"
+                                                : "";
 
-                    </td>
+                                        return `
+                                            <option
+                                                value="${escapeAttribute(
+                                                    villageItem.name
+                                                )}"
+                                                ${selected}
+                                            >
+                                                ${escapeHTML(
+                                                    villageItem.name
+                                                )}
+                                            </option>
+                                        `;
+
+                                    }
+                                ).join("")}
+
+                            </select>
+
+                        </td>
 
 
-                    <!-- DELETE -->
+                        <!-- DELETE -->
 
-                    <td>
+                        <td>
 
-                        <button
-                            class="delete-button"
-                            data-id="${student.id}"
-                        >
-                            Delete
-                        </button>
+                            <button
+                                class="delete-button"
+                                data-id="${student.id}"
+                            >
+                                Delete
+                            </button>
 
-                    </td>
+                        </td>
 
-                </tr>
+                    </tr>
 
                 `;
 
@@ -798,11 +818,11 @@ function attachRowEvents() {
         );
 
 
-    /* Village */
+    /* Assigned Village */
 
     document
         .querySelectorAll(
-            ".village-select"
+            ".assigned-village-select"
         )
         .forEach(
             (select) => {
@@ -811,7 +831,7 @@ function attachRowEvents() {
                     "change",
                     function () {
 
-                        updateVillage(
+                        updateAssignedVillage(
                             select.dataset.id,
                             select.value
                         );
@@ -867,16 +887,14 @@ async function updateComingTomorrow(
                 id
             ),
             {
-                comingTomorrow:
-                    value
+                comingTomorrow: value
             }
         );
 
 
         const student =
             allSubmissions.find(
-                item =>
-                    item.id === id
+                item => item.id === id
             );
 
 
@@ -943,16 +961,14 @@ async function updateVillageStop(
                 id
             ),
             {
-                villageStop:
-                    value
+                villageStop: value
             }
         );
 
 
         const student =
             allSubmissions.find(
-                item =>
-                    item.id === id
+                item => item.id === id
             );
 
 
@@ -978,10 +994,10 @@ async function updateVillageStop(
 
 
 /* =========================================
-   UPDATE VILLAGE
+   UPDATE ASSIGNED VILLAGE
 ========================================= */
 
-async function updateVillage(
+async function updateAssignedVillage(
     id,
     value
 ) {
@@ -995,22 +1011,20 @@ async function updateVillage(
                 id
             ),
             {
-                village:
-                    value
+                assignedVillage: value
             }
         );
 
 
         const student =
             allSubmissions.find(
-                item =>
-                    item.id === id
+                item => item.id === id
             );
 
 
         if (student) {
 
-            student.village =
+            student.assignedVillage =
                 value;
 
         }
@@ -1019,12 +1033,13 @@ async function updateVillage(
     } catch (error) {
 
         console.error(
-            "Error updating village:",
+            "Error updating assigned village:",
             error
         );
 
+
         alert(
-            "Unable to save Village."
+            "Unable to save Assigned Village."
         );
 
     }
@@ -1036,33 +1051,33 @@ async function updateVillage(
    DELETE
 ========================================= */
 
-async function deleteSubmission(
-    id
-) {
+async function deleteSubmission(id) {
 
     const student =
         allSubmissions.find(
-            item =>
-                item.id === id
+            item => item.id === id
         );
 
 
     if (!student) {
+
         return;
+
     }
 
 
     const confirmed =
         confirm(
             `Delete the submission of ${
-                student.name ||
-                "this student"
+                student.name || "this student"
             }?\n\nThis cannot be undone.`
         );
 
 
     if (!confirmed) {
+
         return;
+
     }
 
 
@@ -1079,8 +1094,7 @@ async function deleteSubmission(
 
         allSubmissions =
             allSubmissions.filter(
-                item =>
-                    item.id !== id
+                item => item.id !== id
             );
 
 
@@ -1169,16 +1183,28 @@ function filterSubmissions(search) {
 
             const villageStop =
                 String(
-                    student.villageStop ||
-                    ""
+                    student.villageStop || ""
+                ).toLowerCase();
+
+
+            const assignedVillage =
+                String(
+                    student.assignedVillage || ""
                 ).toLowerCase();
 
 
             return (
+
                 name.includes(search) ||
+
                 phone.includes(search) ||
+
                 village.includes(search) ||
-                villageStop.includes(search)
+
+                villageStop.includes(search) ||
+
+                assignedVillage.includes(search)
+
             );
 
         }
@@ -1193,11 +1219,11 @@ function filterSubmissions(search) {
 
 refreshButton.addEventListener(
     "click",
-    function () {
+    async function () {
 
-        loadVillages();
+        await loadVillages();
 
-        loadSubmissions();
+        await loadSubmissions();
 
     }
 );
@@ -1242,8 +1268,7 @@ function exportExcel() {
                         student.phone || "",
 
                     "SSLC Target %":
-                        student.targetPercentage ||
-                        "",
+                        student.targetPercentage || "",
 
                     "Coming Tomorrow":
                         student.comingTomorrow
@@ -1251,13 +1276,15 @@ function exportExcel() {
                             : "NO",
 
                     "Village Stop":
-                        student.villageStop ||
-                        "",
+                        student.villageStop || "",
 
                     "Village":
                         student.village ||
                         student.villageName ||
-                        ""
+                        "",
+
+                    "Assigned Village":
+                        student.assignedVillage || ""
 
                 };
 
@@ -1318,16 +1345,9 @@ function exportPDF() {
 
     const pdf =
         new jsPDF({
-
-            orientation:
-                "landscape",
-
-            unit:
-                "mm",
-
-            format:
-                "a4"
-
+            orientation: "landscape",
+            unit: "mm",
+            format: "a4"
         });
 
 
@@ -1361,19 +1381,19 @@ function exportPDF() {
 
                 student.phone || "-",
 
-                student.targetPercentage ||
-                    "-",
+                student.targetPercentage || "-",
 
                 student.comingTomorrow
                     ? "YES"
                     : "NO",
 
-                student.villageStop ||
-                    "-",
+                student.villageStop || "-",
 
                 student.village ||
                     student.villageName ||
-                    "-"
+                    "-",
+
+                student.assignedVillage || "-"
 
             ]
         );
@@ -1397,7 +1417,9 @@ function exportPDF() {
 
             "Village Stop",
 
-            "Village"
+            "Village",
+
+            "Assigned Village"
 
         ]],
 
@@ -1476,6 +1498,10 @@ function escapeAttribute(value) {
 }
 
 
+/* =========================================
+   WHATSAPP
+========================================= */
+
 function getWhatsAppLink(phone) {
 
     const cleanPhone =
@@ -1486,6 +1512,9 @@ function getWhatsAppLink(phone) {
     let whatsappNumber =
         cleanPhone;
 
+
+    // If Indian number is stored as 10 digits,
+    // automatically add +91.
 
     if (
         whatsappNumber.length === 10
@@ -1509,6 +1538,4 @@ function getWhatsAppLink(phone) {
         encodeURIComponent(message)
     );
 
-}
-```
-
+    }
