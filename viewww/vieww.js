@@ -1528,7 +1528,7 @@ function getWhatsAppLink(phone) {
 
 
     const message =
-        "Hello, We are from Zenova Educations kindly fill this form https://zenovaeducations.github.io/zenova-form/submissions";
+        "Hello, We are from Zenova Educations, join the group to know detials about bus timings https://chat.whatsapp.com/L09zwFuAfPECtb7IkGh2Zo?s=cl&p=a&mlu=4&ilr=4 ";
 
 
     return (
