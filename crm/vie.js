@@ -1303,9 +1303,7 @@ async function saveStudentCode(input) {
    GET CODE NUMBER
 ========================================================= */
 
-function getStudentCodeNumber(
-    student
-) {
+function getStudentCodeNumber(student) {
 
     if (
         !student ||
@@ -1320,10 +1318,9 @@ function getStudentCodeNumber(
     const match =
         String(
             student.studentCode
-        )
-            .match(
-                /\+(\d{1,4})$/
-            );
+        ).match(
+            /^ZNV\/SSLCM\+(.+)$/
+        );
 
 
     if (!match) {
@@ -1333,19 +1330,9 @@ function getStudentCodeNumber(
     }
 
 
-    return String(
-        Number(
-            match[1]
-        )
-    )
-        .padStart(
-            4,
-            "0"
-        );
+    return match[1];
 
 }
-
-
 /* =========================================================
    TABLE SELECT CHANGES
 ========================================================= */
