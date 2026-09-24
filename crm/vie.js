@@ -674,48 +674,41 @@ function createStudentRow(
         );
 
 
-    return `
+return `
 
-        <tr>
+    <tr>
 
-            <td>
-                ${index + 1}
-            </td>
+        <td>
 
+            <input
+                type="number"
+                class="student-code-input"
+                data-student-id="${escapeAttribute(
+                    student.id
+                )}"
+                value="${getStudentCodeNumber(student)}"
+                placeholder="0001"
+                min="1"
+                max="9999"
+                maxlength="4"
+            >
 
-            <td>
+            <small class="code-preview">
 
-                <button
-                    type="button"
-                    class="student-name student-view-button"
-                    data-student-id="${escapeAttribute(
-                        student.id
-                    )}"
-                >
+                ${
+                    student.studentCode
+                        ? escapeHTML(
+                            student.studentCode
+                        )
+                        : "Not assigned"
+                }
 
-                    ${escapeHTML(
-                        student.name ||
-                        "Unnamed"
-                    )}
+            </small>
 
-                </button>
-
-
-                <small>
-
-                    Target:
-                    ${
-                        student.targetPercentage ??
-                        student.targetPercentageValue ??
-                        "-"
-                    }%
-
-                </small>
-
-            </td>
+        </td>
 
 
-            <td>
+        <td>
 
                 <div class="phone">
 
@@ -928,6 +921,22 @@ function createStudentRow(
 
 }
 
+function getStudentCodeNumber(student) {
+
+    if (!student.studentCode) {
+        return "";
+    }
+
+    const match =
+        String(student.studentCode)
+            .match(/\+(\d{1,4})$/);
+
+    if (!match) {
+        return "";
+    }
+
+    return Number(match[1]);
+}
 
 /* =========================================================
    TABLE SELECT EVENTS
@@ -1017,7 +1026,180 @@ studentsTable.addEventListener(
     }
 );
 
+studentsTable.addEventListener(
+    "change",
+    async function (event) {
 
+        const input =
+            event.target;
+
+
+        if (
+            !input.classList.contains(
+                "student-code-input"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        const studentId =
+            input.dataset.studentId;
+
+
+        let number =
+            String(
+                input.value
+            ).trim();
+
+
+        /*
+         * Only allow 1–4 digits
+         */
+
+        if (
+            !/^\d{1,4}$/.test(
+                number
+            )
+        ) {
+
+            alert(
+                "Enter only 1 to 4 digits."
+            );
+
+            input.value = "";
+
+            return;
+
+        }
+
+
+        const numericNumber =
+            Number(number);
+
+
+        /*
+         * Make it 4 digits
+         *
+         * 1    → 0001
+         * 12   → 0012
+         * 123  → 0123
+         * 1234 → 1234
+         */
+
+        const paddedNumber =
+            String(
+                numericNumber
+            ).padStart(
+                4,
+                "0"
+            );
+
+
+        const studentCode =
+            `ZNV/SSLCM+${paddedNumber}`;
+
+
+        /*
+         * Check duplicate code
+         */
+
+        const duplicate =
+            students.find(
+                student =>
+                    student.id !==
+                    studentId &&
+
+                    student.studentCode ===
+                    studentCode
+            );
+
+
+        if (duplicate) {
+
+            alert(
+                `This student code already exists:\n\n${studentCode}`
+            );
+
+            input.value = "";
+
+            return;
+
+        }
+
+
+        try {
+
+            await updateDoc(
+                doc(
+                    db,
+                    "submissions",
+                    studentId
+                ),
+                {
+
+                    studentCode,
+
+                    updatedAt:
+                        serverTimestamp()
+
+                }
+            );
+
+
+            /*
+             * Update local student
+             */
+
+            const index =
+                students.findIndex(
+                    student =>
+                        student.id ===
+                        studentId
+                );
+
+
+            if (index !== -1) {
+
+                students[index] = {
+
+                    ...students[index],
+
+                    studentCode
+
+                };
+
+            }
+
+
+            /*
+             * Refresh table
+             */
+
+            renderStudents();
+
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Student code error:",
+                error
+            );
+
+
+            alert(
+                "Unable to save student code.\n\n" +
+                error.message
+            );
+
+        }
+
+    }
+);
 /* =========================================================
    STATUS OPTIONS
 ========================================================= */
