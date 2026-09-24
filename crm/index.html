@@ -2,37 +2,59 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Zenova CRM</title>
 
-    <link rel="stylesheet" href="vie.css">
+    <link
+        rel="stylesheet"
+        href="vie.css"
+    >
 
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+        rel="stylesheet"
+    >
 
     <link
         href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css"
-        rel="stylesheet">
+        rel="stylesheet"
+    >
+
 </head>
 
+
 <body>
+
 
 <!-- =====================================================
      LOGIN
 ===================================================== -->
 
-<section id="loginScreen" class="login-screen">
+<section
+    id="loginScreen"
+    class="login-screen"
+>
 
     <div class="login-card">
 
-        <div class="logo">ZENOVA</div>
+        <div class="logo">
+            ZENOVA
+        </div>
 
-        <h1>CRM</h1>
+        <h1>
+            CRM
+        </h1>
 
-        <p>Authorized access only</p>
+        <p>
+            Authorized access only
+        </p>
 
         <input
             type="password"
@@ -40,7 +62,9 @@
             placeholder="Enter password"
         >
 
-        <button id="loginButton">
+        <button
+            id="loginButton"
+        >
             Continue
         </button>
 
@@ -51,11 +75,16 @@
 </section>
 
 
+
 <!-- =====================================================
-     CRM
+     MAIN CRM
 ===================================================== -->
 
-<main id="mainPage" class="crm">
+<main
+    id="mainPage"
+    class="crm"
+>
+
 
     <!-- HEADER -->
 
@@ -67,7 +96,9 @@
                 ZENOVA EDUCATIONS
             </div>
 
-            <h1>Student CRM</h1>
+            <h1>
+                Student CRM
+            </h1>
 
             <p>
                 Manage leads, villages, admissions,
@@ -76,22 +107,28 @@
 
         </div>
 
+
         <button
             id="refreshButton"
             class="secondary-button"
         >
+
             <i class="ri-refresh-line"></i>
+
             Refresh
+
         </button>
 
     </header>
 
 
+
     <!-- =================================================
-         DASHBOARD CARDS
+         DASHBOARD
     ================================================== -->
 
     <section class="stats-grid">
+
 
         <div class="stat-card">
 
@@ -101,7 +138,9 @@
 
             <div>
 
-                <span>Total Leads</span>
+                <span>
+                    Total Leads
+                </span>
 
                 <strong id="totalStudents">
                     0
@@ -112,6 +151,7 @@
         </div>
 
 
+
         <div class="stat-card">
 
             <div class="stat-icon">
@@ -120,7 +160,9 @@
 
             <div>
 
-                <span>Admissions</span>
+                <span>
+                    Admissions
+                </span>
 
                 <strong id="totalAdmissions">
                     0
@@ -131,6 +173,7 @@
         </div>
 
 
+
         <div class="stat-card">
 
             <div class="stat-icon">
@@ -139,7 +182,9 @@
 
             <div>
 
-                <span>Follow-ups</span>
+                <span>
+                    Follow-ups
+                </span>
 
                 <strong id="totalFollowups">
                     0
@@ -150,6 +195,7 @@
         </div>
 
 
+
         <div class="stat-card">
 
             <div class="stat-icon">
@@ -158,7 +204,9 @@
 
             <div>
 
-                <span>Collected</span>
+                <span>
+                    Collected
+                </span>
 
                 <strong id="totalCollected">
                     ₹0
@@ -169,6 +217,7 @@
         </div>
 
 
+
         <div class="stat-card">
 
             <div class="stat-icon">
@@ -177,7 +226,9 @@
 
             <div>
 
-                <span>Outstanding</span>
+                <span>
+                    Outstanding
+                </span>
 
                 <strong id="totalBalance">
                     ₹0
@@ -188,6 +239,7 @@
         </div>
 
 
+
         <div class="stat-card">
 
             <div class="stat-icon">
@@ -196,7 +248,9 @@
 
             <div>
 
-                <span>Coming</span>
+                <span>
+                    Coming
+                </span>
 
                 <strong id="totalComing">
                     0
@@ -209,8 +263,9 @@
     </section>
 
 
+
     <!-- =================================================
-         NAVIGATION
+         TABS
     ================================================== -->
 
     <div class="crm-tabs">
@@ -219,27 +274,39 @@
             class="tab active"
             data-tab="students"
         >
+
             <i class="ri-group-line"></i>
+
             Students
+
         </button>
+
 
         <button
             class="tab"
             data-tab="villages"
         >
+
             <i class="ri-map-pin-line"></i>
+
             Villages
+
         </button>
+
 
         <button
             class="tab"
             data-tab="followups"
         >
+
             <i class="ri-phone-line"></i>
+
             Follow-ups
+
         </button>
 
     </div>
+
 
 
     <!-- =================================================
@@ -255,7 +322,9 @@
 
             <div>
 
-                <h2>Students</h2>
+                <h2>
+                    Students
+                </h2>
 
                 <p>
                     Complete lead and admission database
@@ -266,7 +335,8 @@
         </div>
 
 
-        <!-- FILTER BAR -->
+
+        <!-- FILTERS -->
 
         <div class="filters">
 
@@ -283,7 +353,9 @@
             </div>
 
 
-            <select id="statusFilter">
+            <select
+                id="statusFilter"
+            >
 
                 <option value="">
                     All Lead Status
@@ -328,7 +400,9 @@
             </select>
 
 
-            <select id="paymentFilter">
+            <select
+                id="paymentFilter"
+            >
 
                 <option value="">
                     All Payments
@@ -349,7 +423,9 @@
             </select>
 
 
-            <select id="villageFilter">
+            <select
+                id="villageFilter"
+            >
 
                 <option value="">
                     All Villages
@@ -360,7 +436,10 @@
         </div>
 
 
-        <!-- TABLE -->
+
+        <!-- =================================================
+             TABLE
+        ================================================== -->
 
         <div class="table-wrapper">
 
@@ -370,42 +449,71 @@
 
                     <tr>
 
-                        <th>#</th>
-                        
-                        <th>Code</th>
+                        <!-- IMPORTANT: # COLUMN -->
+                        <th>
+                            #
+                        </th>
 
-                        <th>Student</th>
+                        <th>
+                            CODE
+                        </th>
 
-                        <th>Phone</th>
+                        <th>
+                            STUDENT
+                        </th>
 
-                        <th>Student Village</th>
+                        <th>
+                            PHONE
+                        </th>
 
-                        <th>Assigned Village</th>
+                        <th>
+                            STUDENT VILLAGE
+                        </th>
 
-                        <th>Status</th>
+                        <th>
+                            ASSIGNED VILLAGE
+                        </th>
 
-                        <th>Admission</th>
+                        <th>
+                            STATUS
+                        </th>
 
-                        <th>Paid</th>
+                        <th>
+                            ADMISSION
+                        </th>
 
-                        <th>Balance</th>
+                        <th>
+                            PAID
+                        </th>
 
-                        <th>Follow-up</th>
+                        <th>
+                            BALANCE
+                        </th>
 
-                        <th></th>
+                        <th>
+                            FOLLOW-UP
+                        </th>
+
+                        <th>
+                            ACTION
+                        </th>
 
                     </tr>
 
                 </thead>
 
-                <tbody id="studentsTable">
+
+                <tbody
+                    id="studentsTable"
+                >
 
                     <tr>
 
                         <td
-                            colspan="11"
+                            colspan="12"
                             class="loading"
                         >
+
                             Loading CRM...
 
                         </td>
@@ -421,6 +529,7 @@
     </section>
 
 
+
     <!-- =================================================
          VILLAGES
     ================================================== -->
@@ -434,10 +543,12 @@
 
             <div>
 
-                <h2>Village CRM</h2>
+                <h2>
+                    Village CRM
+                </h2>
 
                 <p>
-                    Click a village to see all assigned students.
+                    Click a village to see assigned students.
                 </p>
 
             </div>
@@ -451,9 +562,14 @@
                     placeholder="Village name"
                 >
 
-                <button id="addVillageButton">
+                <button
+                    id="addVillageButton"
+                >
+
                     <i class="ri-add-line"></i>
+
                     Add Village
+
                 </button>
 
             </div>
@@ -469,6 +585,7 @@
     </section>
 
 
+
     <!-- =================================================
          FOLLOW UPS
     ================================================== -->
@@ -482,7 +599,9 @@
 
             <div>
 
-                <h2>Follow-ups</h2>
+                <h2>
+                    Follow-ups
+                </h2>
 
                 <p>
                     Students requiring action.
@@ -503,6 +622,7 @@
 </main>
 
 
+
 <!-- =====================================================
      STUDENT MODAL
 ===================================================== -->
@@ -518,15 +638,20 @@
             id="closeModal"
             class="close-button"
         >
+
             <i class="ri-close-line"></i>
+
         </button>
 
 
-        <div id="studentDetails"></div>
+        <div
+            id="studentDetails"
+        ></div>
 
     </div>
 
 </div>
+
 
 
 <script
@@ -534,5 +659,7 @@
     src="vie.js"
 ></script>
 
+
 </body>
+
 </html>
