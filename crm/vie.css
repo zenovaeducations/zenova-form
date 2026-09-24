@@ -31,7 +31,182 @@ body {
     color: #6b7280;
     white-space: nowrap;
 }
+/* =========================================================
+   COMPACT CRM TABLE
+========================================================= */
 
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table-wrapper table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+
+/* # */
+.table-wrapper th:nth-child(1),
+.table-wrapper td:nth-child(1) {
+    width: 35px;
+    min-width: 35px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+
+/* CODE */
+.table-wrapper th:nth-child(2),
+.table-wrapper td:nth-child(2) {
+    width: 85px;
+    min-width: 85px;
+}
+
+
+/* STUDENT */
+.table-wrapper th:nth-child(3),
+.table-wrapper td:nth-child(3) {
+    width: 125px;
+    min-width: 125px;
+}
+
+
+/* PHONE */
+.table-wrapper th:nth-child(4),
+.table-wrapper td:nth-child(4) {
+    width: 105px;
+    min-width: 105px;
+}
+
+
+/* STUDENT VILLAGE */
+.table-wrapper th:nth-child(5),
+.table-wrapper td:nth-child(5) {
+    width: 115px;
+    min-width: 115px;
+}
+
+
+/* ASSIGNED VILLAGE */
+.table-wrapper th:nth-child(6),
+.table-wrapper td:nth-child(6) {
+    width: 125px;
+    min-width: 125px;
+}
+
+
+/* STATUS */
+.table-wrapper th:nth-child(7),
+.table-wrapper td:nth-child(7) {
+    width: 105px;
+    min-width: 105px;
+}
+
+
+/* ADMISSION */
+.table-wrapper th:nth-child(8),
+.table-wrapper td:nth-child(8) {
+    width: 125px;
+    min-width: 125px;
+}
+
+
+/* PAID */
+.table-wrapper th:nth-child(9),
+.table-wrapper td:nth-child(9) {
+    width: 70px;
+    min-width: 70px;
+}
+
+
+/* BALANCE */
+.table-wrapper th:nth-child(10),
+.table-wrapper td:nth-child(10) {
+    width: 75px;
+    min-width: 75px;
+}
+
+
+/* FOLLOW-UP */
+.table-wrapper th:nth-child(11),
+.table-wrapper td:nth-child(11) {
+    width: 85px;
+    min-width: 85px;
+}
+
+
+/* ACTION / VIEW */
+.table-wrapper th:nth-child(12),
+.table-wrapper td:nth-child(12) {
+    width: 65px;
+    min-width: 65px;
+}
+
+
+/* Make cells compact */
+.table-wrapper th,
+.table-wrapper td {
+    padding: 9px 7px;
+    font-size: 12px;
+}
+
+
+/* Prevent village from creating huge width */
+.table-wrapper td:nth-child(5),
+.table-wrapper td:nth-child(6) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* Compact dropdowns */
+.table-wrapper .inline-select {
+    width: 100%;
+    max-width: 125px;
+    padding: 7px 5px;
+    font-size: 11px;
+}
+
+
+/* Compact code */
+.table-wrapper .student-code-input {
+    width: 65px;
+    height: 30px;
+    padding: 0 5px;
+}
+
+
+/* Compact student name */
+.table-wrapper .student-name {
+    max-width: 115px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    line-height: 1.2;
+}
+
+
+/* Phone */
+.table-wrapper .phone {
+    white-space: nowrap;
+    font-size: 11px;
+}
+
+
+/* Paid / balance */
+.table-wrapper .money-cell {
+    white-space: nowrap;
+}
+
+
+/* View button */
+.table-wrapper .view-button {
+    padding: 7px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+}
 /* =====================================================
    LOGIN
 ===================================================== */
