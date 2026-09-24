@@ -1314,161 +1314,176 @@ async function addVillage() {
 
 function renderFollowups() {
 
-    const today =
-        new Date();
-
-    today.setHours(
-        0,
-        0,
-        0,
-        0
-    );
-
-
-    const list =
-        students
-            .filter(
-                student =>
-                    student.nextFollowUp
-            )
-            .sort(
-                (a, b) =>
-                    getDateValue(
-                        a.nextFollowUp
-                    ) -
-                    getDateValue(
-                        b.nextFollowUp
-                    )
-            );
-
+    const list = students
+        .filter(student => student.nextFollowUp)
+        .sort((a, b) =>
+            getDateValue(a.nextFollowUp) -
+            getDateValue(b.nextFollowUp)
+        );
 
     if (!list.length) {
 
         followupList.innerHTML = `
-
             <div class="empty-card">
-
                 No follow-ups scheduled.
-
             </div>
-
         `;
 
         return;
-
     }
 
+    followupList.innerHTML = list.map(student => {
 
-    followupList.innerHTML =
-        list.map(
-            student => {
+        const date =
+            getDateValue(student.nextFollowUp);
 
-                const date =
-                    getDateValue(
-                        student.nextFollowUp
+        const today = new Date();
+
+        today.setHours(0, 0, 0, 0);
+
+        const isOverdue =
+            date < today;
+
+        return `
+            <div
+                class="followup-card ${isOverdue ? "overdue" : ""}"
+                data-student-id="${escapeHTML(student.id)}"
+            >
+
+                <div>
+
+                    <strong>
+                        ${escapeHTML(
+                            student.name || "-"
+                        )}
+                    </strong>
+
+                    <span>
+                        ${escapeHTML(
+                            student.phone || "-"
+                        )}
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        ${escapeHTML(
+                            getAssignedVillage(student) ||
+                            getStudentVillage(student) ||
+                            "-"
+                        )}
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        ${formatDate(
+                            student.nextFollowUp
+                        )}
+                    </strong>
+
+                    ${
+                        isOverdue
+                            ? `
+                                <span class="overdue-label">
+                                    OVERDUE
+                                </span>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="followup-view-button"
+                    data-student-id="${escapeHTML(student.id)}"
+                >
+                    View
+                </button>
+
+            </div>
+        `;
+
+    }).join("");
+
+
+    /*
+     * IMPORTANT:
+     * Attach View button events AFTER
+     * the HTML has been inserted.
+     */
+
+    document
+        .querySelectorAll(".followup-view-button")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function(event) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    const studentId =
+                        this.dataset.studentId;
+
+                    console.log(
+                        "Opening student:",
+                        studentId
                     );
 
+                    openStudent(
+                        studentId
+                    );
 
-                const isOverdue =
-                    date < today;
+                }
+            );
 
-
-                return `
-
-                    <div
-                        class="followup-card
-                        ${isOverdue ? "overdue" : ""}"
-                    >
-
-                        <div>
-
-                            <strong>
-                                ${escapeHTML(
-                                    student.name || "-"
-                                )}
-                            </strong>
-
-                            <span>
-                                ${escapeHTML(
-                                    student.phone || "-"
-                                )}
-                            </span>
-
-                        </div>
-
-
-                        <div>
-
-                            <span>
-                                ${escapeHTML(
-                                    getAssignedVillage(student) ||
-                                    getStudentVillage(student) ||
-                                    "-"
-                                )}
-                            </span>
-
-                        </div>
-
-
-                        <div>
-
-                            <strong>
-                                ${formatDate(
-                                    student.nextFollowUp
-                                )}
-                            </strong>
-
-                            ${
-                                isOverdue
-                                    ? `
-                                        <span class="overdue-label">
-                                            OVERDUE
-                                        </span>
-                                    `
-                                    : ""
-                            }
-
-                        </div>
-
-
-                        <button
-                            onclick="openStudent('${student.id}')"
-                        >
-                            View
-                        </button>
-
-                    </div>
-
-                `;
-
-            }
-        ).join("");
+        });
 
 }
-
-
 /* =====================================================
    STUDENT PROFILE
 ===================================================== */
 
-window.openStudent =
-    function(studentId) {
+window.openStudent = function(studentId) {
 
-        const student =
-            students.find(
-                item =>
-                    item.id ===
-                    studentId
-            );
+    console.log("openStudent called:", studentId);
 
+    const student =
+        students.find(
+            student =>
+                student.id === studentId
+        );
 
-        if (!student) return;
+    if (!student) {
 
+        console.error(
+            "Student not found:",
+            studentId
+        );
 
-        selectedStudent =
-            student;
+        alert(
+            "Student record not found."
+        );
 
+        return;
+    }
 
+    selectedStudent = student;
+
+    // Your existing profile/modal code continues here...
+
+};
         const paid =
             getPaidAmount(student);
 
