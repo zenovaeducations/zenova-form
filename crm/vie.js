@@ -32,8 +32,11 @@ let selectedStudent = null;
    DOM
 ========================================================= */
 
-const loginScreen = document.getElementById("loginScreen");
-const mainPage = document.getElementById("mainPage");
+const loginScreen =
+    document.getElementById("loginScreen");
+
+const mainPage =
+    document.getElementById("mainPage");
 
 const passwordInput =
     document.getElementById("passwordInput");
@@ -117,7 +120,9 @@ passwordInput.addEventListener(
     function (event) {
 
         if (event.key === "Enter") {
+
             login();
+
         }
 
     }
@@ -139,6 +144,7 @@ function login() {
         passwordInput.focus();
 
         return;
+
     }
 
 
@@ -161,7 +167,10 @@ async function loadCRM() {
 
     studentsTable.innerHTML = `
         <tr>
-            <td colspan="11" class="loading">
+            <td
+                colspan="12"
+                class="loading"
+            >
                 Loading Zenova CRM...
             </td>
         </tr>
@@ -193,9 +202,13 @@ async function loadCRM() {
             error
         );
 
+
         studentsTable.innerHTML = `
             <tr>
-                <td colspan="11" class="loading">
+                <td
+                    colspan="12"
+                    class="loading"
+                >
 
                     Unable to load CRM.
 
@@ -220,7 +233,7 @@ async function loadCRM() {
 
 async function loadStudents() {
 
-    const submissionsRef =
+    const ref =
         collection(
             db,
             "submissions"
@@ -234,28 +247,23 @@ async function loadStudents() {
 
         const q =
             query(
-                submissionsRef,
+                ref,
                 orderBy(
                     "submittedAt",
                     "desc"
                 )
             );
 
+
         snapshot =
             await getDocs(q);
 
     }
 
-    catch (error) {
-
-        console.warn(
-            "submittedAt ordering unavailable. Loading normally."
-        );
+    catch {
 
         snapshot =
-            await getDocs(
-                submissionsRef
-            );
+            await getDocs(ref);
 
     }
 
@@ -287,7 +295,7 @@ async function loadStudents() {
 
 async function loadVillages() {
 
-    const villagesRef =
+    const ref =
         collection(
             db,
             "villages"
@@ -301,12 +309,13 @@ async function loadVillages() {
 
         const q =
             query(
-                villagesRef,
+                ref,
                 orderBy(
                     "name",
                     "asc"
                 )
             );
+
 
         snapshot =
             await getDocs(q);
@@ -316,9 +325,7 @@ async function loadVillages() {
     catch {
 
         snapshot =
-            await getDocs(
-                villagesRef
-            );
+            await getDocs(ref);
 
     }
 
@@ -371,10 +378,15 @@ function updateDashboard() {
             student =>
                 getAdmissionStatus(
                     student
-                ) === "Admission Done" ||
+                ) ===
+                "Admission Done"
+
+                ||
+
                 getAdmissionStatus(
                     student
-                ) === "Admission Confirmed"
+                ) ===
+                "Admission Confirmed"
         );
 
 
@@ -461,7 +473,7 @@ function updateDashboard() {
 
 
 /* =========================================================
-   STUDENT TABLE
+   STUDENTS TABLE
 ========================================================= */
 
 function renderStudents() {
@@ -494,7 +506,9 @@ function renderStudents() {
 
                         student.assignedVillage,
 
-                        student.assignedVillageName
+                        student.assignedVillageName,
+
+                        student.studentCode
 
                     ]
                         .filter(Boolean)
@@ -561,7 +575,7 @@ function renderStudents() {
             <tr>
 
                 <td
-                    colspan="11"
+                    colspan="12"
                     class="empty"
                 >
 
@@ -573,6 +587,7 @@ function renderStudents() {
         `;
 
         return;
+
     }
 
 
@@ -589,42 +604,7 @@ function renderStudents() {
         ).join("");
 
 
-    /*
-     * IMPORTANT
-     *
-     * Attach View button events AFTER
-     * the table HTML is rendered.
-     */
-
-    document
-        .querySelectorAll(
-            ".student-view-button"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    function (event) {
-
-                        event.preventDefault();
-
-                        event.stopPropagation();
-
-
-                        const studentId =
-                            this.dataset.studentId;
-
-
-                        openStudent(
-                            studentId
-                        );
-
-                    }
-                );
-
-            }
-        );
+    attachStudentButtons();
 
 }
 
@@ -674,47 +654,132 @@ function createStudentRow(
         );
 
 
-return `
+    /*
+     * CODE INPUT
+     *
+     * Existing:
+     * ZNV/SSLCM+0001
+     *
+     * Input:
+     * 0001
+     */
 
-    <tr>
-
-        <td>
-
-            <input
-                type="number"
-                class="student-code-input"
-                data-student-id="${escapeAttribute(
-                    student.id
-                )}"
-                value="${getStudentCodeNumber(student)}"
-                placeholder="0001"
-                min="1"
-                max="9999"
-                maxlength="4"
-            >
-
-            <small class="code-preview">
-
-                ${
-                    student.studentCode
-                        ? escapeHTML(
-                            student.studentCode
-                        )
-                        : "Not assigned"
-                }
-
-            </small>
-
-        </td>
+    const codeNumber =
+        getStudentCodeNumber(
+            student
+        );
 
 
-        <td>
+    return `
+
+        <tr>
+
+
+            <!-- =================================================
+                 1. NUMBER
+            ================================================== -->
+
+            <td>
+
+                <strong>
+                    ${index + 1}
+                </strong>
+
+            </td>
+
+
+
+            <!-- =================================================
+                 2. STUDENT CODE
+            ================================================== -->
+
+            <td>
+
+                <input
+                    type="text"
+                    class="student-code-input"
+                    data-student-id="${escapeAttribute(
+                        student.id
+                    )}"
+                    value="${escapeAttribute(
+                        codeNumber
+                    )}"
+                    placeholder="0001"
+                    maxlength="4"
+                    inputmode="numeric"
+                >
+
+
+                <small
+                    class="code-preview"
+                >
+
+                    ${
+                        student.studentCode
+                            ? escapeHTML(
+                                student.studentCode
+                            )
+                            : "Not assigned"
+                    }
+
+                </small>
+
+            </td>
+
+
+
+            <!-- =================================================
+                 3. STUDENT
+            ================================================== -->
+
+            <td>
+
+                <button
+                    type="button"
+                    class="
+                        student-name
+                        student-view-button
+                    "
+                    data-student-id="${escapeAttribute(
+                        student.id
+                    )}"
+                >
+
+                    ${escapeHTML(
+                        student.name ||
+                        "Unnamed"
+                    )}
+
+                </button>
+
+
+                <small>
+
+                    Target:
+                    ${
+                        student.targetPercentage ??
+                        student.targetPercentageValue ??
+                        "-"
+                    }%
+
+                </small>
+
+            </td>
+
+
+
+            <!-- =================================================
+                 4. PHONE
+            ================================================== -->
+
+            <td>
 
                 <div class="phone">
 
                     <a
                         href="tel:${escapeAttribute(
-                            student.phone || ""
+                            student.phone ||
+                            ""
                         )}"
                     >
 
@@ -723,6 +788,7 @@ return `
                         ></i>
 
                     </a>
+
 
                     ${escapeHTML(
                         student.phone ||
@@ -734,9 +800,16 @@ return `
             </td>
 
 
+
+            <!-- =================================================
+                 5. STUDENT VILLAGE
+            ================================================== -->
+
             <td>
 
-                <span class="village-text">
+                <span
+                    class="village-text"
+                >
 
                     ${escapeHTML(
                         getStudentVillage(
@@ -749,6 +822,11 @@ return `
 
             </td>
 
+
+
+            <!-- =================================================
+                 6. ASSIGNED VILLAGE
+            ================================================== -->
 
             <td>
 
@@ -764,41 +842,51 @@ return `
                         Assign Village
                     </option>
 
+
                     ${
-                        villages.map(
-                            village => `
+                        villages
+                            .map(
+                                village => `
 
-                                <option
-                                    value="${escapeAttribute(
-                                        village.name
-                                    )}"
-
-                                    ${
-                                        getAssignedVillage(
-                                            student
-                                        ).toLowerCase() ===
-                                        String(
+                                    <option
+                                        value="${escapeAttribute(
                                             village.name
-                                        ).toLowerCase()
-                                            ? "selected"
-                                            : ""
-                                    }
-                                >
+                                        )}"
 
-                                    ${escapeHTML(
-                                        village.name
-                                    )}
+                                        ${
+                                            getAssignedVillage(
+                                                student
+                                            )
+                                                .toLowerCase() ===
+                                            String(
+                                                village.name
+                                            )
+                                                .toLowerCase()
+                                                ? "selected"
+                                                : ""
+                                        }
+                                    >
 
-                                </option>
+                                        ${escapeHTML(
+                                            village.name
+                                        )}
 
-                            `
-                        ).join("")
+                                    </option>
+
+                                `
+                            )
+                            .join("")
                     }
 
                 </select>
 
             </td>
 
+
+
+            <!-- =================================================
+                 7. STATUS
+            ================================================== -->
 
             <td>
 
@@ -819,6 +907,11 @@ return `
             </td>
 
 
+
+            <!-- =================================================
+                 8. ADMISSION
+            ================================================== -->
+
             <td>
 
                 <select
@@ -838,9 +931,16 @@ return `
             </td>
 
 
+
+            <!-- =================================================
+                 9. PAID
+            ================================================== -->
+
             <td>
 
-                <div class="money-cell">
+                <div
+                    class="money-cell"
+                >
 
                     <strong>
 
@@ -852,9 +952,12 @@ return `
 
 
                     <span
-                        class="payment-badge ${paymentClass(
-                            paymentStatus
-                        )}"
+                        class="
+                            payment-badge
+                            ${paymentClass(
+                                paymentStatus
+                            )}
+                        "
                     >
 
                         ${paymentStatus}
@@ -865,6 +968,11 @@ return `
 
             </td>
 
+
+
+            <!-- =================================================
+                 10. BALANCE
+            ================================================== -->
 
             <td>
 
@@ -885,9 +993,16 @@ return `
             </td>
 
 
+
+            <!-- =================================================
+                 11. FOLLOW-UP
+            ================================================== -->
+
             <td>
 
-                <span class="followup-date">
+                <span
+                    class="followup-date"
+                >
 
                     ${
                         followup ||
@@ -899,11 +1014,19 @@ return `
             </td>
 
 
+
+            <!-- =================================================
+                 12. VIEW
+            ================================================== -->
+
             <td>
 
                 <button
                     type="button"
-                    class="view-button student-view-button"
+                    class="
+                        view-button
+                        student-view-button
+                    "
                     data-student-id="${escapeAttribute(
                         student.id
                     )}"
@@ -915,31 +1038,421 @@ return `
 
             </td>
 
+
         </tr>
 
     `;
 
 }
 
-function getStudentCodeNumber(student) {
-
-    if (!student.studentCode) {
-        return "";
-    }
-
-    const match =
-        String(student.studentCode)
-            .match(/\+(\d{1,4})$/);
-
-    if (!match) {
-        return "";
-    }
-
-    return Number(match[1]);
-}
 
 /* =========================================================
-   TABLE SELECT EVENTS
+   ATTACH STUDENT BUTTONS
+========================================================= */
+
+function attachStudentButtons() {
+
+    /*
+     * VIEW BUTTONS
+     */
+
+    document
+        .querySelectorAll(
+            ".student-view-button"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+
+                        const studentId =
+                            this.dataset.studentId;
+
+
+                        openStudent(
+                            studentId
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    /*
+     * CODE INPUTS
+     */
+
+    document
+        .querySelectorAll(
+            ".student-code-input"
+        )
+        .forEach(
+            input => {
+
+                input.addEventListener(
+                    "blur",
+                    function () {
+
+                        saveStudentCode(
+                            this
+                        );
+
+                    }
+                );
+
+
+                input.addEventListener(
+                    "keydown",
+                    function (event) {
+
+                        if (
+                            event.key ===
+                            "Enter"
+                        ) {
+
+                            event.preventDefault();
+
+                            this.blur();
+
+                        }
+
+                    }
+                );
+
+
+                /*
+                 * Allow digits only
+                 */
+
+                input.addEventListener(
+                    "input",
+                    function () {
+
+                        this.value =
+                            this.value
+                                .replace(
+                                    /\D/g,
+                                    ""
+                                )
+                                .slice(
+                                    0,
+                                    4
+                                );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   SAVE STUDENT CODE
+========================================================= */
+
+async function saveStudentCode(
+    input
+) {
+
+    const studentId =
+        input.dataset.studentId;
+
+
+    if (!studentId) {
+
+        return;
+
+    }
+
+
+    let number =
+        input.value
+            .trim();
+
+
+    /*
+     * If empty, don't save.
+     */
+
+    if (!number) {
+
+        input.value =
+            getStudentCodeNumber(
+                students.find(
+                    student =>
+                        student.id ===
+                        studentId
+                ) || {}
+            );
+
+        return;
+
+    }
+
+
+    /*
+     * Only numbers.
+     */
+
+    if (
+        !/^\d{1,4}$/.test(
+            number
+        )
+    ) {
+
+        alert(
+            "Enter only 1 to 4 digits."
+        );
+
+        input.value = "";
+
+        return;
+
+    }
+
+
+    const numericNumber =
+        Number(
+            number
+        );
+
+
+    if (
+        numericNumber < 1 ||
+        numericNumber > 9999
+    ) {
+
+        alert(
+            "Student code must be between 0001 and 9999."
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * Convert:
+     *
+     * 1
+     * →
+     * 0001
+     */
+
+    const paddedNumber =
+        String(
+            numericNumber
+        ).padStart(
+            4,
+            "0"
+        );
+
+
+    const studentCode =
+        `ZNV/SSLCM+${paddedNumber}`;
+
+
+    /*
+     * CHECK DUPLICATE
+     */
+
+    const duplicate =
+        students.find(
+            student =>
+
+                student.id !==
+                studentId
+
+                &&
+
+                String(
+                    student.studentCode ||
+                    ""
+                ).toUpperCase() ===
+                studentCode.toUpperCase()
+        );
+
+
+    if (duplicate) {
+
+        alert(
+            `This code is already assigned:\n\n${studentCode}`
+        );
+
+
+        input.value =
+            getStudentCodeNumber(
+                students.find(
+                    student =>
+                        student.id ===
+                        studentId
+                ) || {}
+            );
+
+
+        return;
+
+    }
+
+
+    try {
+
+        /*
+         * SAVE TO FIRESTORE
+         */
+
+        await updateDoc(
+
+            doc(
+                db,
+                "submissions",
+                studentId
+            ),
+
+            {
+
+                studentCode:
+
+                    studentCode,
+
+                updatedAt:
+
+                    serverTimestamp()
+
+            }
+
+        );
+
+
+        /*
+         * UPDATE LOCAL DATA
+         */
+
+        const index =
+            students.findIndex(
+                student =>
+                    student.id ===
+                    studentId
+            );
+
+
+        if (
+            index !== -1
+        ) {
+
+            students[index] = {
+
+                ...students[index],
+
+                studentCode:
+
+                    studentCode
+
+            };
+
+        }
+
+
+        /*
+         * Show formatted code
+         */
+
+        input.value =
+            paddedNumber;
+
+
+        /*
+         * Re-render so preview changes
+         */
+
+        renderStudents();
+
+
+        console.log(
+            "Student code saved:",
+            studentCode
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "STUDENT CODE ERROR:",
+            error
+        );
+
+
+        alert(
+            "Unable to save student code.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   GET CODE NUMBER
+========================================================= */
+
+function getStudentCodeNumber(
+    student
+) {
+
+    if (
+        !student ||
+        !student.studentCode
+    ) {
+
+        return "";
+
+    }
+
+
+    const match =
+        String(
+            student.studentCode
+        )
+            .match(
+                /\+(\d{1,4})$/
+            );
+
+
+    if (!match) {
+
+        return "";
+
+    }
+
+
+    return String(
+        Number(
+            match[1]
+        )
+    )
+        .padStart(
+            4,
+            "0"
+        );
+
+}
+
+
+/* =========================================================
+   TABLE SELECT CHANGES
 ========================================================= */
 
 studentsTable.addEventListener(
@@ -955,7 +1468,9 @@ studentsTable.addEventListener(
                 "inline-select"
             )
         ) {
+
             return;
+
         }
 
 
@@ -975,12 +1490,15 @@ studentsTable.addEventListener(
             !studentId ||
             !action
         ) {
+
             return;
+
         }
 
 
         if (
-            action === "village"
+            action ===
+            "village"
         ) {
 
             await updateStudent(
@@ -995,7 +1513,8 @@ studentsTable.addEventListener(
 
 
         if (
-            action === "lead-status"
+            action ===
+            "lead-status"
         ) {
 
             await updateStudent(
@@ -1010,7 +1529,8 @@ studentsTable.addEventListener(
 
 
         if (
-            action === "admission-status"
+            action ===
+            "admission-status"
         ) {
 
             await updateStudent(
@@ -1026,180 +1546,7 @@ studentsTable.addEventListener(
     }
 );
 
-studentsTable.addEventListener(
-    "change",
-    async function (event) {
 
-        const input =
-            event.target;
-
-
-        if (
-            !input.classList.contains(
-                "student-code-input"
-            )
-        ) {
-
-            return;
-
-        }
-
-
-        const studentId =
-            input.dataset.studentId;
-
-
-        let number =
-            String(
-                input.value
-            ).trim();
-
-
-        /*
-         * Only allow 1–4 digits
-         */
-
-        if (
-            !/^\d{1,4}$/.test(
-                number
-            )
-        ) {
-
-            alert(
-                "Enter only 1 to 4 digits."
-            );
-
-            input.value = "";
-
-            return;
-
-        }
-
-
-        const numericNumber =
-            Number(number);
-
-
-        /*
-         * Make it 4 digits
-         *
-         * 1    → 0001
-         * 12   → 0012
-         * 123  → 0123
-         * 1234 → 1234
-         */
-
-        const paddedNumber =
-            String(
-                numericNumber
-            ).padStart(
-                4,
-                "0"
-            );
-
-
-        const studentCode =
-            `ZNV/SSLCM+${paddedNumber}`;
-
-
-        /*
-         * Check duplicate code
-         */
-
-        const duplicate =
-            students.find(
-                student =>
-                    student.id !==
-                    studentId &&
-
-                    student.studentCode ===
-                    studentCode
-            );
-
-
-        if (duplicate) {
-
-            alert(
-                `This student code already exists:\n\n${studentCode}`
-            );
-
-            input.value = "";
-
-            return;
-
-        }
-
-
-        try {
-
-            await updateDoc(
-                doc(
-                    db,
-                    "submissions",
-                    studentId
-                ),
-                {
-
-                    studentCode,
-
-                    updatedAt:
-                        serverTimestamp()
-
-                }
-            );
-
-
-            /*
-             * Update local student
-             */
-
-            const index =
-                students.findIndex(
-                    student =>
-                        student.id ===
-                        studentId
-                );
-
-
-            if (index !== -1) {
-
-                students[index] = {
-
-                    ...students[index],
-
-                    studentCode
-
-                };
-
-            }
-
-
-            /*
-             * Refresh table
-             */
-
-            renderStudents();
-
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Student code error:",
-                error
-            );
-
-
-            alert(
-                "Unable to save student code.\n\n" +
-                error.message
-            );
-
-        }
-
-    }
-);
 /* =========================================================
    STATUS OPTIONS
 ========================================================= */
@@ -1236,15 +1583,21 @@ function leadStatusOptions(
             status => `
 
                 <option
-                    value="${status}"
+                    value="${escapeAttribute(
+                        status
+                    )}"
+
                     ${
-                        selected === status
+                        selected ===
+                        status
                             ? "selected"
                             : ""
                     }
                 >
 
-                    ${status}
+                    ${escapeHTML(
+                        status
+                    )}
 
                 </option>
 
@@ -1277,15 +1630,21 @@ function admissionOptions(
             status => `
 
                 <option
-                    value="${status}"
+                    value="${escapeAttribute(
+                        status
+                    )}"
+
                     ${
-                        selected === status
+                        selected ===
+                        status
                             ? "selected"
                             : ""
                     }
                 >
 
-                    ${status}
+                    ${escapeHTML(
+                        status
+                    )}
 
                 </option>
 
@@ -1308,17 +1667,22 @@ async function updateStudent(
     try {
 
         await updateDoc(
+
             doc(
                 db,
                 "submissions",
                 studentId
             ),
+
             {
+
                 ...fields,
 
                 updatedAt:
                     serverTimestamp()
+
             }
+
         );
 
 
@@ -1330,7 +1694,9 @@ async function updateStudent(
             );
 
 
-        if (index !== -1) {
+        if (
+            index !== -1
+        ) {
 
             students[index] = {
 
@@ -1382,9 +1748,11 @@ function populateVillageFilter() {
 
 
     villageFilter.innerHTML = `
+
         <option value="">
             All Villages
         </option>
+
     `;
 
 
@@ -1425,15 +1793,22 @@ function populateVillageFilter() {
 
 function renderVillages() {
 
-    if (!villages.length) {
+    if (
+        !villages.length
+    ) {
 
         villageCards.innerHTML = `
+
             <div class="empty-card">
+
                 No villages created yet.
+
             </div>
+
         `;
 
         return;
+
     }
 
 
@@ -1448,10 +1823,6 @@ function renderVillages() {
             .join("");
 
 
-    /*
-     * Village View buttons/cards
-     */
-
     document
         .querySelectorAll(
             ".village-open-button"
@@ -1463,12 +1834,9 @@ function renderVillages() {
                     "click",
                     function () {
 
-                        const villageName =
-                            this.dataset.villageName;
-
-
                         openVillage(
-                            villageName
+                            this.dataset
+                                .villageName
                         );
 
                     }
@@ -1548,7 +1916,10 @@ function createVillageCard(
     return `
 
         <div
-            class="village-card village-open-button"
+            class="
+                village-card
+                village-open-button
+            "
             data-village-name="${escapeAttribute(
                 name
             )}"
@@ -1581,6 +1952,7 @@ function createVillageCard(
                         ${
                             villageStudents.length
                         }
+
                         students
 
                     </span>
@@ -1732,7 +2104,8 @@ newVillageInput.addEventListener(
     function (event) {
 
         if (
-            event.key === "Enter"
+            event.key ===
+            "Enter"
         ) {
 
             addVillage();
@@ -1785,10 +2158,12 @@ async function addVillage() {
 
         const villageRef =
             await addDoc(
+
                 collection(
                     db,
                     "villages"
                 ),
+
                 {
 
                     name,
@@ -1797,6 +2172,7 @@ async function addVillage() {
                         serverTimestamp()
 
                 }
+
             );
 
 
@@ -1822,13 +2198,13 @@ async function addVillage() {
         );
 
 
-        newVillageInput.value = "";
+        newVillageInput.value =
+            "";
 
 
         populateVillageFilter();
 
         renderVillages();
-
 
     }
 
@@ -1851,7 +2227,7 @@ async function addVillage() {
 
 
 /* =========================================================
-   FOLLOW-UP CRM
+   FOLLOW-UPS
 ========================================================= */
 
 function renderFollowups() {
@@ -1875,17 +2251,22 @@ function renderFollowups() {
             );
 
 
-    if (!list.length) {
+    if (
+        !list.length
+    ) {
 
         followupList.innerHTML = `
+
             <div class="empty-card">
 
                 No follow-ups scheduled.
 
             </div>
+
         `;
 
         return;
+
     }
 
 
@@ -2021,13 +2402,6 @@ function renderFollowups() {
             .join("");
 
 
-    /*
-     * THIS FIXES THE VIEW BUTTON
-     *
-     * We attach the click event AFTER
-     * follow-up HTML is inserted.
-     */
-
     document
         .querySelectorAll(
             ".followup-view-button"
@@ -2044,18 +2418,9 @@ function renderFollowups() {
                         event.stopPropagation();
 
 
-                        const studentId =
-                            this.dataset.studentId;
-
-
-                        console.log(
-                            "Follow-up View:",
-                            studentId
-                        );
-
-
                         openStudent(
-                            studentId
+                            this.dataset
+                                .studentId
                         );
 
                     }
@@ -2068,18 +2433,12 @@ function renderFollowups() {
 
 
 /* =========================================================
-   OPEN STUDENT PROFILE
+   OPEN STUDENT
 ========================================================= */
 
 function openStudent(
     studentId
 ) {
-
-    console.log(
-        "Opening student:",
-        studentId
-    );
-
 
     const student =
         students.find(
@@ -2095,18 +2454,12 @@ function openStudent(
 
     if (!student) {
 
-        console.error(
-            "Student not found:",
-            studentId
-        );
-
-
         alert(
             "Student record not found."
         );
 
-
         return;
+
     }
 
 
@@ -2128,7 +2481,9 @@ function openStudent(
 
     studentDetails.innerHTML = `
 
-        <div class="profile-header">
+        <div
+            class="profile-header"
+        >
 
             <div>
 
@@ -2161,7 +2516,9 @@ function openStudent(
             </div>
 
 
-            <div class="profile-actions">
+            <div
+                class="profile-actions"
+            >
 
                 <a
                     class="call-action"
@@ -2202,12 +2559,67 @@ function openStudent(
         </div>
 
 
-        <div class="profile-grid">
+
+        <div
+            class="profile-grid"
+        >
+
+
+            <!-- CODE -->
+
+            <div
+                class="profile-section"
+            >
+
+                <h3>
+                    Student Code
+                </h3>
+
+
+                <label>
+                    Last 4 Digits
+                </label>
+
+
+                <input
+                    id="profileCode"
+                    class="profile-input"
+                    type="text"
+                    maxlength="4"
+                    inputmode="numeric"
+                    value="${escapeAttribute(
+                        getStudentCodeNumber(
+                            student
+                        )
+                    )}"
+                    placeholder="0001"
+                >
+
+
+                <div
+                    style="
+                        margin-top:10px;
+                        font-weight:800;
+                    "
+                    id="profileCodePreview"
+                >
+
+                    ${
+                        student.studentCode ||
+                        "Not assigned"
+                    }
+
+                </div>
+
+            </div>
+
 
 
             <!-- STUDENT INFORMATION -->
 
-            <div class="profile-section">
+            <div
+                class="profile-section"
+            >
 
                 <h3>
                     Student Information
@@ -2249,9 +2661,12 @@ function openStudent(
             </div>
 
 
-            <!-- CRM STATUS -->
 
-            <div class="profile-section">
+            <!-- CRM -->
+
+            <div
+                class="profile-section"
+            >
 
                 <h3>
                     CRM Status
@@ -2315,9 +2730,12 @@ function openStudent(
             </div>
 
 
+
             <!-- FEES -->
 
-            <div class="profile-section">
+            <div
+                class="profile-section"
+            >
 
                 <h3>
                     Fees
@@ -2355,7 +2773,9 @@ function openStudent(
                 >
 
 
-                <div class="fee-summary">
+                <div
+                    class="fee-summary"
+                >
 
                     <span>
                         Balance
@@ -2364,11 +2784,6 @@ function openStudent(
 
                     <strong
                         id="profileBalance"
-                        class="${
-                            balance > 0
-                                ? "balance-due"
-                                : "balance-clear"
-                        }"
                     >
 
                         ${formatMoney(
@@ -2382,9 +2797,12 @@ function openStudent(
             </div>
 
 
+
             <!-- FOLLOW UP -->
 
-            <div class="profile-section">
+            <div
+                class="profile-section"
+            >
 
                 <h3>
                     Follow-up
@@ -2423,10 +2841,14 @@ function openStudent(
 
             </div>
 
+
         </div>
 
 
-        <div class="profile-footer">
+
+        <div
+            class="profile-footer"
+        >
 
             <button
                 type="button"
@@ -2453,7 +2875,66 @@ function openStudent(
 
 
     /*
-     * Recalculate balance when fee/paid changes
+     * CODE PREVIEW
+     */
+
+    const codeInput =
+        document.getElementById(
+            "profileCode"
+        );
+
+
+    const codePreview =
+        document.getElementById(
+            "profileCodePreview"
+        );
+
+
+    codeInput.addEventListener(
+        "input",
+        function () {
+
+            this.value =
+                this.value
+                    .replace(
+                        /\D/g,
+                        ""
+                    )
+                    .slice(
+                        0,
+                        4
+                    );
+
+
+            if (
+                this.value
+            ) {
+
+                codePreview.textContent =
+                    `ZNV/SSLCM+${String(
+                        Number(
+                            this.value
+                        )
+                    ).padStart(
+                        4,
+                        "0"
+                    )}`;
+
+            }
+
+            else {
+
+                codePreview.textContent =
+                    "Not assigned";
+
+            }
+
+        }
+    );
+
+
+    /*
+     * BALANCE
      */
 
     const feeInput =
@@ -2468,24 +2949,19 @@ function openStudent(
         );
 
 
-    function updateProfileBalance() {
+    function updateBalance() {
 
-        const total =
+        const fee =
             Number(
-                feeInput.value || 0
+                feeInput.value ||
+                0
             );
 
 
         const paidValue =
             Number(
-                paidInput.value || 0
-            );
-
-
-        const newBalance =
-            Math.max(
-                0,
-                total - paidValue
+                paidInput.value ||
+                0
             );
 
 
@@ -2495,29 +2971,30 @@ function openStudent(
             );
 
 
-        balanceElement.textContent =
-            formatMoney(
-                newBalance
+        const balanceValue =
+            Math.max(
+                0,
+                fee - paidValue
             );
 
 
-        balanceElement.className =
-            newBalance > 0
-                ? "balance-due"
-                : "balance-clear";
+        balanceElement.textContent =
+            formatMoney(
+                balanceValue
+            );
 
     }
 
 
     feeInput.addEventListener(
         "input",
-        updateProfileBalance
+        updateBalance
     );
 
 
     paidInput.addEventListener(
         "input",
-        updateProfileBalance
+        updateBalance
     );
 
 
@@ -2534,55 +3011,7 @@ function openStudent(
 
 
 /* =========================================================
-   PROFILE FIELD
-========================================================= */
-
-function profileField(
-    label,
-    value
-) {
-
-    return `
-
-        <div
-            style="
-                margin-bottom:12px;
-            "
-        >
-
-            <span
-                style="
-                    display:block;
-                    font-size:11px;
-                    color:#6b7280;
-                    margin-bottom:4px;
-                "
-            >
-
-                ${escapeHTML(
-                    label
-                )}
-
-            </span>
-
-
-            <strong>
-
-                ${escapeHTML(
-                    value
-                )}
-
-            </strong>
-
-        </div>
-
-    `;
-
-}
-
-
-/* =========================================================
-   SAVE STUDENT PROFILE
+   SAVE PROFILE
 ========================================================= */
 
 async function saveStudentProfile() {
@@ -2594,11 +3023,100 @@ async function saveStudentProfile() {
     }
 
 
+    /*
+     * STUDENT CODE
+     */
+
+    const codeInput =
+        document.getElementById(
+            "profileCode"
+        );
+
+
+    let codeNumber =
+        codeInput.value.trim();
+
+
+    if (
+        codeNumber &&
+        !/^\d{1,4}$/.test(
+            codeNumber
+        )
+    ) {
+
+        alert(
+            "Student code must contain only 1 to 4 digits."
+        );
+
+        return;
+
+    }
+
+
+    let studentCode = "";
+
+
+    if (codeNumber) {
+
+        const padded =
+            String(
+                Number(
+                    codeNumber
+                )
+            ).padStart(
+                4,
+                "0"
+            );
+
+
+        studentCode =
+            `ZNV/SSLCM+${padded}`;
+
+
+        /*
+         * DUPLICATE CHECK
+         */
+
+        const duplicate =
+            students.find(
+                student =>
+
+                    student.id !==
+                    selectedStudent.id
+
+                    &&
+
+                    String(
+                        student.studentCode ||
+                        ""
+                    ).toUpperCase() ===
+                    studentCode.toUpperCase()
+            );
+
+
+        if (duplicate) {
+
+            alert(
+                `This code is already assigned:\n\n${studentCode}`
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    /*
+     * FEES
+     */
+
     const totalFee =
         Number(
             document.getElementById(
                 "profileTotalFee"
-            ).value || 0
+            ).value ||
+            0
         );
 
 
@@ -2606,16 +3124,18 @@ async function saveStudentProfile() {
         Number(
             document.getElementById(
                 "profilePaid"
-            ).value || 0
+            ).value ||
+            0
         );
 
 
-    if (paid > totalFee) {
+    if (
+        paid > totalFee
+    ) {
 
         alert(
             "Paid amount cannot be greater than total fee."
         );
-
 
         return;
 
@@ -2629,7 +3149,13 @@ async function saveStudentProfile() {
         );
 
 
+    /*
+     * ALL FIELDS
+     */
+
     const fields = {
+
+        studentCode,
 
         leadStatus:
             document.getElementById(
@@ -2649,26 +3175,18 @@ async function saveStudentProfile() {
             ).value,
 
 
-        totalFee:
-
-
-            totalFee,
-
+        totalFee,
 
         totalPaid:
             paid,
 
-
-        balance:
-
-
-            balance,
-
+        balance,
 
         nextFollowUp:
             document.getElementById(
                 "profileFollowup"
-            ).value || "",
+            ).value ||
+            "",
 
 
         followUpNotes:
@@ -2686,14 +3204,21 @@ async function saveStudentProfile() {
     try {
 
         await updateDoc(
+
             doc(
                 db,
                 "submissions",
                 selectedStudent.id
             ),
+
             fields
+
         );
 
+
+        /*
+         * LOCAL UPDATE
+         */
 
         const index =
             students.findIndex(
@@ -2703,7 +3228,9 @@ async function saveStudentProfile() {
             );
 
 
-        if (index !== -1) {
+        if (
+            index !== -1
+        ) {
 
             students[index] = {
 
@@ -2713,11 +3240,11 @@ async function saveStudentProfile() {
 
             };
 
+
+            selectedStudent =
+                students[index];
+
         }
-
-
-        selectedStudent =
-            students[index];
 
 
         closeStudentModal();
@@ -2741,7 +3268,7 @@ async function saveStudentProfile() {
     catch (error) {
 
         console.error(
-            "SAVE STUDENT ERROR:",
+            "SAVE PROFILE ERROR:",
             error
         );
 
@@ -2792,6 +3319,54 @@ function closeStudentModal() {
 
     selectedStudent =
         null;
+
+}
+
+
+/* =========================================================
+   PROFILE FIELD
+========================================================= */
+
+function profileField(
+    label,
+    value
+) {
+
+    return `
+
+        <div
+            style="
+                margin-bottom:12px;
+            "
+        >
+
+            <span
+                style="
+                    display:block;
+                    font-size:11px;
+                    color:#6b7280;
+                    margin-bottom:4px;
+                "
+            >
+
+                ${escapeHTML(
+                    label
+                )}
+
+            </span>
+
+
+            <strong>
+
+                ${escapeHTML(
+                    value
+                )}
+
+            </strong>
+
+        </div>
+
+    `;
 
 }
 
@@ -2888,11 +3463,7 @@ villageFilter.addEventListener(
 
 refreshButton.addEventListener(
     "click",
-    async function () {
-
-        await loadCRM();
-
-    }
+    loadCRM
 );
 
 
@@ -3066,7 +3637,7 @@ function getPaymentStatus(
 
 
 /* =========================================================
-   DATE HELPERS
+   DATE
 ========================================================= */
 
 function formatDate(
@@ -3299,10 +3870,11 @@ function getWhatsAppLink(
     let number =
         String(
             phone || ""
-        ).replace(
-            /\D/g,
-            ""
-        );
+        )
+            .replace(
+                /\D/g,
+                ""
+            );
 
 
     if (
@@ -3333,7 +3905,7 @@ function getWhatsAppLink(
 
 
 /* =========================================================
-   HTML ESCAPING
+   SECURITY / HTML ESCAPE
 ========================================================= */
 
 function escapeHTML(
@@ -3343,22 +3915,27 @@ function escapeHTML(
     return String(
         value ?? ""
     )
+
         .replaceAll(
             "&",
             "&amp;"
         )
+
         .replaceAll(
             "<",
             "&lt;"
         )
+
         .replaceAll(
             ">",
             "&gt;"
         )
+
         .replaceAll(
             '"',
             "&quot;"
         )
+
         .replaceAll(
             "'",
             "&#039;"
@@ -3378,10 +3955,6 @@ function escapeAttribute(
 }
 
 
-/* =========================================================
-   STARTUP
-========================================================= */
-
 console.log(
-    "Zenova CRM JS loaded successfully."
+    "Zenova CRM loaded successfully."
 );
