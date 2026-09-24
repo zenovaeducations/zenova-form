@@ -8,38 +8,32 @@ import {
     addDoc,
     updateDoc,
     doc,
-    serverTimestamp,
-    deleteDoc
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 
-/* =====================================================
+/* =========================================================
    CONFIG
-===================================================== */
+========================================================= */
 
 const VIEW_PASSWORD = "123456";
 
 
-/* =====================================================
+/* =========================================================
    STATE
-===================================================== */
+========================================================= */
 
 let students = [];
-
 let villages = [];
-
 let selectedStudent = null;
 
 
-/* =====================================================
-   ELEMENTS
-===================================================== */
+/* =========================================================
+   DOM
+========================================================= */
 
-const loginScreen =
-    document.getElementById("loginScreen");
-
-const mainPage =
-    document.getElementById("mainPage");
+const loginScreen = document.getElementById("loginScreen");
+const mainPage = document.getElementById("mainPage");
 
 const passwordInput =
     document.getElementById("passwordInput");
@@ -108,9 +102,9 @@ const studentDetails =
     document.getElementById("studentDetails");
 
 
-/* =====================================================
+/* =========================================================
    LOGIN
-===================================================== */
+========================================================= */
 
 loginButton.addEventListener(
     "click",
@@ -120,12 +114,10 @@ loginButton.addEventListener(
 
 passwordInput.addEventListener(
     "keydown",
-    event => {
+    function (event) {
 
         if (event.key === "Enter") {
-
             login();
-
         }
 
     }
@@ -147,7 +139,6 @@ function login() {
         passwordInput.focus();
 
         return;
-
     }
 
 
@@ -162,28 +153,26 @@ function login() {
 }
 
 
-/* =====================================================
-   INITIAL LOAD
-===================================================== */
+/* =========================================================
+   LOAD CRM
+========================================================= */
 
 async function loadCRM() {
 
+    studentsTable.innerHTML = `
+        <tr>
+            <td colspan="11" class="loading">
+                Loading Zenova CRM...
+            </td>
+        </tr>
+    `;
+
+
     try {
 
-        studentsTable.innerHTML = `
-            <tr>
-                <td colspan="11" class="loading">
-                    Loading Zenova CRM...
-                </td>
-            </tr>
-        `;
+        await loadStudents();
 
-
-        await Promise.all([
-            loadStudents(),
-            loadVillages()
-        ]);
-
+        await loadVillages();
 
         updateDashboard();
 
@@ -195,17 +184,27 @@ async function loadCRM() {
 
         renderFollowups();
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
-        console.error(error);
+        console.error(
+            "CRM LOAD ERROR:",
+            error
+        );
 
         studentsTable.innerHTML = `
             <tr>
                 <td colspan="11" class="loading">
+
                     Unable to load CRM.
+
                     <br><br>
-                    ${escapeHTML(error.message)}
+
+                    ${escapeHTML(
+                        error.message
+                    )}
+
                 </td>
             </tr>
         `;
@@ -215,14 +214,17 @@ async function loadCRM() {
 }
 
 
-/* =====================================================
+/* =========================================================
    LOAD STUDENTS
-===================================================== */
+========================================================= */
 
 async function loadStudents() {
 
-    const ref =
-        collection(db, "submissions");
+    const submissionsRef =
+        collection(
+            db,
+            "submissions"
+        );
 
 
     let snapshot;
@@ -232,7 +234,7 @@ async function loadStudents() {
 
         const q =
             query(
-                ref,
+                submissionsRef,
                 orderBy(
                     "submittedAt",
                     "desc"
@@ -242,15 +244,18 @@ async function loadStudents() {
         snapshot =
             await getDocs(q);
 
-    } catch {
+    }
 
-        /*
-         * Fallback if old documents don't have
-         * submittedAt correctly.
-         */
+    catch (error) {
+
+        console.warn(
+            "submittedAt ordering unavailable. Loading normally."
+        );
 
         snapshot =
-            await getDocs(ref);
+            await getDocs(
+                submissionsRef
+            );
 
     }
 
@@ -258,34 +263,35 @@ async function loadStudents() {
     students = [];
 
 
-    snapshot.forEach(firebaseDocument => {
+    snapshot.forEach(
+        firebaseDocument => {
 
-        const data =
-            firebaseDocument.data();
+            students.push({
 
+                id:
+                    firebaseDocument.id,
 
-        students.push({
+                ...firebaseDocument.data()
 
-            id:
-                firebaseDocument.id,
+            });
 
-            ...data
-
-        });
-
-    });
+        }
+    );
 
 }
 
 
-/* =====================================================
+/* =========================================================
    LOAD VILLAGES
-===================================================== */
+========================================================= */
 
 async function loadVillages() {
 
-    const ref =
-        collection(db, "villages");
+    const villagesRef =
+        collection(
+            db,
+            "villages"
+        );
 
 
     let snapshot;
@@ -295,17 +301,24 @@ async function loadVillages() {
 
         const q =
             query(
-                ref,
-                orderBy("name", "asc")
+                villagesRef,
+                orderBy(
+                    "name",
+                    "asc"
+                )
             );
 
         snapshot =
             await getDocs(q);
 
-    } catch {
+    }
+
+    catch {
 
         snapshot =
-            await getDocs(ref);
+            await getDocs(
+                villagesRef
+            );
 
     }
 
@@ -313,25 +326,39 @@ async function loadVillages() {
     villages = [];
 
 
-    snapshot.forEach(firebaseDocument => {
+    snapshot.forEach(
+        firebaseDocument => {
 
-        villages.push({
+            villages.push({
 
-            id:
-                firebaseDocument.id,
+                id:
+                    firebaseDocument.id,
 
-            ...firebaseDocument.data()
+                ...firebaseDocument.data()
 
-        });
+            });
 
-    });
+        }
+    );
+
+
+    villages.sort(
+        (a, b) =>
+            String(
+                a.name || ""
+            ).localeCompare(
+                String(
+                    b.name || ""
+                )
+            )
+    );
 
 }
 
 
-/* =====================================================
+/* =========================================================
    DASHBOARD
-===================================================== */
+========================================================= */
 
 function updateDashboard() {
 
@@ -342,8 +369,12 @@ function updateDashboard() {
     const admissions =
         students.filter(
             student =>
-                getAdmissionStatus(student) ===
-                "Admission Done"
+                getAdmissionStatus(
+                    student
+                ) === "Admission Done" ||
+                getAdmissionStatus(
+                    student
+                ) === "Admission Confirmed"
         );
 
 
@@ -354,7 +385,9 @@ function updateDashboard() {
     const followups =
         students.filter(
             student =>
-                student.nextFollowUp
+                Boolean(
+                    student.nextFollowUp
+                )
         );
 
 
@@ -364,18 +397,28 @@ function updateDashboard() {
 
     const collected =
         students.reduce(
-            (total, student) =>
+            (
+                total,
+                student
+            ) =>
                 total +
-                getPaidAmount(student),
+                getPaidAmount(
+                    student
+                ),
             0
         );
 
 
     const balance =
         students.reduce(
-            (total, student) =>
+            (
+                total,
+                student
+            ) =>
                 total +
-                getBalance(student),
+                getBalance(
+                    student
+                ),
             0
         );
 
@@ -383,18 +426,32 @@ function updateDashboard() {
     const coming =
         students.filter(
             student =>
-                student.comingTomorrow === true ||
-                student.visitStatus === "Coming Today" ||
-                student.visitStatus === "Coming Tomorrow"
+
+                student.comingTomorrow ===
+                true
+
+                ||
+
+                student.visitStatus ===
+                "Coming Today"
+
+                ||
+
+                student.visitStatus ===
+                "Coming Tomorrow"
         );
 
 
     totalCollected.textContent =
-        formatMoney(collected);
+        formatMoney(
+            collected
+        );
 
 
     totalBalance.textContent =
-        formatMoney(balance);
+        formatMoney(
+            balance
+        );
 
 
     totalComing.textContent =
@@ -403,9 +460,9 @@ function updateDashboard() {
 }
 
 
-/* =====================================================
+/* =========================================================
    STUDENT TABLE
-===================================================== */
+========================================================= */
 
 function renderStudents() {
 
@@ -422,31 +479,35 @@ function renderStudents() {
     if (search) {
 
         data =
-            data.filter(student => {
+            data.filter(
+                student => {
 
-                const text = [
+                    const text = [
 
-                    student.name,
+                        student.name,
 
-                    student.phone,
+                        student.phone,
 
-                    student.village,
+                        student.village,
 
-                    student.villageName,
+                        student.villageName,
 
-                    student.assignedVillage,
+                        student.assignedVillage,
 
-                    student.assignedVillageName
+                        student.assignedVillageName
 
-                ]
-                    .filter(Boolean)
-                    .join(" ")
-                    .toLowerCase();
+                    ]
+                        .filter(Boolean)
+                        .join(" ")
+                        .toLowerCase();
 
 
-                return text.includes(search);
+                    return text.includes(
+                        search
+                    );
 
-            });
+                }
+            );
 
     }
 
@@ -456,7 +517,9 @@ function renderStudents() {
         data =
             data.filter(
                 student =>
-                    getLeadStatus(student) ===
+                    getLeadStatus(
+                        student
+                    ) ===
                     statusFilter.value
             );
 
@@ -468,7 +531,9 @@ function renderStudents() {
         data =
             data.filter(
                 student =>
-                    getPaymentStatus(student) ===
+                    getPaymentStatus(
+                        student
+                    ) ===
                     paymentFilter.value
             );
 
@@ -480,8 +545,9 @@ function renderStudents() {
         data =
             data.filter(
                 student =>
-                    getAssignedVillage(student)
-                        .toLowerCase() ===
+                    getAssignedVillage(
+                        student
+                    ).toLowerCase() ===
                     villageFilter.value
                         .toLowerCase()
             );
@@ -493,35 +559,79 @@ function renderStudents() {
 
         studentsTable.innerHTML = `
             <tr>
+
                 <td
                     colspan="11"
                     class="empty"
                 >
+
                     No students found.
+
                 </td>
+
             </tr>
         `;
 
         return;
-
     }
 
 
     studentsTable.innerHTML =
         data.map(
-            (student, index) =>
+            (
+                student,
+                index
+            ) =>
                 createStudentRow(
                     student,
                     index
                 )
         ).join("");
 
+
+    /*
+     * IMPORTANT
+     *
+     * Attach View button events AFTER
+     * the table HTML is rendered.
+     */
+
+    document
+        .querySelectorAll(
+            ".student-view-button"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+
+                        const studentId =
+                            this.dataset.studentId;
+
+
+                        openStudent(
+                            studentId
+                        );
+
+                    }
+                );
+
+            }
+        );
+
 }
 
 
-/* =====================================================
-   STUDENT ROW
-===================================================== */
+/* =========================================================
+   CREATE STUDENT ROW
+========================================================= */
 
 function createStudentRow(
     student,
@@ -529,23 +639,33 @@ function createStudentRow(
 ) {
 
     const leadStatus =
-        getLeadStatus(student);
+        getLeadStatus(
+            student
+        );
 
 
     const admissionStatus =
-        getAdmissionStatus(student);
+        getAdmissionStatus(
+            student
+        );
 
 
     const paid =
-        getPaidAmount(student);
+        getPaidAmount(
+            student
+        );
 
 
     const balance =
-        getBalance(student);
+        getBalance(
+            student
+        );
 
 
     const paymentStatus =
-        getPaymentStatus(student);
+        getPaymentStatus(
+            student
+        );
 
 
     const followup =
@@ -566,23 +686,30 @@ function createStudentRow(
             <td>
 
                 <button
-                    class="student-name"
-                    onclick="openStudent('${student.id}')"
+                    type="button"
+                    class="student-name student-view-button"
+                    data-student-id="${escapeAttribute(
+                        student.id
+                    )}"
                 >
 
                     ${escapeHTML(
-                        student.name || "Unnamed"
+                        student.name ||
+                        "Unnamed"
                     )}
 
                 </button>
 
+
                 <small>
+
                     Target:
                     ${
                         student.targetPercentage ??
                         student.targetPercentageValue ??
                         "-"
                     }%
+
                 </small>
 
             </td>
@@ -597,11 +724,16 @@ function createStudentRow(
                             student.phone || ""
                         )}"
                     >
-                        <i class="ri-phone-line"></i>
+
+                        <i
+                            class="ri-phone-line"
+                        ></i>
+
                     </a>
 
                     ${escapeHTML(
-                        student.phone || "-"
+                        student.phone ||
+                        "-"
                     )}
 
                 </div>
@@ -614,7 +746,10 @@ function createStudentRow(
                 <span class="village-text">
 
                     ${escapeHTML(
-                        getStudentVillage(student) || "-"
+                        getStudentVillage(
+                            student
+                        ) ||
+                        "-"
                     )}
 
                 </span>
@@ -626,10 +761,10 @@ function createStudentRow(
 
                 <select
                     class="inline-select"
-                    onchange="changeAssignedVillage(
-                        '${student.id}',
-                        this.value
-                    )"
+                    data-student-id="${escapeAttribute(
+                        student.id
+                    )}"
+                    data-action="village"
                 >
 
                     <option value="">
@@ -639,23 +774,30 @@ function createStudentRow(
                     ${
                         villages.map(
                             village => `
+
                                 <option
                                     value="${escapeAttribute(
                                         village.name
                                     )}"
+
                                     ${
-                                        getAssignedVillage(student)
-                                            .toLowerCase() ===
-                                        String(village.name)
-                                            .toLowerCase()
+                                        getAssignedVillage(
+                                            student
+                                        ).toLowerCase() ===
+                                        String(
+                                            village.name
+                                        ).toLowerCase()
                                             ? "selected"
                                             : ""
                                     }
                                 >
+
                                     ${escapeHTML(
                                         village.name
                                     )}
+
                                 </option>
+
                             `
                         ).join("")
                     }
@@ -669,10 +811,10 @@ function createStudentRow(
 
                 <select
                     class="inline-select"
-                    onchange="changeLeadStatus(
-                        '${student.id}',
-                        this.value
-                    )"
+                    data-student-id="${escapeAttribute(
+                        student.id
+                    )}"
+                    data-action="lead-status"
                 >
 
                     ${leadStatusOptions(
@@ -688,10 +830,10 @@ function createStudentRow(
 
                 <select
                     class="inline-select"
-                    onchange="changeAdmissionStatus(
-                        '${student.id}',
-                        this.value
-                    )"
+                    data-student-id="${escapeAttribute(
+                        student.id
+                    )}"
+                    data-action="admission-status"
                 >
 
                     ${admissionOptions(
@@ -708,10 +850,19 @@ function createStudentRow(
                 <div class="money-cell">
 
                     <strong>
-                        ${formatMoney(paid)}
+
+                        ${formatMoney(
+                            paid
+                        )}
+
                     </strong>
 
-                    <span class="payment-badge ${paymentClass(paymentStatus)}">
+
+                    <span
+                        class="payment-badge ${paymentClass(
+                            paymentStatus
+                        )}"
+                    >
 
                         ${paymentStatus}
 
@@ -725,10 +876,16 @@ function createStudentRow(
             <td>
 
                 <strong
-                    class="${balance > 0 ? "balance-due" : "balance-clear"}"
+                    class="${
+                        balance > 0
+                            ? "balance-due"
+                            : "balance-clear"
+                    }"
                 >
 
-                    ${formatMoney(balance)}
+                    ${formatMoney(
+                        balance
+                    )}
 
                 </strong>
 
@@ -739,7 +896,10 @@ function createStudentRow(
 
                 <span class="followup-date">
 
-                    ${followup || "—"}
+                    ${
+                        followup ||
+                        "—"
+                    }
 
                 </span>
 
@@ -749,8 +909,11 @@ function createStudentRow(
             <td>
 
                 <button
-                    class="view-button"
-                    onclick="openStudent('${student.id}')"
+                    type="button"
+                    class="view-button student-view-button"
+                    data-student-id="${escapeAttribute(
+                        student.id
+                    )}"
                 >
 
                     View
@@ -766,134 +929,194 @@ function createStudentRow(
 }
 
 
-/* =====================================================
-   STATUS OPTIONS
-===================================================== */
+/* =========================================================
+   TABLE SELECT EVENTS
+========================================================= */
 
-function leadStatusOptions(selected) {
+studentsTable.addEventListener(
+    "change",
+    async function (event) {
+
+        const element =
+            event.target;
+
+
+        if (
+            !element.classList.contains(
+                "inline-select"
+            )
+        ) {
+            return;
+        }
+
+
+        const studentId =
+            element.dataset.studentId;
+
+
+        const action =
+            element.dataset.action;
+
+
+        const value =
+            element.value;
+
+
+        if (
+            !studentId ||
+            !action
+        ) {
+            return;
+        }
+
+
+        if (
+            action === "village"
+        ) {
+
+            await updateStudent(
+                studentId,
+                {
+                    assignedVillage:
+                        value
+                }
+            );
+
+        }
+
+
+        if (
+            action === "lead-status"
+        ) {
+
+            await updateStudent(
+                studentId,
+                {
+                    leadStatus:
+                        value
+                }
+            );
+
+        }
+
+
+        if (
+            action === "admission-status"
+        ) {
+
+            await updateStudent(
+                studentId,
+                {
+                    admissionStatus:
+                        value
+                }
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   STATUS OPTIONS
+========================================================= */
+
+function leadStatusOptions(
+    selected
+) {
 
     const statuses = [
 
         "New",
+
         "Contacted",
+
         "Not Answered",
+
         "Interested",
+
         "Follow-up",
+
         "Not Interested",
+
         "Coming",
+
         "Admission Done",
+
         "Lost"
 
     ];
 
 
-    return statuses.map(
-        status => `
+    return statuses
+        .map(
+            status => `
 
-            <option
-                value="${status}"
-                ${selected === status ? "selected" : ""}
-            >
-                ${status}
-            </option>
+                <option
+                    value="${status}"
+                    ${
+                        selected === status
+                            ? "selected"
+                            : ""
+                    }
+                >
 
-        `
-    ).join("");
+                    ${status}
+
+                </option>
+
+            `
+        )
+        .join("");
 
 }
 
 
-function admissionOptions(selected) {
+function admissionOptions(
+    selected
+) {
 
     const statuses = [
 
         "Not Enrolled",
+
         "Admission Confirmed",
+
         "Admission Done",
+
         "Admission Cancelled"
 
     ];
 
 
-    return statuses.map(
-        status => `
+    return statuses
+        .map(
+            status => `
 
-            <option
-                value="${status}"
-                ${selected === status ? "selected" : ""}
-            >
-                ${status}
-            </option>
+                <option
+                    value="${status}"
+                    ${
+                        selected === status
+                            ? "selected"
+                            : ""
+                    }
+                >
 
-        `
-    ).join("");
+                    ${status}
+
+                </option>
+
+            `
+        )
+        .join("");
 
 }
 
 
-/* =====================================================
-   UPDATE LEAD STATUS
-===================================================== */
-
-window.changeLeadStatus =
-    async function(
-        studentId,
-        status
-    ) {
-
-        await updateStudent(
-            studentId,
-            {
-                leadStatus: status
-            }
-        );
-
-    };
-
-
-/* =====================================================
-   UPDATE ADMISSION
-===================================================== */
-
-window.changeAdmissionStatus =
-    async function(
-        studentId,
-        status
-    ) {
-
-        await updateStudent(
-            studentId,
-            {
-                admissionStatus: status
-            }
-        );
-
-    };
-
-
-/* =====================================================
-   ASSIGN VILLAGE
-===================================================== */
-
-window.changeAssignedVillage =
-    async function(
-        studentId,
-        village
-    ) {
-
-        await updateStudent(
-            studentId,
-            {
-                assignedVillage: village
-            }
-        );
-
-    };
-
-
-/* =====================================================
+/* =========================================================
    UPDATE STUDENT
-===================================================== */
+========================================================= */
 
 async function updateStudent(
     studentId,
@@ -910,6 +1133,7 @@ async function updateStudent(
             ),
             {
                 ...fields,
+
                 updatedAt:
                     serverTimestamp()
             }
@@ -945,10 +1169,15 @@ async function updateStudent(
 
         renderFollowups();
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
-        console.error(error);
+        console.error(
+            "UPDATE ERROR:",
+            error
+        );
+
 
         alert(
             "Unable to update student.\n\n" +
@@ -960,9 +1189,9 @@ async function updateStudent(
 }
 
 
-/* =====================================================
+/* =========================================================
    VILLAGE FILTER
-===================================================== */
+========================================================= */
 
 function populateVillageFilter() {
 
@@ -977,24 +1206,29 @@ function populateVillageFilter() {
     `;
 
 
-    villages.forEach(village => {
+    villages.forEach(
+        village => {
 
-        const option =
-            document.createElement("option");
-
-
-        option.value =
-            village.name;
-
-        option.textContent =
-            village.name;
+            const option =
+                document.createElement(
+                    "option"
+                );
 
 
-        villageFilter.appendChild(
-            option
-        );
+            option.value =
+                village.name;
 
-    });
+
+            option.textContent =
+                village.name;
+
+
+            villageFilter.appendChild(
+                option
+            );
+
+        }
+    );
 
 
     villageFilter.value =
@@ -1003,36 +1237,63 @@ function populateVillageFilter() {
 }
 
 
-/* =====================================================
-   VILLAGE CARDS
-===================================================== */
+/* =========================================================
+   VILLAGES
+========================================================= */
 
 function renderVillages() {
 
     if (!villages.length) {
 
         villageCards.innerHTML = `
-
             <div class="empty-card">
-
                 No villages created yet.
-
             </div>
-
         `;
 
         return;
-
     }
 
 
     villageCards.innerHTML =
-        villages.map(
-            village =>
-                createVillageCard(
-                    village
-                )
-        ).join("");
+        villages
+            .map(
+                village =>
+                    createVillageCard(
+                        village
+                    )
+            )
+            .join("");
+
+
+    /*
+     * Village View buttons/cards
+     */
+
+    document
+        .querySelectorAll(
+            ".village-open-button"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const villageName =
+                            this.dataset.villageName;
+
+
+                        openVillage(
+                            villageName
+                        );
+
+                    }
+                );
+
+            }
+        );
 
 }
 
@@ -1050,8 +1311,9 @@ function createVillageCard(
     const villageStudents =
         students.filter(
             student =>
-                getAssignedVillage(student)
-                    .toLowerCase() ===
+                getAssignedVillage(
+                    student
+                ).toLowerCase() ===
                 name.toLowerCase()
         );
 
@@ -1059,27 +1321,44 @@ function createVillageCard(
     const admissions =
         villageStudents.filter(
             student =>
-                getAdmissionStatus(student) ===
-                "Admission Done" ||
-                getAdmissionStatus(student) ===
+                getAdmissionStatus(
+                    student
+                ) ===
+                "Admission Done"
+
+                ||
+
+                getAdmissionStatus(
+                    student
+                ) ===
                 "Admission Confirmed"
         ).length;
 
 
     const paid =
         villageStudents.reduce(
-            (sum, student) =>
+            (
+                sum,
+                student
+            ) =>
                 sum +
-                getPaidAmount(student),
+                getPaidAmount(
+                    student
+                ),
             0
         );
 
 
     const balance =
         villageStudents.reduce(
-            (sum, student) =>
+            (
+                sum,
+                student
+            ) =>
                 sum +
-                getBalance(student),
+                getBalance(
+                    student
+                ),
             0
         );
 
@@ -1087,27 +1366,41 @@ function createVillageCard(
     return `
 
         <div
-            class="village-card"
-            onclick="openVillage('${escapeAttribute(name)}')"
+            class="village-card village-open-button"
+            data-village-name="${escapeAttribute(
+                name
+            )}"
         >
 
             <div class="village-card-top">
 
                 <div class="village-icon">
 
-                    <i class="ri-map-pin-line"></i>
+                    <i
+                        class="ri-map-pin-line"
+                    ></i>
 
                 </div>
+
 
                 <div>
 
                     <h3>
-                        ${escapeHTML(name)}
+
+                        ${escapeHTML(
+                            name
+                        )}
+
                     </h3>
 
+
                     <span>
-                        ${villageStudents.length}
+
+                        ${
+                            villageStudents.length
+                        }
                         students
+
                     </span>
 
                 </div>
@@ -1119,7 +1412,9 @@ function createVillageCard(
 
                 <div>
 
-                    <span>Admissions</span>
+                    <span>
+                        Admissions
+                    </span>
 
                     <strong>
                         ${admissions}
@@ -1130,10 +1425,14 @@ function createVillageCard(
 
                 <div>
 
-                    <span>Collected</span>
+                    <span>
+                        Collected
+                    </span>
 
                     <strong>
-                        ${formatMoney(paid)}
+                        ${formatMoney(
+                            paid
+                        )}
                     </strong>
 
                 </div>
@@ -1141,10 +1440,14 @@ function createVillageCard(
 
                 <div>
 
-                    <span>Balance</span>
+                    <span>
+                        Balance
+                    </span>
 
                     <strong>
-                        ${formatMoney(balance)}
+                        ${formatMoney(
+                            balance
+                        )}
                     </strong>
 
                 </div>
@@ -1155,7 +1458,10 @@ function createVillageCard(
             <div class="view-village">
 
                 View Village
-                <i class="ri-arrow-right-line"></i>
+
+                <i
+                    class="ri-arrow-right-line"
+                ></i>
 
             </div>
 
@@ -1166,30 +1472,72 @@ function createVillageCard(
 }
 
 
-/* =====================================================
+/* =========================================================
    OPEN VILLAGE
-===================================================== */
+========================================================= */
 
-window.openVillage =
-    function(name) {
+function openVillage(
+    villageName
+) {
 
+    document
+        .querySelectorAll(
+            ".tab"
+        )
+        .forEach(
+            tab =>
+                tab.classList.remove(
+                    "active"
+                )
+        );
+
+
+    document
+        .querySelectorAll(
+            ".tab-content"
+        )
+        .forEach(
+            content =>
+                content.classList.remove(
+                    "active"
+                )
+        );
+
+
+    const studentTab =
         document.querySelector(
             '[data-tab="students"]'
-        ).click();
+        );
 
 
-        villageFilter.value =
-            name;
+    const studentsContent =
+        document.getElementById(
+            "studentsTab"
+        );
 
 
-        renderStudents();
+    studentTab.classList.add(
+        "active"
+    );
 
-    };
+
+    studentsContent.classList.add(
+        "active"
+    );
 
 
-/* =====================================================
+    villageFilter.value =
+        villageName;
+
+
+    renderStudents();
+
+}
+
+
+/* =========================================================
    ADD VILLAGE
-===================================================== */
+========================================================= */
 
 addVillageButton.addEventListener(
     "click",
@@ -1199,9 +1547,11 @@ addVillageButton.addEventListener(
 
 newVillageInput.addEventListener(
     "keydown",
-    event => {
+    function (event) {
 
-        if (event.key === "Enter") {
+        if (
+            event.key === "Enter"
+        ) {
 
             addVillage();
 
@@ -1231,8 +1581,9 @@ async function addVillage() {
     const exists =
         villages.some(
             village =>
-                String(village.name)
-                    .toLowerCase() ===
+                String(
+                    village.name
+                ).toLowerCase() ===
                 name.toLowerCase()
         );
 
@@ -1279,10 +1630,13 @@ async function addVillage() {
 
         villages.sort(
             (a, b) =>
-                String(a.name)
-                    .localeCompare(
-                        String(b.name)
+                String(
+                    a.name
+                ).localeCompare(
+                    String(
+                        b.name
                     )
+                )
         );
 
 
@@ -1294,9 +1648,15 @@ async function addVillage() {
         renderVillages();
 
 
-    } catch (error) {
+    }
 
-        console.error(error);
+    catch (error) {
+
+        console.error(
+            "ADD VILLAGE ERROR:",
+            error
+        );
+
 
         alert(
             "Unable to create village.\n\n" +
@@ -1308,162 +1668,248 @@ async function addVillage() {
 }
 
 
-/* =====================================================
-   FOLLOWUPS
-===================================================== */
+/* =========================================================
+   FOLLOW-UP CRM
+========================================================= */
 
 function renderFollowups() {
 
-    const list = students
-        .filter(student => student.nextFollowUp)
-        .sort((a, b) =>
-            getDateValue(a.nextFollowUp) -
-            getDateValue(b.nextFollowUp)
-        );
+    const list =
+        students
+            .filter(
+                student =>
+                    Boolean(
+                        student.nextFollowUp
+                    )
+            )
+            .sort(
+                (a, b) =>
+                    getDateValue(
+                        a.nextFollowUp
+                    ) -
+                    getDateValue(
+                        b.nextFollowUp
+                    )
+            );
+
 
     if (!list.length) {
 
         followupList.innerHTML = `
             <div class="empty-card">
+
                 No follow-ups scheduled.
+
             </div>
         `;
 
         return;
     }
 
-    followupList.innerHTML = list.map(student => {
 
-        const date =
-            getDateValue(student.nextFollowUp);
-
-        const today = new Date();
-
-        today.setHours(0, 0, 0, 0);
-
-        const isOverdue =
-            date < today;
-
-        return `
-            <div
-                class="followup-card ${isOverdue ? "overdue" : ""}"
-                data-student-id="${escapeHTML(student.id)}"
-            >
-
-                <div>
-
-                    <strong>
-                        ${escapeHTML(
-                            student.name || "-"
-                        )}
-                    </strong>
-
-                    <span>
-                        ${escapeHTML(
-                            student.phone || "-"
-                        )}
-                    </span>
-
-                </div>
+    const today =
+        new Date();
 
 
-                <div>
-
-                    <span>
-                        ${escapeHTML(
-                            getAssignedVillage(student) ||
-                            getStudentVillage(student) ||
-                            "-"
-                        )}
-                    </span>
-
-                </div>
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
 
 
-                <div>
+    followupList.innerHTML =
+        list
+            .map(
+                student => {
 
-                    <strong>
-                        ${formatDate(
+                    const date =
+                        getDateValue(
                             student.nextFollowUp
-                        )}
-                    </strong>
+                        );
 
-                    ${
-                        isOverdue
-                            ? `
-                                <span class="overdue-label">
-                                    OVERDUE
+
+                    const isOverdue =
+                        date < today;
+
+
+                    return `
+
+                        <div
+                            class="
+                                followup-card
+                                ${
+                                    isOverdue
+                                        ? "overdue"
+                                        : ""
+                                }
+                            "
+                        >
+
+                            <div>
+
+                                <strong>
+
+                                    ${escapeHTML(
+                                        student.name ||
+                                        "-"
+                                    )}
+
+                                </strong>
+
+
+                                <span>
+
+                                    ${escapeHTML(
+                                        student.phone ||
+                                        "-"
+                                    )}
+
                                 </span>
-                            `
-                            : ""
-                    }
 
-                </div>
+                            </div>
 
 
-                <button
-                    type="button"
-                    class="followup-view-button"
-                    data-student-id="${escapeHTML(student.id)}"
-                >
-                    View
-                </button>
+                            <div>
 
-            </div>
-        `;
+                                <span>
 
-    }).join("");
+                                    ${escapeHTML(
+                                        getAssignedVillage(
+                                            student
+                                        ) ||
+                                        getStudentVillage(
+                                            student
+                                        ) ||
+                                        "-"
+                                    )}
+
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+
+                                    ${formatDate(
+                                        student.nextFollowUp
+                                    )}
+
+                                </strong>
+
+
+                                ${
+                                    isOverdue
+                                        ? `
+                                            <span
+                                                class="overdue-label"
+                                            >
+                                                OVERDUE
+                                            </span>
+                                        `
+                                        : ""
+                                }
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="
+                                    followup-view-button
+                                "
+                                data-student-id="${escapeAttribute(
+                                    student.id
+                                )}"
+                            >
+
+                                View
+
+                            </button>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
 
 
     /*
-     * IMPORTANT:
-     * Attach View button events AFTER
-     * the HTML has been inserted.
+     * THIS FIXES THE VIEW BUTTON
+     *
+     * We attach the click event AFTER
+     * follow-up HTML is inserted.
      */
 
     document
-        .querySelectorAll(".followup-view-button")
-        .forEach(button => {
+        .querySelectorAll(
+            ".followup-view-button"
+        )
+        .forEach(
+            button => {
 
-            button.addEventListener(
-                "click",
-                function(event) {
+                button.addEventListener(
+                    "click",
+                    function (event) {
 
-                    event.preventDefault();
+                        event.preventDefault();
 
-                    event.stopPropagation();
+                        event.stopPropagation();
 
-                    const studentId =
-                        this.dataset.studentId;
 
-                    console.log(
-                        "Opening student:",
-                        studentId
-                    );
+                        const studentId =
+                            this.dataset.studentId;
 
-                    openStudent(
-                        studentId
-                    );
 
-                }
-            );
+                        console.log(
+                            "Follow-up View:",
+                            studentId
+                        );
 
-        });
+
+                        openStudent(
+                            studentId
+                        );
+
+                    }
+                );
+
+            }
+        );
 
 }
-/* =====================================================
-   STUDENT PROFILE
-===================================================== */
 
-window.openStudent = function(studentId) {
 
-    console.log("openStudent called:", studentId);
+/* =========================================================
+   OPEN STUDENT PROFILE
+========================================================= */
+
+function openStudent(
+    studentId
+) {
+
+    console.log(
+        "Opening student:",
+        studentId
+    );
+
 
     const student =
         students.find(
-            student =>
-                student.id === studentId
+            item =>
+                String(
+                    item.id
+                ) ===
+                String(
+                    studentId
+                )
         );
+
 
     if (!student) {
 
@@ -1472,312 +1918,498 @@ window.openStudent = function(studentId) {
             studentId
         );
 
+
         alert(
             "Student record not found."
         );
 
+
         return;
     }
 
-    selectedStudent = student;
 
-    // Your existing profile/modal code continues here...
+    selectedStudent =
+        student;
 
-};
-        const paid =
-            getPaidAmount(student);
 
-
-        const balance =
-            getBalance(student);
-
-
-        studentDetails.innerHTML = `
-
-            <div class="profile-header">
-
-                <div>
-
-                    <span class="profile-label">
-                        STUDENT
-                    </span>
-
-                    <h2>
-                        ${escapeHTML(
-                            student.name || "Unnamed"
-                        )}
-                    </h2>
-
-                    <p>
-                        ${escapeHTML(
-                            student.phone || "-"
-                        )}
-                    </p>
-
-                </div>
-
-
-                <div class="profile-actions">
-
-                    <a
-                        class="call-action"
-                        href="tel:${escapeAttribute(
-                            student.phone || ""
-                        )}"
-                    >
-                        <i class="ri-phone-line"></i>
-                        Call
-                    </a>
-
-
-                    <a
-                        class="whatsapp-action"
-                        href="${getWhatsAppLink(
-                            student.phone
-                        )}"
-                        target="_blank"
-                    >
-                        <i class="ri-whatsapp-line"></i>
-                        WhatsApp
-                    </a>
-
-                </div>
-
-            </div>
-
-
-            <div class="profile-grid">
-
-
-                <!-- BASIC -->
-
-                <div class="profile-section">
-
-                    <h3>
-                        Student Information
-                    </h3>
-
-
-                    ${profileField(
-                        "Target %",
-                        (
-                            student.targetPercentage ??
-                            student.targetPercentageValue ??
-                            "-"
-                        ) + "%"
-                    )}
-
-
-                    ${profileField(
-                        "Student Village",
-                        getStudentVillage(student) || "-"
-                    )}
-
-
-                    ${profileField(
-                        "Assigned Village",
-                        getAssignedVillage(student) || "-"
-                    )}
-
-
-                    ${profileField(
-                        "Village Stop",
-                        student.villageStop || "-"
-                    )}
-
-                </div>
-
-
-                <!-- CRM -->
-
-                <div class="profile-section">
-
-                    <h3>
-                        CRM Status
-                    </h3>
-
-
-                    <label>
-                        Lead Status
-                    </label>
-
-                    <select
-                        id="profileLeadStatus"
-                        class="profile-input"
-                    >
-
-                        ${leadStatusOptions(
-                            getLeadStatus(student)
-                        )}
-
-                    </select>
-
-
-                    <label>
-                        Admission
-                    </label>
-
-                    <select
-                        id="profileAdmissionStatus"
-                        class="profile-input"
-                    >
-
-                        ${admissionOptions(
-                            getAdmissionStatus(student)
-                        )}
-
-                    </select>
-
-
-                    <label>
-                        Visit Status
-                    </label>
-
-                    <select
-                        id="profileVisitStatus"
-                        class="profile-input"
-                    >
-
-                        ${visitStatusOptions(
-                            student.visitStatus
-                        )}
-
-                    </select>
-
-                </div>
-
-
-                <!-- FEES -->
-
-                <div class="profile-section">
-
-                    <h3>
-                        Fees
-                    </h3>
-
-
-                    <label>
-                        Total Fee
-                    </label>
-
-                    <input
-                        id="profileTotalFee"
-                        class="profile-input"
-                        type="number"
-                        value="${Number(
-                            student.totalFee || 0
-                        )}"
-                    >
-
-
-                    <label>
-                        Amount Paid
-                    </label>
-
-                    <input
-                        id="profilePaid"
-                        class="profile-input"
-                        type="number"
-                        value="${paid}"
-                    >
-
-
-                    <div class="fee-summary">
-
-                        <span>
-                            Balance
-                        </span>
-
-                        <strong>
-                            ${formatMoney(balance)}
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                <!-- FOLLOW UP -->
-
-                <div class="profile-section">
-
-                    <h3>
-                        Follow-up
-                    </h3>
-
-
-                    <label>
-                        Next Follow-up
-                    </label>
-
-                    <input
-                        id="profileFollowup"
-                        class="profile-input"
-                        type="date"
-                        value="${dateInputValue(
-                            student.nextFollowUp
-                        )}"
-                    >
-
-
-                    <label>
-                        Follow-up Notes
-                    </label>
-
-                    <textarea
-                        id="profileNotes"
-                        class="profile-input"
-                        rows="4"
-                    >${escapeHTML(
-                        student.followUpNotes ||
-                        student.notes ||
-                        ""
-                    )}</textarea>
-
-                </div>
-
-            </div>
-
-
-            <div class="profile-footer">
-
-                <button
-                    id="saveStudentButton"
-                    class="save-button"
-                >
-                    <i class="ri-save-line"></i>
-                    Save Changes
-                </button>
-
-            </div>
-
-        `;
-
-
-        studentModal.classList.add(
-            "show"
+    const paid =
+        getPaidAmount(
+            student
         );
 
 
-        document
-            .getElementById(
-                "saveStudentButton"
-            )
-            .addEventListener(
-                "click",
-                saveStudentProfile
+    const balance =
+        getBalance(
+            student
+        );
+
+
+    studentDetails.innerHTML = `
+
+        <div class="profile-header">
+
+            <div>
+
+                <span
+                    class="profile-label"
+                >
+                    STUDENT
+                </span>
+
+
+                <h2>
+
+                    ${escapeHTML(
+                        student.name ||
+                        "Unnamed"
+                    )}
+
+                </h2>
+
+
+                <p>
+
+                    ${escapeHTML(
+                        student.phone ||
+                        "-"
+                    )}
+
+                </p>
+
+            </div>
+
+
+            <div class="profile-actions">
+
+                <a
+                    class="call-action"
+                    href="tel:${escapeAttribute(
+                        student.phone ||
+                        ""
+                    )}"
+                >
+
+                    <i
+                        class="ri-phone-line"
+                    ></i>
+
+                    Call
+
+                </a>
+
+
+                <a
+                    class="whatsapp-action"
+                    href="${getWhatsAppLink(
+                        student.phone
+                    )}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+
+                    <i
+                        class="ri-whatsapp-line"
+                    ></i>
+
+                    WhatsApp
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-grid">
+
+
+            <!-- STUDENT INFORMATION -->
+
+            <div class="profile-section">
+
+                <h3>
+                    Student Information
+                </h3>
+
+
+                ${profileField(
+                    "Target %",
+                    (
+                        student.targetPercentage ??
+                        student.targetPercentageValue ??
+                        "-"
+                    ) + "%"
+                )}
+
+
+                ${profileField(
+                    "Student Village",
+                    getStudentVillage(
+                        student
+                    ) || "-"
+                )}
+
+
+                ${profileField(
+                    "Assigned Village",
+                    getAssignedVillage(
+                        student
+                    ) || "-"
+                )}
+
+
+                ${profileField(
+                    "Village Stop",
+                    student.villageStop ||
+                    "-"
+                )}
+
+            </div>
+
+
+            <!-- CRM STATUS -->
+
+            <div class="profile-section">
+
+                <h3>
+                    CRM Status
+                </h3>
+
+
+                <label>
+                    Lead Status
+                </label>
+
+
+                <select
+                    id="profileLeadStatus"
+                    class="profile-input"
+                >
+
+                    ${leadStatusOptions(
+                        getLeadStatus(
+                            student
+                        )
+                    )}
+
+                </select>
+
+
+                <label>
+                    Admission
+                </label>
+
+
+                <select
+                    id="profileAdmissionStatus"
+                    class="profile-input"
+                >
+
+                    ${admissionOptions(
+                        getAdmissionStatus(
+                            student
+                        )
+                    )}
+
+                </select>
+
+
+                <label>
+                    Visit Status
+                </label>
+
+
+                <select
+                    id="profileVisitStatus"
+                    class="profile-input"
+                >
+
+                    ${visitStatusOptions(
+                        student.visitStatus
+                    )}
+
+                </select>
+
+            </div>
+
+
+            <!-- FEES -->
+
+            <div class="profile-section">
+
+                <h3>
+                    Fees
+                </h3>
+
+
+                <label>
+                    Total Fee
+                </label>
+
+
+                <input
+                    id="profileTotalFee"
+                    class="profile-input"
+                    type="number"
+                    min="0"
+                    value="${Number(
+                        student.totalFee ||
+                        0
+                    )}"
+                >
+
+
+                <label>
+                    Amount Paid
+                </label>
+
+
+                <input
+                    id="profilePaid"
+                    class="profile-input"
+                    type="number"
+                    min="0"
+                    value="${paid}"
+                >
+
+
+                <div class="fee-summary">
+
+                    <span>
+                        Balance
+                    </span>
+
+
+                    <strong
+                        id="profileBalance"
+                        class="${
+                            balance > 0
+                                ? "balance-due"
+                                : "balance-clear"
+                        }"
+                    >
+
+                        ${formatMoney(
+                            balance
+                        )}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- FOLLOW UP -->
+
+            <div class="profile-section">
+
+                <h3>
+                    Follow-up
+                </h3>
+
+
+                <label>
+                    Next Follow-up
+                </label>
+
+
+                <input
+                    id="profileFollowup"
+                    class="profile-input"
+                    type="date"
+                    value="${dateInputValue(
+                        student.nextFollowUp
+                    )}"
+                >
+
+
+                <label>
+                    Follow-up Notes
+                </label>
+
+
+                <textarea
+                    id="profileNotes"
+                    class="profile-input"
+                    rows="4"
+                >${escapeHTML(
+                    student.followUpNotes ||
+                    student.notes ||
+                    ""
+                )}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-footer">
+
+            <button
+                type="button"
+                id="saveStudentButton"
+                class="save-button"
+            >
+
+                <i
+                    class="ri-save-line"
+                ></i>
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    `;
+
+
+    studentModal.classList.add(
+        "show"
+    );
+
+
+    /*
+     * Recalculate balance when fee/paid changes
+     */
+
+    const feeInput =
+        document.getElementById(
+            "profileTotalFee"
+        );
+
+
+    const paidInput =
+        document.getElementById(
+            "profilePaid"
+        );
+
+
+    function updateProfileBalance() {
+
+        const total =
+            Number(
+                feeInput.value || 0
             );
 
-    };
+
+        const paidValue =
+            Number(
+                paidInput.value || 0
+            );
 
 
-/* =====================================================
-   SAVE PROFILE
-===================================================== */
+        const newBalance =
+            Math.max(
+                0,
+                total - paidValue
+            );
+
+
+        const balanceElement =
+            document.getElementById(
+                "profileBalance"
+            );
+
+
+        balanceElement.textContent =
+            formatMoney(
+                newBalance
+            );
+
+
+        balanceElement.className =
+            newBalance > 0
+                ? "balance-due"
+                : "balance-clear";
+
+    }
+
+
+    feeInput.addEventListener(
+        "input",
+        updateProfileBalance
+    );
+
+
+    paidInput.addEventListener(
+        "input",
+        updateProfileBalance
+    );
+
+
+    document
+        .getElementById(
+            "saveStudentButton"
+        )
+        .addEventListener(
+            "click",
+            saveStudentProfile
+        );
+
+}
+
+
+/* =========================================================
+   PROFILE FIELD
+========================================================= */
+
+function profileField(
+    label,
+    value
+) {
+
+    return `
+
+        <div
+            style="
+                margin-bottom:12px;
+            "
+        >
+
+            <span
+                style="
+                    display:block;
+                    font-size:11px;
+                    color:#6b7280;
+                    margin-bottom:4px;
+                "
+            >
+
+                ${escapeHTML(
+                    label
+                )}
+
+            </span>
+
+
+            <strong>
+
+                ${escapeHTML(
+                    value
+                )}
+
+            </strong>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   SAVE STUDENT PROFILE
+========================================================= */
 
 async function saveStudentProfile() {
 
-    if (!selectedStudent) return;
+    if (!selectedStudent) {
+
+        return;
+
+    }
 
 
     const totalFee =
@@ -1796,6 +2428,18 @@ async function saveStudentProfile() {
         );
 
 
+    if (paid > totalFee) {
+
+        alert(
+            "Paid amount cannot be greater than total fee."
+        );
+
+
+        return;
+
+    }
+
+
     const balance =
         Math.max(
             0,
@@ -1810,32 +2454,46 @@ async function saveStudentProfile() {
                 "profileLeadStatus"
             ).value,
 
+
         admissionStatus:
             document.getElementById(
                 "profileAdmissionStatus"
             ).value,
+
 
         visitStatus:
             document.getElementById(
                 "profileVisitStatus"
             ).value,
 
-        totalFee,
+
+        totalFee:
+
+
+            totalFee,
+
 
         totalPaid:
             paid,
 
-        balance,
+
+        balance:
+
+
+            balance,
+
 
         nextFollowUp:
             document.getElementById(
                 "profileFollowup"
             ).value || "",
 
+
         followUpNotes:
             document.getElementById(
                 "profileNotes"
             ).value.trim(),
+
 
         updatedAt:
             serverTimestamp()
@@ -1855,12 +2513,6 @@ async function saveStudentProfile() {
         );
 
 
-        Object.assign(
-            selectedStudent,
-            fields
-        );
-
-
         const index =
             students.findIndex(
                 student =>
@@ -1871,16 +2523,23 @@ async function saveStudentProfile() {
 
         if (index !== -1) {
 
-            students[index] =
-                {
-                    ...students[index],
-                    ...fields
-                };
+            students[index] = {
+
+                ...students[index],
+
+                ...fields
+
+            };
 
         }
 
 
+        selectedStudent =
+            students[index];
+
+
         closeStudentModal();
+
 
         updateDashboard();
 
@@ -1895,10 +2554,15 @@ async function saveStudentProfile() {
             "Student updated successfully."
         );
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
-        console.error(error);
+        console.error(
+            "SAVE STUDENT ERROR:",
+            error
+        );
+
 
         alert(
             "Unable to save student.\n\n" +
@@ -1910,9 +2574,9 @@ async function saveStudentProfile() {
 }
 
 
-/* =====================================================
+/* =========================================================
    CLOSE MODAL
-===================================================== */
+========================================================= */
 
 closeModal.addEventListener(
     "click",
@@ -1922,7 +2586,7 @@ closeModal.addEventListener(
 
 studentModal.addEventListener(
     "click",
-    event => {
+    function (event) {
 
         if (
             event.target ===
@@ -1943,69 +2607,74 @@ function closeStudentModal() {
         "show"
     );
 
-    selectedStudent = null;
+
+    selectedStudent =
+        null;
 
 }
 
 
-/* =====================================================
-   TAB SYSTEM
-===================================================== */
+/* =========================================================
+   VISIT STATUS
+========================================================= */
 
-document
-    .querySelectorAll(".tab")
-    .forEach(button => {
+function visitStatusOptions(
+    selected
+) {
 
-        button.addEventListener(
-            "click",
-            () => {
+    const statuses = [
 
-                document
-                    .querySelectorAll(".tab")
-                    .forEach(
-                        tab =>
-                            tab.classList.remove(
-                                "active"
-                            )
-                    );
+        "",
 
+        "Not Planned",
 
-                document
-                    .querySelectorAll(".tab-content")
-                    .forEach(
-                        content =>
-                            content.classList.remove(
-                                "active"
-                            )
-                    );
+        "Coming Today",
+
+        "Coming Tomorrow",
+
+        "Visited",
+
+        "Did Not Come",
+
+        "Rescheduled"
+
+    ];
 
 
-                button.classList.add(
-                    "active"
-                );
+    return statuses
+        .map(
+            status => `
+
+                <option
+                    value="${escapeAttribute(
+                        status
+                    )}"
+
+                    ${
+                        selected ===
+                        status
+                            ? "selected"
+                            : ""
+                    }
+                >
+
+                    ${
+                        status ||
+                        "Select visit status"
+                    }
+
+                </option>
+
+            `
+        )
+        .join("");
+
+}
 
 
-                const target =
-                    button.dataset.tab;
-
-
-                document
-                    .getElementById(
-                        target + "Tab"
-                    )
-                    .classList.add(
-                        "active"
-                    );
-
-            }
-        );
-
-    });
-
-
-/* =====================================================
+/* =========================================================
    FILTERS
-===================================================== */
+========================================================= */
 
 searchInput.addEventListener(
     "input",
@@ -2031,21 +2700,27 @@ villageFilter.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
    REFRESH
-===================================================== */
+========================================================= */
 
 refreshButton.addEventListener(
     "click",
-    loadCRM
+    async function () {
+
+        await loadCRM();
+
+    }
 );
 
 
-/* =====================================================
+/* =========================================================
    DATA HELPERS
-===================================================== */
+========================================================= */
 
-function getStudentVillage(student) {
+function getStudentVillage(
+    student
+) {
 
     return (
         student.village ||
@@ -2056,7 +2731,9 @@ function getStudentVillage(student) {
 }
 
 
-function getAssignedVillage(student) {
+function getAssignedVillage(
+    student
+) {
 
     return (
         student.assignedVillage ||
@@ -2067,7 +2744,9 @@ function getAssignedVillage(student) {
 }
 
 
-function getLeadStatus(student) {
+function getLeadStatus(
+    student
+) {
 
     return (
         student.leadStatus ||
@@ -2077,7 +2756,9 @@ function getLeadStatus(student) {
 }
 
 
-function getAdmissionStatus(student) {
+function getAdmissionStatus(
+    student
+) {
 
     return (
         student.admissionStatus ||
@@ -2087,29 +2768,43 @@ function getAdmissionStatus(student) {
 }
 
 
-function getPaidAmount(student) {
+function getPaidAmount(
+    student
+) {
 
     return Number(
+
         student.totalPaid ??
+
         student.amountPaid ??
+
         student.paidAmount ??
+
         0
+
     );
 
 }
 
 
-function getTotalFee(student) {
+function getTotalFee(
+    student
+) {
 
     return Number(
+
         student.totalFee ??
+
         0
+
     );
 
 }
 
 
-function getBalance(student) {
+function getBalance(
+    student
+) {
 
     const stored =
         student.balance;
@@ -2123,29 +2818,45 @@ function getBalance(student) {
 
         return Math.max(
             0,
-            Number(stored)
+            Number(
+                stored
+            )
         );
 
     }
 
 
     return Math.max(
+
         0,
-        getTotalFee(student) -
-        getPaidAmount(student)
+
+        getTotalFee(
+            student
+        ) -
+
+        getPaidAmount(
+            student
+        )
+
     );
 
 }
 
 
-function getPaymentStatus(student) {
+function getPaymentStatus(
+    student
+) {
 
     const total =
-        getTotalFee(student);
+        getTotalFee(
+            student
+        );
 
 
     const paid =
-        getPaidAmount(student);
+        getPaidAmount(
+            student
+        );
 
 
     if (
@@ -2172,94 +2883,41 @@ function getPaymentStatus(student) {
 }
 
 
-/* =====================================================
-   VISIT STATUS
-===================================================== */
-
-function visitStatusOptions(
-    selected
-) {
-
-    const statuses = [
-
-        "",
-        "Not Planned",
-        "Coming Today",
-        "Coming Tomorrow",
-        "Visited",
-        "Did Not Come",
-        "Rescheduled"
-
-    ];
-
-
-    return statuses.map(
-        status => `
-
-            <option
-                value="${status}"
-                ${
-                    selected === status
-                        ? "selected"
-                        : ""
-                }
-            >
-                ${
-                    status ||
-                    "Select visit status"
-                }
-            </option>
-
-        `
-    ).join("");
-
-}
-
-
-/* =====================================================
-   FORMATTING
-===================================================== */
-
-function formatMoney(
-    amount
-) {
-
-    return new Intl.NumberFormat(
-        "en-IN",
-        {
-            style: "currency",
-            currency: "INR",
-            maximumFractionDigits: 0
-        }
-    ).format(
-        Number(amount || 0)
-    );
-
-}
-
+/* =========================================================
+   DATE HELPERS
+========================================================= */
 
 function formatDate(
     value
 ) {
 
-    if (!value) return "";
+    if (!value) {
+
+        return "";
+
+    }
 
 
     let date;
 
 
     if (
-        typeof value === "object" &&
+        typeof value ===
+        "object" &&
         value.toDate
     ) {
 
         date =
             value.toDate();
 
-    } else {
+    }
+
+    else {
 
         date =
-            new Date(value);
+            new Date(
+                value
+            );
 
     }
 
@@ -2278,9 +2936,14 @@ function formatDate(
     return date.toLocaleDateString(
         "en-IN",
         {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
+            day:
+                "2-digit",
+
+            month:
+                "short",
+
+            year:
+                "numeric"
         }
     );
 
@@ -2291,24 +2954,33 @@ function dateInputValue(
     value
 ) {
 
-    if (!value) return "";
+    if (!value) {
+
+        return "";
+
+    }
 
 
     let date;
 
 
     if (
-        typeof value === "object" &&
+        typeof value ===
+        "object" &&
         value.toDate
     ) {
 
         date =
             value.toDate();
 
-    } else {
+    }
+
+    else {
 
         date =
-            new Date(value);
+            new Date(
+                value
+            );
 
     }
 
@@ -2338,24 +3010,33 @@ function getDateValue(
     value
 ) {
 
-    if (!value) return Infinity;
+    if (!value) {
+
+        return Infinity;
+
+    }
 
 
     let date;
 
 
     if (
-        typeof value === "object" &&
+        typeof value ===
+        "object" &&
         value.toDate
     ) {
 
         date =
             value.toDate();
 
-    } else {
+    }
+
+    else {
 
         date =
-            new Date(value);
+            new Date(
+                value
+            );
 
     }
 
@@ -2365,35 +3046,81 @@ function getDateValue(
 }
 
 
+/* =========================================================
+   MONEY
+========================================================= */
+
+function formatMoney(
+    amount
+) {
+
+    return new Intl.NumberFormat(
+        "en-IN",
+        {
+            style:
+                "currency",
+
+            currency:
+                "INR",
+
+            maximumFractionDigits:
+                0
+        }
+    ).format(
+        Number(
+            amount || 0
+        )
+    );
+
+}
+
+
+/* =========================================================
+   PAYMENT CLASS
+========================================================= */
+
 function paymentClass(
     status
 ) {
 
-    if (status === "Paid")
+    if (
+        status === "Paid"
+    ) {
+
         return "paid";
 
-    if (status === "Partial")
+    }
+
+
+    if (
+        status === "Partial"
+    ) {
+
         return "partial";
+
+    }
+
 
     return "unpaid";
 
 }
 
 
-/* =====================================================
+/* =========================================================
    WHATSAPP
-===================================================== */
+========================================================= */
 
 function getWhatsAppLink(
     phone
 ) {
 
     let number =
-        String(phone || "")
-            .replace(
-                /\D/g,
-                ""
-            );
+        String(
+            phone || ""
+        ).replace(
+            /\D/g,
+            ""
+        );
 
 
     if (
@@ -2401,7 +3128,8 @@ function getWhatsAppLink(
     ) {
 
         number =
-            "91" + number;
+            "91" +
+            number;
 
     }
 
@@ -2422,9 +3150,9 @@ function getWhatsAppLink(
 }
 
 
-/* =====================================================
-   HTML SECURITY
-===================================================== */
+/* =========================================================
+   HTML ESCAPING
+========================================================= */
 
 function escapeHTML(
     value
@@ -2461,14 +3189,17 @@ function escapeAttribute(
     value
 ) {
 
-    return escapeHTML(value);
+    return escapeHTML(
+        value
+    );
 
 }
 
 
-/* =====================================================
-   GLOBAL FUNCTIONS
-===================================================== */
+/* =========================================================
+   STARTUP
+========================================================= */
 
-window.openStudent =
-    window.openStudent;
+console.log(
+    "Zenova CRM JS loaded successfully."
+);
