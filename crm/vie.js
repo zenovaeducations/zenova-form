@@ -1161,106 +1161,42 @@ function attachStudentButtons() {
    SAVE STUDENT CODE
 ========================================================= */
 
-async function saveStudentCode(
-    input
-) {
+async function saveStudentCode(input) {
 
     const studentId =
         input.dataset.studentId;
 
-
     if (!studentId) {
-
         return;
-
     }
 
-
-    let number =
-        input.value
-            .trim();
-
+    const number =
+        input.value.trim();
 
     /*
-     * If empty, don't save.
-     */
-
-    if (!number) {
-
-        input.value =
-            getStudentCodeNumber(
-                students.find(
-                    student =>
-                        student.id ===
-                        studentId
-                ) || {}
-            );
-
-        return;
-
-    }
-
-
-    /*
-     * Only numbers.
-     */
-
-    if (
-        !/^\d{1,4}$/.test(
-            number
-        )
-    ) {
-
-        alert(
-            "Enter only 1 to 4 digits."
-        );
-
-        input.value = "";
-
-        return;
-
-    }
-
-
-    const numericNumber =
-        Number(
-            number
-        );
-
-
-    if (
-        numericNumber < 1 ||
-        numericNumber > 9999
-    ) {
-
-        alert(
-            "Student code must be between 0001 and 9999."
-        );
-
-        return;
-
-    }
-
-
-    /*
-     * Convert:
+     * Allow ANY number of digits.
      *
      * 1
-     * →
-     * 0001
+     * 45
+     * 2701
+     * 2799
+     * 27100
+     * 27101
+     * 100000
      */
 
-    const paddedNumber =
-        String(
-            numericNumber
-        ).padStart(
-            4,
-            "0"
+    if (!/^\d+$/.test(number)) {
+
+        alert(
+            "Student code must contain numbers only."
         );
+
+        return;
+    }
 
 
     const studentCode =
-        `ZNV/SSLCM+${paddedNumber}`;
+        `ZNV/SSLCM+${number}`;
 
 
     /*
@@ -1270,15 +1206,9 @@ async function saveStudentCode(
     const duplicate =
         students.find(
             student =>
-
-                student.id !==
-                studentId
-
-                &&
-
+                student.id !== studentId &&
                 String(
-                    student.studentCode ||
-                    ""
+                    student.studentCode || ""
                 ).toUpperCase() ===
                 studentCode.toUpperCase()
         );
@@ -1287,30 +1217,14 @@ async function saveStudentCode(
     if (duplicate) {
 
         alert(
-            `This code is already assigned:\n\n${studentCode}`
+            `This student code is already assigned:\n\n${studentCode}`
         );
 
-
-        input.value =
-            getStudentCodeNumber(
-                students.find(
-                    student =>
-                        student.id ===
-                        studentId
-                ) || {}
-            );
-
-
         return;
-
     }
 
 
     try {
-
-        /*
-         * SAVE TO FIRESTORE
-         */
 
         await updateDoc(
 
@@ -1321,15 +1235,12 @@ async function saveStudentCode(
             ),
 
             {
-
                 studentCode:
 
                     studentCode,
 
                 updatedAt:
-
                     serverTimestamp()
-
             }
 
         );
@@ -1347,33 +1258,21 @@ async function saveStudentCode(
             );
 
 
-        if (
-            index !== -1
-        ) {
+        if (index !== -1) {
 
             students[index] = {
 
                 ...students[index],
 
                 studentCode:
-
                     studentCode
-
             };
 
         }
 
 
         /*
-         * Show formatted code
-         */
-
-        input.value =
-            paddedNumber;
-
-
-        /*
-         * Re-render so preview changes
+         * Refresh table
          */
 
         renderStudents();
@@ -1393,17 +1292,13 @@ async function saveStudentCode(
             error
         );
 
-
         alert(
             "Unable to save student code.\n\n" +
             error.message
         );
 
     }
-
 }
-
-
 /* =========================================================
    GET CODE NUMBER
 ========================================================= */
