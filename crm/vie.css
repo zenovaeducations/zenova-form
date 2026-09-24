@@ -9,7 +9,28 @@ body {
     background: #f5f7fb;
     color: #111827;
 }
+.student-code-input {
+    width: 76px;
+    height: 32px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0 7px;
+    font-size: 12px;
+    outline: none;
+    font-family: monospace;
+}
 
+.student-code-input:focus {
+    border-color: #111827;
+}
+
+.code-preview {
+    display: block;
+    margin-top: 4px;
+    font-size: 9px;
+    color: #6b7280;
+    white-space: nowrap;
+}
 
 /* =====================================================
    LOGIN
