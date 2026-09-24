@@ -705,7 +705,7 @@ function createStudentRow(
                         codeNumber
                     )}"
                     placeholder="0001"
-                    maxlength="4"
+                    maxlength="6"
                     inputmode="numeric"
                 >
 
