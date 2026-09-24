@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Zenova CRM</title>
+
+    <link rel="stylesheet" href="vie.css">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css"
+        rel="stylesheet">
+</head>
+
+<body>
+
+<!-- =====================================================
+     LOGIN
+===================================================== -->
+
+<section id="loginScreen" class="login-screen">
+
+    <div class="login-card">
+
+        <div class="logo">ZENOVA</div>
+
+        <h1>CRM</h1>
+
+        <p>Authorized access only</p>
+
+        <input
+            type="password"
+            id="passwordInput"
+            placeholder="Enter password"
+        >
+
+        <button id="loginButton">
+            Continue
+        </button>
+
+        <div id="loginError"></div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     CRM
+===================================================== -->
+
+<main id="mainPage" class="crm">
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+        <div>
+
+            <div class="brand">
+                ZENOVA EDUCATIONS
+            </div>
+
+            <h1>Student CRM</h1>
+
+            <p>
+                Manage leads, villages, admissions,
+                follow-ups and payments.
+            </p>
+
+        </div>
+
+        <button
+            id="refreshButton"
+            class="secondary-button"
+        >
+            <i class="ri-refresh-line"></i>
+            Refresh
+        </button>
+
+    </header>
+
+
+    <!-- =================================================
+         DASHBOARD CARDS
+    ================================================== -->
+
+    <section class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="ri-group-line"></i>
+            </div>
+
+            <div>
+
+                <span>Total Leads</span>
+
+                <strong id="totalStudents">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="ri-checkbox-circle-line"></i>
+            </div>
+
+            <div>
+
+                <span>Admissions</span>
+
+                <strong id="totalAdmissions">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="ri-phone-line"></i>
+            </div>
+
+            <div>
+
+                <span>Follow-ups</span>
+
+                <strong id="totalFollowups">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="ri-wallet-3-line"></i>
+            </div>
+
+            <div>
+
+                <span>Collected</span>
+
+                <strong id="totalCollected">
+                    ₹0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="ri-money-rupee-circle-line"></i>
+            </div>
+
+            <div>
+
+                <span>Outstanding</span>
+
+                <strong id="totalBalance">
+                    ₹0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="ri-calendar-check-line"></i>
+            </div>
+
+            <div>
+
+                <span>Coming</span>
+
+                <strong id="totalComing">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         NAVIGATION
+    ================================================== -->
+
+    <div class="crm-tabs">
+
+        <button
+            class="tab active"
+            data-tab="students"
+        >
+            <i class="ri-group-line"></i>
+            Students
+        </button>
+
+        <button
+            class="tab"
+            data-tab="villages"
+        >
+            <i class="ri-map-pin-line"></i>
+            Villages
+        </button>
+
+        <button
+            class="tab"
+            data-tab="followups"
+        >
+            <i class="ri-phone-line"></i>
+            Follow-ups
+        </button>
+
+    </div>
+
+
+    <!-- =================================================
+         STUDENTS
+    ================================================== -->
+
+    <section
+        id="studentsTab"
+        class="tab-content active"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>Students</h2>
+
+                <p>
+                    Complete lead and admission database
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- FILTER BAR -->
+
+        <div class="filters">
+
+            <div class="search-box">
+
+                <i class="ri-search-line"></i>
+
+                <input
+                    id="searchInput"
+                    type="text"
+                    placeholder="Search name, phone or village..."
+                >
+
+            </div>
+
+
+            <select id="statusFilter">
+
+                <option value="">
+                    All Lead Status
+                </option>
+
+                <option value="New">
+                    New
+                </option>
+
+                <option value="Contacted">
+                    Contacted
+                </option>
+
+                <option value="Not Answered">
+                    Not Answered
+                </option>
+
+                <option value="Interested">
+                    Interested
+                </option>
+
+                <option value="Follow-up">
+                    Follow-up
+                </option>
+
+                <option value="Not Interested">
+                    Not Interested
+                </option>
+
+                <option value="Coming">
+                    Coming
+                </option>
+
+                <option value="Admission Done">
+                    Admission Done
+                </option>
+
+                <option value="Lost">
+                    Lost
+                </option>
+
+            </select>
+
+
+            <select id="paymentFilter">
+
+                <option value="">
+                    All Payments
+                </option>
+
+                <option value="Not Paid">
+                    Not Paid
+                </option>
+
+                <option value="Partial">
+                    Partial
+                </option>
+
+                <option value="Paid">
+                    Fully Paid
+                </option>
+
+            </select>
+
+
+            <select id="villageFilter">
+
+                <option value="">
+                    All Villages
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- TABLE -->
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>#</th>
+
+                        <th>Student</th>
+
+                        <th>Phone</th>
+
+                        <th>Student Village</th>
+
+                        <th>Assigned Village</th>
+
+                        <th>Status</th>
+
+                        <th>Admission</th>
+
+                        <th>Paid</th>
+
+                        <th>Balance</th>
+
+                        <th>Follow-up</th>
+
+                        <th></th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="studentsTable">
+
+                    <tr>
+
+                        <td
+                            colspan="11"
+                            class="loading"
+                        >
+                            Loading CRM...
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         VILLAGES
+    ================================================== -->
+
+    <section
+        id="villagesTab"
+        class="tab-content"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>Village CRM</h2>
+
+                <p>
+                    Click a village to see all assigned students.
+                </p>
+
+            </div>
+
+
+            <div class="add-village">
+
+                <input
+                    id="newVillageInput"
+                    type="text"
+                    placeholder="Village name"
+                >
+
+                <button id="addVillageButton">
+                    <i class="ri-add-line"></i>
+                    Add Village
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="villageCards"
+            class="village-grid"
+        ></div>
+
+    </section>
+
+
+    <!-- =================================================
+         FOLLOW UPS
+    ================================================== -->
+
+    <section
+        id="followupsTab"
+        class="tab-content"
+    >
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>Follow-ups</h2>
+
+                <p>
+                    Students requiring action.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="followupList"
+            class="followup-list"
+        ></div>
+
+    </section>
+
+</main>
+
+
+<!-- =====================================================
+     STUDENT MODAL
+===================================================== -->
+
+<div
+    id="studentModal"
+    class="modal"
+>
+
+    <div class="modal-card">
+
+        <button
+            id="closeModal"
+            class="close-button"
+        >
+            <i class="ri-close-line"></i>
+        </button>
+
+
+        <div id="studentDetails"></div>
+
+    </div>
+
+</div>
+
+
+<script
+    type="module"
+    src="vie.js"
+></script>
+
+</body>
+</html>
