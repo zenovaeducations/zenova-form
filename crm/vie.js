@@ -120,9 +120,7 @@ passwordInput.addEventListener(
     function (event) {
 
         if (event.key === "Enter") {
-
             login();
-
         }
 
     }
@@ -144,7 +142,6 @@ function login() {
         passwordInput.focus();
 
         return;
-
     }
 
 
@@ -155,7 +152,6 @@ function login() {
     mainPage.style.display = "block";
 
     loadCRM();
-
 }
 
 
@@ -209,15 +205,11 @@ async function loadCRM() {
                     colspan="12"
                     class="loading"
                 >
-
                     Unable to load CRM.
-
                     <br><br>
-
                     ${escapeHTML(
                         error.message
                     )}
-
                 </td>
             </tr>
         `;
@@ -375,18 +367,22 @@ function updateDashboard() {
 
     const admissions =
         students.filter(
-            student =>
-                getAdmissionStatus(
-                    student
-                ) ===
-                "Admission Done"
+            student => {
 
-                ||
+                const status =
+                    getAdmissionStatus(
+                        student
+                    );
 
-                getAdmissionStatus(
-                    student
-                ) ===
-                "Admission Confirmed"
+                return (
+                    status ===
+                    "Admission Done"
+                    ||
+                    status ===
+                    "Admission Confirmed"
+                );
+
+            }
         );
 
 
@@ -473,6 +469,196 @@ function updateDashboard() {
 
 
 /* =========================================================
+   STUDENT CODE SORTING
+========================================================= */
+
+/*
+    IMPORTANT:
+
+    Students are sorted by their actual numeric code.
+
+    Example:
+
+    ZNV/SSLCM+2701
+    ZNV/SSLCM+2702
+    ZNV/SSLCM+2704
+    ZNV/SSLCM+2705
+    ZNV/SSLCM+27100
+    ZNV/SSLCM+27101
+
+    BigInt is used so very large numbers
+    are also supported without JavaScript
+    Number precision problems.
+*/
+
+function getStudentCodeNumber(
+    student
+) {
+
+    if (
+        !student ||
+        !student.studentCode
+    ) {
+
+        return "";
+
+    }
+
+
+    const match =
+        String(
+            student.studentCode
+        ).match(
+            /^ZNV\/SSLCM\+(.+)$/
+        );
+
+
+    if (!match) {
+
+        return "";
+
+    }
+
+
+    return match[1];
+
+}
+
+
+function getCodeSortValue(
+    student
+) {
+
+    const number =
+        getStudentCodeNumber(
+            student
+        );
+
+
+    if (!number) {
+
+        return null;
+
+    }
+
+
+    if (
+        !/^\d+$/.test(
+            number
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    try {
+
+        return BigInt(number);
+
+    }
+
+    catch {
+
+        return null;
+
+    }
+
+}
+
+
+function sortStudentsByCode(
+    data
+) {
+
+    return [...data].sort(
+        (a, b) => {
+
+            const codeA =
+                getCodeSortValue(a);
+
+            const codeB =
+                getCodeSortValue(b);
+
+
+            /*
+                Students without code
+                always go to bottom.
+            */
+
+            if (
+                codeA === null &&
+                codeB === null
+            ) {
+
+                return String(
+                    a.name || ""
+                ).localeCompare(
+                    String(
+                        b.name || ""
+                    )
+                );
+
+            }
+
+
+            if (
+                codeA === null
+            ) {
+
+                return 1;
+
+            }
+
+
+            if (
+                codeB === null
+            ) {
+
+                return -1;
+
+            }
+
+
+            if (
+                codeA < codeB
+            ) {
+
+                return -1;
+
+            }
+
+
+            if (
+                codeA > codeB
+            ) {
+
+                return 1;
+
+            }
+
+
+            /*
+                Same code:
+                sort by name.
+            */
+
+            return String(
+                a.name || ""
+            ).localeCompare(
+                String(
+                    b.name || ""
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
    STUDENTS TABLE
 ========================================================= */
 
@@ -526,7 +712,9 @@ function renderStudents() {
     }
 
 
-    if (statusFilter.value) {
+    if (
+        statusFilter.value
+    ) {
 
         data =
             data.filter(
@@ -540,7 +728,9 @@ function renderStudents() {
     }
 
 
-    if (paymentFilter.value) {
+    if (
+        paymentFilter.value
+    ) {
 
         data =
             data.filter(
@@ -554,7 +744,9 @@ function renderStudents() {
     }
 
 
-    if (villageFilter.value) {
+    if (
+        villageFilter.value
+    ) {
 
         data =
             data.filter(
@@ -569,20 +761,29 @@ function renderStudents() {
     }
 
 
+    /*
+        FINAL SORT:
+
+        ALWAYS sort by student code
+        after applying filters.
+    */
+
+    data =
+        sortStudentsByCode(
+            data
+        );
+
+
     if (!data.length) {
 
         studentsTable.innerHTML = `
             <tr>
-
                 <td
                     colspan="12"
                     class="empty"
                 >
-
                     No students found.
-
                 </td>
-
             </tr>
         `;
 
@@ -654,16 +855,6 @@ function createStudentRow(
         );
 
 
-    /*
-     * CODE INPUT
-     *
-     * Existing:
-     * ZNV/SSLCM+0001
-     *
-     * Input:
-     * 0001
-     */
-
     const codeNumber =
         getStudentCodeNumber(
             student
@@ -674,10 +865,7 @@ function createStudentRow(
 
         <tr>
 
-
-            <!-- =================================================
-                 1. NUMBER
-            ================================================== -->
+            <!-- NUMBER -->
 
             <td>
 
@@ -688,10 +876,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 2. STUDENT CODE
-            ================================================== -->
+            <!-- STUDENT CODE -->
 
             <td>
 
@@ -704,8 +889,7 @@ function createStudentRow(
                     value="${escapeAttribute(
                         codeNumber
                     )}"
-                    placeholder="0001"
-                    maxlength="6"
+                    placeholder="2701"
                     inputmode="numeric"
                 >
 
@@ -727,10 +911,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 3. STUDENT
-            ================================================== -->
+            <!-- STUDENT -->
 
             <td>
 
@@ -756,6 +937,7 @@ function createStudentRow(
                 <small>
 
                     Target:
+
                     ${
                         student.targetPercentage ??
                         student.targetPercentageValue ??
@@ -767,10 +949,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 4. PHONE
-            ================================================== -->
+            <!-- PHONE -->
 
             <td>
 
@@ -800,10 +979,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 5. STUDENT VILLAGE
-            ================================================== -->
+            <!-- STUDENT VILLAGE -->
 
             <td>
 
@@ -823,10 +999,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 6. ASSIGNED VILLAGE
-            ================================================== -->
+            <!-- ASSIGNED VILLAGE -->
 
             <td>
 
@@ -841,7 +1014,6 @@ function createStudentRow(
                     <option value="">
                         Assign Village
                     </option>
-
 
                     ${
                         villages
@@ -883,10 +1055,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 7. STATUS
-            ================================================== -->
+            <!-- STATUS -->
 
             <td>
 
@@ -907,10 +1076,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 8. ADMISSION
-            ================================================== -->
+            <!-- ADMISSION -->
 
             <td>
 
@@ -931,10 +1097,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 9. PAID
-            ================================================== -->
+            <!-- PAID -->
 
             <td>
 
@@ -969,10 +1132,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 10. BALANCE
-            ================================================== -->
+            <!-- BALANCE -->
 
             <td>
 
@@ -993,10 +1153,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 11. FOLLOW-UP
-            ================================================== -->
+            <!-- FOLLOW UP -->
 
             <td>
 
@@ -1014,10 +1171,7 @@ function createStudentRow(
             </td>
 
 
-
-            <!-- =================================================
-                 12. VIEW
-            ================================================== -->
+            <!-- VIEW -->
 
             <td>
 
@@ -1038,7 +1192,6 @@ function createStudentRow(
 
             </td>
 
-
         </tr>
 
     `;
@@ -1053,8 +1206,8 @@ function createStudentRow(
 function attachStudentButtons() {
 
     /*
-     * VIEW BUTTONS
-     */
+        VIEW BUTTONS
+    */
 
     document
         .querySelectorAll(
@@ -1088,8 +1241,8 @@ function attachStudentButtons() {
 
 
     /*
-     * CODE INPUTS
-     */
+        CODE INPUTS
+    */
 
     document
         .querySelectorAll(
@@ -1130,8 +1283,11 @@ function attachStudentButtons() {
 
 
                 /*
-                 * Allow digits only
-                 */
+                    ONLY NUMBERS.
+
+                    NO 4 DIGIT LIMIT.
+                    NO 6 DIGIT LIMIT.
+                */
 
                 input.addEventListener(
                     "input",
@@ -1142,10 +1298,6 @@ function attachStudentButtons() {
                                 .replace(
                                     /\D/g,
                                     ""
-                                )
-                                .slice(
-                                    0,
-                                    4
                                 );
 
                     }
@@ -1161,66 +1313,88 @@ function attachStudentButtons() {
    SAVE STUDENT CODE
 ========================================================= */
 
-async function saveStudentCode(input) {
+async function saveStudentCode(
+    input
+) {
 
     const studentId =
         input.dataset.studentId;
+
 
     if (!studentId) {
         return;
     }
 
+
     const number =
         input.value.trim();
 
-    /*
-     * Allow ANY number of digits.
-     *
-     * 1
-     * 45
-     * 2701
-     * 2799
-     * 27100
-     * 27101
-     * 100000
-     */
-
-    if (!/^\d+$/.test(number)) {
-
-        alert(
-            "Student code must contain numbers only."
-        );
-
-        return;
-    }
-
-
-    const studentCode =
-        `ZNV/SSLCM+${number}`;
-
 
     /*
-     * CHECK DUPLICATE
-     */
+        Empty code is allowed.
+    */
 
-    const duplicate =
-        students.find(
-            student =>
-                student.id !== studentId &&
-                String(
-                    student.studentCode || ""
-                ).toUpperCase() ===
-                studentCode.toUpperCase()
-        );
+    let studentCode = "";
 
 
-    if (duplicate) {
+    if (number) {
 
-        alert(
-            `This student code is already assigned:\n\n${studentCode}`
-        );
+        /*
+            ANY NUMBER OF DIGITS.
+        */
 
-        return;
+        if (
+            !/^\d+$/.test(
+                number
+            )
+        ) {
+
+            alert(
+                "Student code must contain numbers only."
+            );
+
+            return;
+
+        }
+
+
+        studentCode =
+            `ZNV/SSLCM+${number}`;
+
+
+        /*
+            DUPLICATE CHECK
+        */
+
+        const duplicate =
+            students.find(
+                student =>
+
+                    student.id !==
+                    studentId
+
+                    &&
+
+                    String(
+                        student.studentCode ||
+                        ""
+                    ).toUpperCase() ===
+                    studentCode.toUpperCase()
+            );
+
+
+        if (duplicate) {
+
+            alert(
+                `This student code is already assigned:\n\n${studentCode}`
+            );
+
+            renderStudents();
+
+            return;
+
+        }
+
     }
 
 
@@ -1236,7 +1410,6 @@ async function saveStudentCode(input) {
 
             {
                 studentCode:
-
                     studentCode,
 
                 updatedAt:
@@ -1246,10 +1419,6 @@ async function saveStudentCode(input) {
         );
 
 
-        /*
-         * UPDATE LOCAL DATA
-         */
-
         const index =
             students.findIndex(
                 student =>
@@ -1258,7 +1427,9 @@ async function saveStudentCode(input) {
             );
 
 
-        if (index !== -1) {
+        if (
+            index !== -1
+        ) {
 
             students[index] = {
 
@@ -1266,16 +1437,19 @@ async function saveStudentCode(input) {
 
                 studentCode:
                     studentCode
+
             };
 
         }
 
 
-        /*
-         * Refresh table
-         */
+        updateDashboard();
 
         renderStudents();
+
+        renderVillages();
+
+        renderFollowups();
 
 
         console.log(
@@ -1292,47 +1466,17 @@ async function saveStudentCode(input) {
             error
         );
 
+
         alert(
             "Unable to save student code.\n\n" +
             error.message
         );
 
     }
-}
-/* =========================================================
-   GET CODE NUMBER
-========================================================= */
-
-function getStudentCodeNumber(student) {
-
-    if (
-        !student ||
-        !student.studentCode
-    ) {
-
-        return "";
-
-    }
-
-
-    const match =
-        String(
-            student.studentCode
-        ).match(
-            /^ZNV\/SSLCM\+(.+)$/
-        );
-
-
-    if (!match) {
-
-        return "";
-
-    }
-
-
-    return match[1];
 
 }
+
+
 /* =========================================================
    TABLE SELECT CHANGES
 ========================================================= */
@@ -1557,12 +1701,10 @@ async function updateStudent(
             ),
 
             {
-
                 ...fields,
 
                 updatedAt:
                     serverTimestamp()
-
             }
 
         );
@@ -1752,18 +1894,22 @@ function createVillageCard(
 
     const admissions =
         villageStudents.filter(
-            student =>
-                getAdmissionStatus(
-                    student
-                ) ===
-                "Admission Done"
+            student => {
 
-                ||
+                const status =
+                    getAdmissionStatus(
+                        student
+                    );
 
-                getAdmissionStatus(
-                    student
-                ) ===
-                "Admission Confirmed"
+                return (
+                    status ===
+                    "Admission Done"
+                    ||
+                    status ===
+                    "Admission Confirmed"
+                );
+
+            }
         ).length;
 
 
@@ -1952,14 +2098,22 @@ function openVillage(
         );
 
 
-    studentTab.classList.add(
-        "active"
-    );
+    if (studentTab) {
+
+        studentTab.classList.add(
+            "active"
+        );
+
+    }
 
 
-    studentsContent.classList.add(
-        "active"
-    );
+    if (studentsContent) {
+
+        studentsContent.classList.add(
+            "active"
+        );
+
+    }
 
 
     villageFilter.value =
@@ -2441,11 +2595,9 @@ function openStudent(
         </div>
 
 
-
         <div
             class="profile-grid"
         >
-
 
             <!-- CODE -->
 
@@ -2459,7 +2611,7 @@ function openStudent(
 
 
                 <label>
-                    Last 4 Digits
+                    Code Number
                 </label>
 
 
@@ -2467,14 +2619,13 @@ function openStudent(
                     id="profileCode"
                     class="profile-input"
                     type="text"
-                    maxlength="4"
                     inputmode="numeric"
                     value="${escapeAttribute(
                         getStudentCodeNumber(
                             student
                         )
                     )}"
-                    placeholder="0001"
+                    placeholder="2701"
                 >
 
 
@@ -2494,7 +2645,6 @@ function openStudent(
                 </div>
 
             </div>
-
 
 
             <!-- STUDENT INFORMATION -->
@@ -2541,7 +2691,6 @@ function openStudent(
                 )}
 
             </div>
-
 
 
             <!-- CRM -->
@@ -2612,7 +2761,6 @@ function openStudent(
             </div>
 
 
-
             <!-- FEES -->
 
             <div
@@ -2679,7 +2827,6 @@ function openStudent(
             </div>
 
 
-
             <!-- FOLLOW UP -->
 
             <div
@@ -2723,9 +2870,7 @@ function openStudent(
 
             </div>
 
-
         </div>
-
 
 
         <div
@@ -2756,9 +2901,9 @@ function openStudent(
     );
 
 
-    /*
-     * CODE PREVIEW
-     */
+    /* =====================================================
+       CODE PREVIEW
+    ===================================================== */
 
     const codeInput =
         document.getElementById(
@@ -2781,10 +2926,6 @@ function openStudent(
                     .replace(
                         /\D/g,
                         ""
-                    )
-                    .slice(
-                        0,
-                        4
                     );
 
 
@@ -2793,14 +2934,7 @@ function openStudent(
             ) {
 
                 codePreview.textContent =
-                    `ZNV/SSLCM+${String(
-                        Number(
-                            this.value
-                        )
-                    ).padStart(
-                        4,
-                        "0"
-                    )}`;
+                    `ZNV/SSLCM+${this.value}`;
 
             }
 
@@ -2815,9 +2949,9 @@ function openStudent(
     );
 
 
-    /*
-     * BALANCE
-     */
+    /* =====================================================
+       BALANCE
+    ===================================================== */
 
     const feeInput =
         document.getElementById(
@@ -2899,15 +3033,13 @@ function openStudent(
 async function saveStudentProfile() {
 
     if (!selectedStudent) {
-
         return;
-
     }
 
 
-    /*
-     * STUDENT CODE
-     */
+    /* =====================================================
+       STUDENT CODE
+    ===================================================== */
 
     const codeInput =
         document.getElementById(
@@ -2915,19 +3047,34 @@ async function saveStudentProfile() {
         );
 
 
-    let codeNumber =
+    const codeNumber =
         codeInput.value.trim();
 
 
+    /*
+        ANY NUMBER OF DIGITS.
+
+        Examples:
+
+        1
+        45
+        2701
+        2799
+        27100
+        27101
+        271000
+        1000000
+    */
+
     if (
         codeNumber &&
-        !/^\d{1,4}$/.test(
+        !/^\d+$/.test(
             codeNumber
         )
     ) {
 
         alert(
-            "Student code must contain only 1 to 4 digits."
+            "Student code must contain numbers only."
         );
 
         return;
@@ -2940,24 +3087,13 @@ async function saveStudentProfile() {
 
     if (codeNumber) {
 
-        const padded =
-            String(
-                Number(
-                    codeNumber
-                )
-            ).padStart(
-                4,
-                "0"
-            );
-
-
         studentCode =
-            `ZNV/SSLCM+${padded}`;
+            `ZNV/SSLCM+${codeNumber}`;
 
 
         /*
-         * DUPLICATE CHECK
-         */
+            DUPLICATE CHECK
+        */
 
         const duplicate =
             students.find(
@@ -2989,9 +3125,9 @@ async function saveStudentProfile() {
     }
 
 
-    /*
-     * FEES
-     */
+    /* =====================================================
+       FEES
+    ===================================================== */
 
     const totalFee =
         Number(
@@ -3031,9 +3167,9 @@ async function saveStudentProfile() {
         );
 
 
-    /*
-     * ALL FIELDS
-     */
+    /* =====================================================
+       ALL FIELDS
+    ===================================================== */
 
     const fields = {
 
@@ -3098,9 +3234,9 @@ async function saveStudentProfile() {
         );
 
 
-        /*
-         * LOCAL UPDATE
-         */
+        /* =================================================
+           LOCAL UPDATE
+        ================================================= */
 
         const index =
             students.findIndex(
