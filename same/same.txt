@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Zenova Duplicate Cleaner</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f7fb;
+  color: #172033;
+}
+
+.container {
+  width: min(1250px, 94%);
+  margin: 35px auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  gap: 20px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #667085;
+}
+
+h1 {
+  margin: 5px 0;
+  font-size: 30px;
+}
+
+.header p {
+  margin: 0;
+  color: #667085;
+}
+
+.scan-btn {
+  border: 0;
+  background: #111827;
+  color: white;
+  padding: 13px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.stat-card span {
+  display: block;
+  color: #667085;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.stat-card strong {
+  font-size: 27px;
+}
+
+.stat-card.danger strong {
+  color: #dc2626;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.group {
+  background: white;
+  border: 1px solid #e4e7ec;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.group-header {
+  padding: 15px 18px;
+  background: #fafafa;
+  border-bottom: 1px solid #e4e7ec;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.group-title {
+  font-weight: 700;
+}
+
+.group-type {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.student-row {
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: 1fr 180px 180px 150px 100px;
+  align-items: center;
+  gap: 15px;
+  border-bottom: 1px solid #f0f1f3;
+}
+
+.student-row:last-child {
+  border-bottom: 0;
+}
+
+.student-name {
+  font-weight: 700;
+}
+
+.student-id {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #98a2b3;
+  word-break: break-all;
+}
+
+.info {
+  font-size: 13px;
+  color: #475467;
+}
+
+.info strong {
+  display: block;
+  color: #172033;
+  margin-bottom: 3px;
+}
+
+.delete-btn {
+  border: 0;
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #fecaca;
+}
+
+.loading {
+  background: white;
+  border-radius: 15px;
+  padding: 50px;
+  text-align: center;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #111827;
+  border-radius: 50%;
+  margin: auto;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty {
+  background: white;
+  border-radius: 15px;
+  text-align: center;
+  padding: 65px 20px;
+}
+
+.empty-icon {
+  width: 55px;
+  height: 55px;
+  margin: auto;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #15803d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.empty h2 {
+  margin-bottom: 5px;
+}
+
+.empty p {
+  color: #667085;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, .55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.modal-box {
+  width: min(430px, 100%);
+  background: white;
+  border-radius: 18px;
+  padding: 25px;
+}
+
+.modal-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.modal-box h2 {
+  margin-bottom: 8px;
+}
+
+.modal-box p {
+  color: #667085;
+  line-height: 1.5;
+}
+
+.delete-info {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 15px 0;
+  font-size: 13px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-btn,
+.delete-confirm-btn {
+  border: 0;
+  padding: 11px 15px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.cancel-btn {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.delete-confirm-btn {
+  background: #dc2626;
+  color: white;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 850px) {
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .scan-btn {
+    width: 100%;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .student-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+
+  .container {
+    margin: 20px auto;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  .student-row {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+
+    <div>
+      <div class="eyebrow">ZENOVA CRM</div>
+
+      <h1>Duplicate Cleaner</h1>
+
+      <p>
+        Find duplicate names and suspicious phone numbers.
+      </p>
+    </div>
+
+    <button id="scanBtn" class="scan-btn">
+      Scan Students
+    </button>
+
+  </div>
+
+  <div id="stats" class="stats hidden">
+
+    <div class="stat-card">
+      <span>Total Students</span>
+      <strong id="totalStudents">0</strong>
+    </div>
+
+    <div class="stat-card danger">
+      <span>Problem Records</span>
+      <strong id="problemRecords">0</strong>
+    </div>
+
+    <div class="stat-card">
+      <span>Duplicate Numbers</span>
+      <strong id="duplicateNumbers">0</strong>
+    </div>
+
+    <div class="stat-card">
+      <span>Duplicate Names</span>
+      <strong id="duplicateNames">0</strong>
+    </div>
+
+  </div>
+
+  <div id="loading" class="loading hidden">
+
+    <div class="spinner"></div>
+
+    <p>Scanning student data...</p>
+
+  </div>
+
+  <div id="empty" class="empty hidden">
+
+    <div class="empty-icon">✓</div>
+
+    <h2>No duplicates found</h2>
+
+    <p>Your student database looks clean.</p>
+
+  </div>
+
+  <div id="results" class="results"></div>
+
+</div>
+
+<!-- DELETE CONFIRMATION -->
+
+<div id="deleteModal" class="modal hidden">
+
+  <div class="modal-box">
+
+    <div class="modal-icon">!</div>
+
+    <h2>Delete Student?</h2>
+
+    <p>
+      This will permanently delete this student
+      from the <strong>submissions</strong> collection.
+    </p>
+
+    <div id="deleteStudentInfo" class="delete-info"></div>
+
+    <div class="modal-actions">
+
+      <button id="cancelDelete" class="cancel-btn">
+        Cancel
+      </button>
+
+      <button id="confirmDelete" class="delete-confirm-btn">
+        Delete Permanently
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module">
+
+/* ============================================================
+   FIREBASE
+   ============================================================ */
+
+import { db } from "../firebase-config.js";
+
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
+
+const COLLECTION_NAME = "submissions";
+
+/* ============================================================
+   DOM
+   ============================================================ */
+
+const scanBtn =
+  document.getElementById("scanBtn");
+
+const stats =
+  document.getElementById("stats");
+
+const totalStudents =
+  document.getElementById("totalStudents");
+
+const problemRecords =
+  document.getElementById("problemRecords");
+
+const duplicateNumbers =
+  document.getElementById("duplicateNumbers");
+
+const duplicateNames =
+  document.getElementById("duplicateNames");
+
+const loading =
+  document.getElementById("loading");
+
+const empty =
+  document.getElementById("empty");
+
+const results =
+  document.getElementById("results");
+
+const deleteModal =
+  document.getElementById("deleteModal");
+
+const deleteStudentInfo =
+  document.getElementById("deleteStudentInfo");
+
+const cancelDelete =
+  document.getElementById("cancelDelete");
+
+const confirmDelete =
+  document.getElementById("confirmDelete");
+
+let studentToDelete = null;
+
+/* ============================================================
+   SCAN
+   ============================================================ */
+
+scanBtn.addEventListener(
+  "click",
+  scanStudents
+);
+
+async function scanStudents() {
+
+  loading.classList.remove("hidden");
+
+  empty.classList.add("hidden");
+
+  results.innerHTML = "";
+
+  try {
+
+    const snapshot =
+      await getDocs(
+        collection(
+          db,
+          COLLECTION_NAME
+        )
+      );
+
+    const students = [];
+
+    snapshot.forEach(docSnap => {
+
+      students.push({
+
+        id: docSnap.id,
+
+        ...docSnap.data()
+
+      });
+
+    });
+
+    totalStudents.textContent =
+      students.length;
+
+    const analysis =
+      analyzeStudents(students);
+
+    duplicateNumbers.textContent =
+      analysis.duplicateNumberGroups.length;
+
+    duplicateNames.textContent =
+      analysis.duplicateNameGroups.length;
+
+    problemRecords.textContent =
+      analysis.problemStudents.length;
+
+    stats.classList.remove("hidden");
+
+    renderResults(analysis);
+
+  } catch (error) {
+
+    console.error(error);
+
+    results.innerHTML = `
+
+      <div class="group">
+
+        <div style="
+          padding:25px;
+          color:#dc2626;
+        ">
+
+          <strong>
+            Unable to load student data
+          </strong>
+
+          <br><br>
+
+          ${escapeHTML(error.message)}
+
+        </div>
+
+      </div>
+
+    `;
+
+  } finally {
+
+    loading.classList.add("hidden");
+
+  }
+
+}
+
+/* ============================================================
+   ANALYZE STUDENTS
+   ============================================================ */
+
+function analyzeStudents(students) {
+
+  const phoneMap =
+    new Map();
+
+  const nameMap =
+    new Map();
+
+  const suspiciousStudents = [];
+
+  students.forEach(student => {
+
+    const phone =
+      getPhone(student);
+
+    const name =
+      getName(student);
+
+    /* PHONE */
+
+    if (phone) {
+
+      const normalizedPhone =
+        normalizePhone(phone);
+
+      if (normalizedPhone) {
+
+        if (!phoneMap.has(normalizedPhone)) {
+
+          phoneMap.set(
+            normalizedPhone,
+            []
+          );
+
+        }
+
+        phoneMap
+          .get(normalizedPhone)
+          .push(student);
+
+      }
+
+      if (isSuspiciousPhone(phone)) {
+
+        suspiciousStudents.push({
+
+          student,
+
+          reason:
+            "Suspicious phone number"
+
+        });
+
+      }
+
+    }
+
+    /* NAME */
+
+    if (name) {
+
+      const normalizedName =
+        normalizeName(name);
+
+      if (normalizedName) {
+
+        if (!nameMap.has(normalizedName)) {
+
+          nameMap.set(
+            normalizedName,
+            []
+          );
+
+        }
+
+        nameMap
+          .get(normalizedName)
+          .push(student);
+
+      }
+
+    }
+
+  });
+
+  /* DUPLICATE PHONE GROUPS */
+
+  const duplicateNumberGroups = [];
+
+  phoneMap.forEach(
+    (group, phone) => {
+
+      if (group.length > 1) {
+
+        duplicateNumberGroups.push({
+
+          key: phone,
+
+          students: group
+
+        });
+
+      }
+
+    }
+  );
+
+  /* DUPLICATE NAME GROUPS */
+
+  const duplicateNameGroups = [];
+
+  nameMap.forEach(
+    (group, name) => {
+
+      if (group.length > 1) {
+
+        duplicateNameGroups.push({
+
+          key: name,
+
+          students: group
+
+        });
+
+      }
+
+    }
+  );
+
+  /* ALL PROBLEM STUDENTS */
+
+  const problemMap =
+    new Map();
+
+  duplicateNumberGroups
+    .forEach(group => {
+
+      group.students
+        .forEach(student => {
+
+          addProblem(
+            problemMap,
+            student,
+            "Duplicate phone number"
+          );
+
+        });
+
+    });
+
+  duplicateNameGroups
+    .forEach(group => {
+
+      group.students
+        .forEach(student => {
+
+          addProblem(
+            problemMap,
+            student,
+            "Duplicate name"
+          );
+
+        });
+
+    });
+
+  suspiciousStudents
+    .forEach(item => {
+
+      addProblem(
+        problemMap,
+        item.student,
+        item.reason
+      );
+
+    });
+
+  return {
+
+    duplicateNumberGroups,
+
+    duplicateNameGroups,
+
+    suspiciousStudents,
+
+    problemStudents:
+      Array.from(problemMap.values())
+
+  };
+
+}
+
+function addProblem(
+  map,
+  student,
+  reason
+) {
+
+  if (!map.has(student.id)) {
+
+    map.set(
+      student.id,
+      {
+        student,
+        reasons: []
+      }
+    );
+
+  }
+
+  const item =
+    map.get(student.id);
+
+  if (!item.reasons.includes(reason)) {
+
+    item.reasons.push(reason);
+
+  }
+
+}
+
+/* ============================================================
+   PHONE
+   ============================================================ */
+
+function getPhone(student) {
+
+  return firstValue([
+
+    student.phone,
+
+    student.mobile,
+
+    student.mobileNumber,
+
+    student.phoneNumber,
+
+    student.student?.phone,
+
+    student.student?.mobile,
+
+    student.student?.mobileNumber,
+
+    student.student?.phoneNumber
+
+  ]);
+
+}
+
+function normalizePhone(value) {
+
+  if (!value) return "";
+
+  let digits =
+    String(value)
+      .replace(/\D/g, "");
+
+  /*
+    +91 99999 99999
+    +919999999999
+
+    become:
+
+    9999999999
+  */
+
+  if (
+    digits.length === 12 &&
+    digits.startsWith("91")
+  ) {
+
+    digits =
+      digits.substring(2);
+
+  }
+
+  return digits;
+
+}
+
+/* ============================================================
+   SUSPICIOUS PHONE
+   ============================================================ */
+
+function isSuspiciousPhone(value) {
+
+  let digits =
+    String(value || "")
+      .replace(/\D/g, "");
+
+  if (
+    digits.length === 12 &&
+    digits.startsWith("91")
+  ) {
+
+    digits =
+      digits.substring(2);
+
+  }
+
+  /*
+    Only 10 digit numbers
+  */
+
+  if (digits.length !== 10) {
+
+    return true;
+
+  }
+
+  /*
+    0000000000
+  */
+
+  if (/^0+$/.test(digits)) {
+
+    return true;
+
+  }
+
+  /*
+    9999999999
+  */
+
+  if (/^9+$/.test(digits)) {
+
+    return true;
+
+  }
+
+  /*
+    1111111111
+    2222222222
+    etc.
+  */
+
+  if (/^(\d)\1{9}$/.test(digits)) {
+
+    return true;
+
+  }
+
+  /*
+    Common fake sequences
+  */
+
+  if (
+    digits === "1234567890" ||
+    digits === "0123456789"
+  ) {
+
+    return true;
+
+  }
+
+  return false;
+
+}
+
+/* ============================================================
+   NAME
+   ============================================================ */
+
+function getName(student) {
+
+  return firstValue([
+
+    student.name,
+
+    student.studentName,
+
+    student.fullName,
+
+    student.student?.name,
+
+    student.student?.studentName,
+
+    student.student?.fullName
+
+  ]);
+
+}
+
+function normalizeName(value) {
+
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+
+}
+
+/* ============================================================
+   RENDER RESULTS
+   ============================================================ */
+
+function renderResults(analysis) {
+
+  results.innerHTML = "";
+
+  if (
+    analysis.problemStudents.length === 0
+  ) {
+
+    empty.classList.remove("hidden");
+
+    return;
+
+  }
+
+  /* DUPLICATE PHONE */
+
+  analysis
+    .duplicateNumberGroups
+    .forEach(group => {
+
+      const wrapper =
+        document.createElement("div");
+
+      wrapper.className =
+        "group";
+
+      wrapper.innerHTML = `
+
+        <div class="group-header">
+
+          <div class="group-title">
+
+            📱 ${escapeHTML(
+              formatPhone(group.key)
+            )}
+
+            <span style="
+              color:#98a2b3;
+              font-weight:400;
+            ">
+
+              (${group.students.length}
+              records)
+
+            </span>
+
+          </div>
+
+          <div class="group-type">
+            DUPLICATE NUMBER
+          </div>
+
+        </div>
+
+      `;
+
+      group.students.forEach(student => {
+
+        wrapper.appendChild(
+          createStudentRow(
+            student,
+            "Duplicate phone number"
+          )
+        );
+
+      });
+
+      results.appendChild(wrapper);
+
+    });
+
+  /* DUPLICATE NAMES */
+
+  analysis
+    .duplicateNameGroups
+    .forEach(group => {
+
+      const wrapper =
+        document.createElement("div");
+
+      wrapper.className =
+        "group";
+
+      wrapper.innerHTML = `
+
+        <div class="group-header">
+
+          <div class="group-title">
+
+            👤 ${escapeHTML(
+              getName(group.students[0])
+              || "Unnamed"
+            )}
+
+            <span style="
+              color:#98a2b3;
+              font-weight:400;
+            ">
+
+              (${group.students.length}
+              records)
+
+            </span>
+
+          </div>
+
+          <div class="group-type">
+            DUPLICATE NAME
+          </div>
+
+        </div>
+
+      `;
+
+      group.students.forEach(student => {
+
+        wrapper.appendChild(
+          createStudentRow(
+            student,
+            "Duplicate name"
+          )
+        );
+
+      });
+
+      results.appendChild(wrapper);
+
+    });
+
+  /* SUSPICIOUS NUMBERS */
+
+  analysis
+    .suspiciousStudents
+    .forEach(item => {
+
+      const wrapper =
+        document.createElement("div");
+
+      wrapper.className =
+        "group";
+
+      wrapper.innerHTML = `
+
+        <div class="group-header">
+
+          <div class="group-title">
+            ⚠️ Suspicious Number
+          </div>
+
+          <div class="group-type">
+            CHECK NUMBER
+          </div>
+
+        </div>
+
+      `;
+
+      wrapper.appendChild(
+        createStudentRow(
+          item.student,
+          item.reason
+        )
+      );
+
+      results.appendChild(wrapper);
+
+    });
+
+}
+
+/* ============================================================
+   STUDENT ROW
+   ============================================================ */
+
+function createStudentRow(
+  student,
+  reason
+) {
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "student-row";
+
+  const name =
+    getName(student)
+    || "Unknown Student";
+
+  const phone =
+    getPhone(student)
+    || "No phone";
+
+  const village =
+    firstValue([
+
+      student.village,
+
+      student.villageName,
+
+      student.assignedVillage,
+
+      student.assignedVillageName,
+
+      student.student?.village,
+
+      student.student?.villageName
+
+    ]) || "-";
+
+  const school =
+    firstValue([
+
+      student.school,
+
+      student.schoolName,
+
+      student.studentSchool,
+
+      student.school_name,
+
+      student.student?.school,
+
+      student.student?.schoolName
+
+    ]) || "-";
+
+  const studentCode =
+    firstValue([
+
+      student.studentCode,
+
+      student.code,
+
+      student.student?.studentCode
+
+    ]) || "-";
+
+  row.innerHTML = `
+
+    <div>
+
+      <div class="student-name">
+
+        ${escapeHTML(name)}
+
+      </div>
+
+      <div class="student-id">
+
+        ID:
+        ${escapeHTML(student.id)}
+
+      </div>
+
+    </div>
+
+    <div class="info">
+
+      <strong>Phone</strong>
+
+      ${escapeHTML(phone)}
+
+    </div>
+
+    <div class="info">
+
+      <strong>Village</strong>
+
+      ${escapeHTML(village)}
+
+    </div>
+
+    <div class="info">
+
+      <strong>Student Code</strong>
+
+      ${escapeHTML(studentCode)}
+
+    </div>
+
+    <div>
+
+      <button
+        class="delete-btn"
+      >
+        Delete
+      </button>
+
+    </div>
+
+  `;
+
+  row
+    .querySelector(".delete-btn")
+    .addEventListener(
+      "click",
+      () => {
+
+        openDeleteModal(
+          student,
+          reason
+        );
+
+      }
+    );
+
+  return row;
+
+}
+
+/* ============================================================
+   DELETE
+   ============================================================ */
+
+function openDeleteModal(
+  student,
+  reason
+) {
+
+  studentToDelete =
+    student;
+
+  const name =
+    getName(student)
+    || "Unknown Student";
+
+  const phone =
+    getPhone(student)
+    || "No phone";
+
+  deleteStudentInfo.innerHTML = `
+
+    <strong>
+      ${escapeHTML(name)}
+    </strong>
+
+    <br><br>
+
+    Phone:
+    ${escapeHTML(phone)}
+
+    <br><br>
+
+    Reason:
+    <span style="
+      color:#dc2626;
+      font-weight:700;
+    ">
+
+      ${escapeHTML(reason)}
+
+    </span>
+
+  `;
+
+  deleteModal
+    .classList
+    .remove("hidden");
+
+}
+
+cancelDelete.addEventListener(
+  "click",
+  closeDeleteModal
+);
+
+confirmDelete.addEventListener(
+  "click",
+  deleteStudent
+);
+
+async function deleteStudent() {
+
+  if (!studentToDelete) {
+
+    return;
+
+  }
+
+  confirmDelete.disabled =
+    true;
+
+  confirmDelete.textContent =
+    "Deleting...";
+
+  try {
+
+    await deleteDoc(
+
+      doc(
+        db,
+        COLLECTION_NAME,
+        studentToDelete.id
+      )
+
+    );
+
+    closeDeleteModal();
+
+    /*
+      Scan again automatically
+      so duplicate groups disappear
+      immediately.
+    */
+
+    await scanStudents();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Unable to delete student.\n\n" +
+      error.message
+    );
+
+  } finally {
+
+    confirmDelete.disabled =
+      false;
+
+    confirmDelete.textContent =
+      "Delete Permanently";
+
+  }
+
+}
+
+function closeDeleteModal() {
+
+  deleteModal
+    .classList
+    .add("hidden");
+
+  studentToDelete =
+    null;
+
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function firstValue(values) {
+
+  for (
+    const value of values
+  ) {
+
+    if (
+      value !== undefined &&
+      value !== null &&
+      String(value).trim() !== ""
+    ) {
+
+      return value;
+
+    }
+
+  }
+
+  return "";
+
+}
+
+function formatPhone(phone) {
+
+  if (!phone) return "";
+
+  const digits =
+    String(phone)
+      .replace(/\D/g, "");
+
+  if (
+    digits.length === 10
+  ) {
+
+    return "+91 " +
+      digits.substring(0, 5) +
+      " " +
+      digits.substring(5);
+
+  }
+
+  return phone;
+
+}
+
+function escapeHTML(value) {
+
+  return String(value ?? "")
+
+    .replace(/&/g, "&amp;")
+
+    .replace(/</g, "&lt;")
+
+    .replace(/>/g, "&gt;")
+
+    .replace(/"/g, "&quot;")
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+</script>
+
+</body>
+</html>
