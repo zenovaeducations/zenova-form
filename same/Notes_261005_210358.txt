@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Zenova Duplicate Cleaner</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f7fb;
+  color:#172033
+}
+
+.container{
+  width:min(1250px,94%);
+  margin:30px auto
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  margin-bottom:25px
+}
+
+.eyebrow{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:#667085
+}
+
+h1{
+  margin:5px 0;
+  font-size:30px
+}
+
+.header p{
+  margin:0;
+  color:#667085
+}
+
+.scan-btn{
+  border:0;
+  background:#111827;
+  color:white;
+  padding:13px 22px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer
+}
+
+.scan-btn:disabled{
+  opacity:.6;
+  cursor:not-allowed
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:22px
+}
+
+.stat{
+  background:white;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px
+}
+
+.stat span{
+  display:block;
+  color:#667085;
+  font-size:13px;
+  margin-bottom:7px
+}
+
+.stat strong{
+  font-size:27px
+}
+
+.danger strong{
+  color:#dc2626
+}
+
+.loading{
+  background:white;
+  border:1px solid #e5e7eb;
+  border-radius:15px;
+  padding:35px;
+  text-align:center;
+  margin-bottom:20px
+}
+
+.spinner{
+  width:30px;
+  height:30px;
+  border:3px solid #e5e7eb;
+  border-top-color:#111827;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  margin:0 auto 15px
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+.progress-text{
+  color:#667085;
+  font-size:14px
+}
+
+.group{
+  background:white;
+  border:1px solid #e4e7ec;
+  border-radius:15px;
+  overflow:hidden;
+  margin-bottom:15px
+}
+
+.group-header{
+  padding:15px 18px;
+  background:#fafafa;
+  border-bottom:1px solid #e4e7ec;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px
+}
+
+.group-title{
+  font-weight:700
+}
+
+.group-type{
+  font-size:10px;
+  font-weight:700;
+  padding:5px 9px;
+  border-radius:20px;
+  background:#fee2e2;
+  color:#b91c1c;
+  white-space:nowrap
+}
+
+.student{
+  padding:15px 18px;
+  display:grid;
+  grid-template-columns:1.3fr 1fr 1fr 1fr 100px;
+  gap:15px;
+  align-items:center;
+  border-bottom:1px solid #f0f1f3
+}
+
+.student:last-child{
+  border-bottom:0
+}
+
+.name{
+  font-weight:700
+}
+
+.id{
+  font-size:11px;
+  color:#98a2b3;
+  margin-top:4px;
+  word-break:break-all
+}
+
+.info{
+  font-size:13px;
+  color:#475467
+}
+
+.info b{
+  display:block;
+  color:#172033;
+  margin-bottom:3px
+}
+
+.delete{
+  border:0;
+  background:#fee2e2;
+  color:#b91c1c;
+  padding:9px 12px;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer
+}
+
+.delete:hover{
+  background:#fecaca
+}
+
+.empty{
+  background:white;
+  border:1px solid #e5e7eb;
+  border-radius:15px;
+  padding:60px 20px;
+  text-align:center
+}
+
+.check{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  background:#dcfce7;
+  color:#15803d;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:auto;
+  font-size:25px;
+  font-weight:bold
+}
+
+.hidden{
+  display:none!important
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.55);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  z-index:100
+}
+
+.modal-box{
+  background:white;
+  width:min(430px,100%);
+  border-radius:18px;
+  padding:25px
+}
+
+.modal-box h2{
+  margin:10px 0
+}
+
+.delete-info{
+  background:#f8fafc;
+  padding:13px;
+  border-radius:10px;
+  font-size:13px;
+  line-height:1.7;
+  margin:15px 0
+}
+
+.actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px
+}
+
+.cancel,
+.confirm{
+  border:0;
+  padding:11px 15px;
+  border-radius:9px;
+  font-weight:700;
+  cursor:pointer
+}
+
+.cancel{
+  background:#f1f5f9
+}
+
+.confirm{
+  background:#dc2626;
+  color:white
+}
+
+@media(max-width:850px){
+
+  .header{
+    flex-direction:column;
+    align-items:flex-start
+  }
+
+  .scan-btn{
+    width:100%
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr
+  }
+
+  .student{
+    grid-template-columns:1fr 1fr
+  }
+}
+
+@media(max-width:500px){
+
+  .student{
+    grid-template-columns:1fr
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+
+    <div>
+      <div class="eyebrow">ZENOVA CRM</div>
+      <h1>Duplicate Cleaner</h1>
+      <p>
+        Find repeated names and suspicious phone numbers.
+      </p>
+    </div>
+
+    <button id="scanBtn" class="scan-btn">
+      Scan Students
+    </button>
+
+  </div>
+
+  <div id="stats" class="stats hidden">
+
+    <div class="stat">
+      <span>Total Students</span>
+      <strong id="total">0</strong>
+    </div>
+
+    <div class="stat danger">
+      <span>Problem Records</span>
+      <strong id="problems">0</strong>
+    </div>
+
+    <div class="stat">
+      <span>Duplicate Numbers</span>
+      <strong id="dupNumbers">0</strong>
+    </div>
+
+    <div class="stat">
+      <span>Duplicate Names</span>
+      <strong id="dupNames">0</strong>
+    </div>
+
+  </div>
+
+  <div id="loading" class="loading hidden">
+
+    <div class="spinner"></div>
+
+    <div id="progress" class="progress-text">
+      Connecting to database...
+    </div>
+
+  </div>
+
+  <div id="empty" class="empty hidden">
+
+    <div class="check">✓</div>
+
+    <h2>No problematic records</h2>
+
+    <p>
+      No duplicate names or suspicious numbers were found.
+    </p>
+
+  </div>
+
+  <div id="results"></div>
+
+</div>
+
+<!-- DELETE MODAL -->
+
+<div id="modal" class="modal hidden">
+
+  <div class="modal-box">
+
+    <h2>Delete this student?</h2>
+
+    <p>
+      This will permanently delete the record from
+      <b>submissions</b>.
+    </p>
+
+    <div id="deleteInfo" class="delete-info"></div>
+
+    <div class="actions">
+
+      <button id="cancel" class="cancel">
+        Cancel
+      </button>
+
+      <button id="confirm" class="confirm">
+        Delete Permanently
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module">
+
+/* =========================================================
+   FIREBASE
+   ========================================================= */
+
+import { db } from "../firebase-config.js";
+
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const scanBtn =
+  document.getElementById("scanBtn");
+
+const loading =
+  document.getElementById("loading");
+
+const progress =
+  document.getElementById("progress");
+
+const stats =
+  document.getElementById("stats");
+
+const total =
+  document.getElementById("total");
+
+const problems =
+  document.getElementById("problems");
+
+const dupNumbers =
+  document.getElementById("dupNumbers");
+
+const dupNames =
+  document.getElementById("dupNames");
+
+const results =
+  document.getElementById("results");
+
+const empty =
+  document.getElementById("empty");
+
+const modal =
+  document.getElementById("modal");
+
+const deleteInfo =
+  document.getElementById("deleteInfo");
+
+const cancel =
+  document.getElementById("cancel");
+
+const confirm =
+  document.getElementById("confirm");
+
+let selectedStudent = null;
+
+/* =========================================================
+   SCAN
+   ========================================================= */
+
+scanBtn.addEventListener(
+  "click",
+  scan
+);
+
+async function scan(){
+
+  scanBtn.disabled = true;
+
+  loading.classList.remove("hidden");
+
+  empty.classList.add("hidden");
+
+  results.innerHTML = "";
+
+  stats.classList.add("hidden");
+
+  try{
+
+    progress.textContent =
+      "Loading student records...";
+
+    /*
+      ONLY ONE FIRESTORE READ.
+
+      The previous version could feel slow because
+      the entire collection was downloaded before
+      processing. This version processes immediately
+      after that single read.
+    */
+
+    const snapshot =
+      await getDocs(
+        collection(db,"submissions")
+      );
+
+    progress.textContent =
+      "Processing " +
+      snapshot.size +
+      " students...";
+
+    const students = [];
+
+    snapshot.forEach(item => {
+
+      students.push({
+
+        id:item.id,
+
+        ...item.data()
+
+      });
+
+    });
+
+    total.textContent =
+      students.length;
+
+    /*
+      Process locally.
+      No more Firebase requests.
+    */
+
+    const analysis =
+      analyze(students);
+
+    dupNumbers.textContent =
+      analysis.phoneGroups.length;
+
+    dupNames.textContent =
+      analysis.nameGroups.length;
+
+    problems.textContent =
+      analysis.problemMap.size;
+
+    stats.classList.remove("hidden");
+
+    render(analysis);
+
+  }catch(error){
+
+    console.error(error);
+
+    results.innerHTML = `
+
+      <div class="group">
+
+        <div style="
+          padding:25px;
+          color:#dc2626;
+        ">
+
+          <b>Unable to load data</b>
+
+          <br><br>
+
+          ${escapeHTML(error.message)}
+
+        </div>
+
+      </div>
+
+    `;
+
+  }finally{
+
+    loading.classList.add("hidden");
+
+    scanBtn.disabled = false;
+
+  }
+
+}
+
+/* =========================================================
+   ANALYSIS
+   ========================================================= */
+
+function analyze(students){
+
+  const phoneMap =
+    new Map();
+
+  const nameMap =
+    new Map();
+
+  /*
+    First pass
+  */
+
+  for(const student of students){
+
+    const phone =
+      normalizePhone(
+        getPhone(student)
+      );
+
+    const name =
+      normalizeName(
+        getName(student)
+      );
+
+    if(phone){
+
+      if(!phoneMap.has(phone))
+        phoneMap.set(phone,[]);
+
+      phoneMap
+        .get(phone)
+        .push(student);
+
+    }
+
+    if(name){
+
+      if(!nameMap.has(name))
+        nameMap.set(name,[]);
+
+      nameMap
+        .get(name)
+        .push(student);
+
+    }
+
+  }
+
+  /*
+    Only groups having more than
+    one student are duplicates.
+  */
+
+  const phoneGroups = [];
+
+  phoneMap.forEach(
+    (students,phone)=>{
+
+      if(students.length > 1){
+
+        phoneGroups.push({
+          key:phone,
+          students
+        });
+
+      }
+
+    }
+  );
+
+  const nameGroups = [];
+
+  nameMap.forEach(
+    (students,name)=>{
+
+      if(students.length > 1){
+
+        nameGroups.push({
+          key:name,
+          students
+        });
+
+      }
+
+    }
+  );
+
+  /*
+    Problem records
+  */
+
+  const problemMap =
+    new Map();
+
+  function add(student,reason){
+
+    if(!problemMap.has(student.id)){
+
+      problemMap.set(
+        student.id,
+        {
+          student,
+          reasons:[]
+        }
+      );
+
+    }
+
+    const item =
+      problemMap.get(student.id);
+
+    if(!item.reasons.includes(reason)){
+
+      item.reasons.push(reason);
+
+    }
+
+  }
+
+  /*
+    Duplicate numbers
+  */
+
+  for(const group of phoneGroups){
+
+    for(const student of group.students){
+
+      add(
+        student,
+        "Duplicate phone number"
+      );
+
+    }
+
+  }
+
+  /*
+    Duplicate names
+  */
+
+  for(const group of nameGroups){
+
+    for(const student of group.students){
+
+      add(
+        student,
+        "Duplicate name"
+      );
+
+    }
+
+  }
+
+  /*
+    Suspicious numbers
+  */
+
+  for(const student of students){
+
+    const phone =
+      getPhone(student);
+
+    if(
+      phone &&
+      suspicious(phone)
+    ){
+
+      add(
+        student,
+        "Suspicious phone number"
+      );
+
+    }
+
+  }
+
+  return {
+    phoneGroups,
+    nameGroups,
+    problemMap
+  };
+
+}
+
+/* =========================================================
+   PHONE
+   ========================================================= */
+
+function getPhone(student){
+
+  return first([
+
+    student.phone,
+
+    student.mobile,
+
+    student.mobileNumber,
+
+    student.phoneNumber,
+
+    student.student?.phone,
+
+    student.student?.mobile,
+
+    student.student?.mobileNumber,
+
+    student.student?.phoneNumber
+
+  ]);
+
+}
+
+function normalizePhone(value){
+
+  if(!value)
+    return "";
+
+  let n =
+    String(value)
+    .replace(/\D/g,"");
+
+  /*
+    +91XXXXXXXXXX
+  */
+
+  if(
+    n.length === 12 &&
+    n.startsWith("91")
+  ){
+
+    n =
+      n.substring(2);
+
+  }
+
+  return n;
+
+}
+
+/* =========================================================
+   SUSPICIOUS NUMBERS
+   ========================================================= */
+
+function suspicious(value){
+
+  const n =
+    normalizePhone(value);
+
+  /*
+    Wrong length
+  */
+
+  if(n.length !== 10)
+    return true;
+
+  /*
+    0000000000
+  */
+
+  if(/^0{10}$/.test(n))
+    return true;
+
+  /*
+    9999999999
+  */
+
+  if(/^9{10}$/.test(n))
+    return true;
+
+  /*
+    1111111111
+    2222222222
+    etc.
+  */
+
+  if(/^(\d)\1{9}$/.test(n))
+    return true;
+
+  /*
+    Obvious sequences
+  */
+
+  if(
+    n === "1234567890" ||
+    n === "0123456789"
+  )
+    return true;
+
+  return false;
+
+}
+
+/* =========================================================
+   NAME
+   ========================================================= */
+
+function getName(student){
+
+  return first([
+
+    student.name,
+
+    student.studentName,
+
+    student.fullName,
+
+    student.student?.name,
+
+    student.student?.studentName,
+
+    student.student?.fullName
+
+  ]);
+
+}
+
+function normalizeName(value){
+
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g," ");
+
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+
+function render(data){
+
+  results.innerHTML = "";
+
+  if(data.problemMap.size === 0){
+
+    empty.classList.remove("hidden");
+
+    return;
+
+  }
+
+  /*
+    PHONE DUPLICATES
+  */
+
+  for(const group of data.phoneGroups){
+
+    const box =
+      document.createElement("div");
+
+    box.className = "group";
+
+    box.innerHTML = `
+
+      <div class="group-header">
+
+        <div class="group-title">
+
+          📱 ${escapeHTML(
+            formatPhone(group.key)
+          )}
+
+          <span style="
+            color:#98a2b3;
+            font-weight:400
+          ">
+
+            (${group.students.length})
+
+          </span>
+
+        </div>
+
+        <div class="group-type">
+          DUPLICATE NUMBER
+        </div>
+
+      </div>
+
+    `;
+
+    for(const student of group.students){
+
+      box.appendChild(
+        createStudent(
+          student,
+          "Duplicate phone number"
+        )
+      );
+
+    }
+
+    results.appendChild(box);
+
+  }
+
+  /*
+    NAME DUPLICATES
+  */
+
+  for(const group of data.nameGroups){
+
+    const box =
+      document.createElement("div");
+
+    box.className = "group";
+
+    box.innerHTML = `
+
+      <div class="group-header">
+
+        <div class="group-title">
+
+          👤 ${escapeHTML(
+            getName(group.students[0])
+            || "Unknown"
+          )}
+
+          <span style="
+            color:#98a2b3;
+            font-weight:400
+          ">
+
+            (${group.students.length})
+
+          </span>
+
+        </div>
+
+        <div class="group-type">
+          DUPLICATE NAME
+        </div>
+
+      </div>
+
+    `;
+
+    for(const student of group.students){
+
+      box.appendChild(
+        createStudent(
+          student,
+          "Duplicate name"
+        )
+      );
+
+    }
+
+    results.appendChild(box);
+
+  }
+
+  /*
+    SUSPICIOUS NUMBERS
+  */
+
+  const alreadyShown =
+    new Set();
+
+  for(const group of data.phoneGroups){
+
+    for(const student of group.students){
+
+      alreadyShown.add(student.id);
+
+    }
+
+  }
+
+  for(const student of data.problemMap.values()){
+
+    if(
+      student.reasons.includes(
+        "Suspicious phone number"
+      ) &&
+      !alreadyShown.has(
+        student.student.id
+      )
+    ){
+
+      const box =
+        document.createElement("div");
+
+      box.className = "group";
+
+      box.innerHTML = `
+
+        <div class="group-header">
+
+          <div class="group-title">
+            ⚠️ Suspicious Number
+          </div>
+
+          <div class="group-type">
+            CHECK NUMBER
+          </div>
+
+        </div>
+
+      `;
+
+      box.appendChild(
+        createStudent(
+          student.student,
+          "Suspicious phone number"
+        )
+      );
+
+      results.appendChild(box);
+
+    }
+
+  }
+
+}
+
+/* =========================================================
+   STUDENT ROW
+   ========================================================= */
+
+function createStudent(
+  student,
+  reason
+){
+
+  const row =
+    document.createElement("div");
+
+  row.className = "student";
+
+  const name =
+    getName(student)
+    || "Unknown Student";
+
+  const phone =
+    getPhone(student)
+    || "No phone";
+
+  const village =
+    first([
+
+      student.village,
+
+      student.villageName,
+
+      student.assignedVillage,
+
+      student.assignedVillageName,
+
+      student.student?.village,
+
+      student.student?.villageName
+
+    ]) || "-";
+
+  const school =
+    first([
+
+      student.school,
+
+      student.schoolName,
+
+      student.studentSchool,
+
+      student.school_name,
+
+      student.student?.school,
+
+      student.student?.schoolName
+
+    ]) || "-";
+
+  const code =
+    first([
+
+      student.studentCode,
+
+      student.code,
+
+      student.student?.studentCode
+
+    ]) || "-";
+
+  row.innerHTML = `
+
+    <div>
+
+      <div class="name">
+        ${escapeHTML(name)}
+      </div>
+
+      <div class="id">
+        ID: ${escapeHTML(student.id)}
+      </div>
+
+    </div>
+
+    <div class="info">
+
+      <b>Phone</b>
+
+      ${escapeHTML(phone)}
+
+    </div>
+
+    <div class="info">
+
+      <b>Village</b>
+
+      ${escapeHTML(village)}
+
+    </div>
+
+    <div class="info">
+
+      <b>Code</b>
+
+      ${escapeHTML(code)}
+
+    </div>
+
+    <button class="delete">
+      Delete
+    </button>
+
+  `;
+
+  row
+    .querySelector(".delete")
+    .addEventListener(
+      "click",
+      ()=>openDelete(student,reason)
+    );
+
+  return row;
+
+}
+
+/* =========================================================
+   DELETE
+   ========================================================= */
+
+function openDelete(student,reason){
+
+  selectedStudent =
+    student;
+
+  deleteInfo.innerHTML = `
+
+    <b>
+      ${escapeHTML(
+        getName(student)
+        || "Unknown Student"
+      )}
+    </b>
+
+    <br>
+
+    Phone:
+    ${escapeHTML(
+      getPhone(student)
+      || "No phone"
+    )}
+
+    <br>
+
+    Reason:
+    <span style="
+      color:#dc2626;
+      font-weight:700
+    ">
+
+      ${escapeHTML(reason)}
+
+    </span>
+
+  `;
+
+  modal.classList.remove("hidden");
+
+}
+
+cancel.addEventListener(
+  "click",
+  ()=>{
+    modal.classList.add("hidden");
+    selectedStudent = null;
+  }
+);
+
+confirm.addEventListener(
+  "click",
+  async ()=>{
+
+    if(!selectedStudent)
+      return;
+
+    confirm.disabled = true;
+
+    confirm.textContent =
+      "Deleting...";
+
+    try{
+
+      await deleteDoc(
+        doc(
+          db,
+          "submissions",
+          selectedStudent.id
+        )
+      );
+
+      modal.classList.add("hidden");
+
+      selectedStudent = null;
+
+      /*
+        IMPORTANT:
+        We scan again only AFTER deletion.
+        No repeated Firebase reads during
+        the actual analysis.
+      */
+
+      await scan();
+
+    }catch(error){
+
+      console.error(error);
+
+      alert(
+        "Delete failed:\n\n" +
+        error.message
+      );
+
+    }finally{
+
+      confirm.disabled = false;
+
+      confirm.textContent =
+        "Delete Permanently";
+
+    }
+
+  }
+);
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function first(values){
+
+  for(const value of values){
+
+    if(
+      value !== undefined &&
+      value !== null &&
+      String(value).trim() !== ""
+    ){
+
+      return value;
+
+    }
+
+  }
+
+  return "";
+
+}
+
+function formatPhone(phone){
+
+  const n =
+    normalizePhone(phone);
+
+  if(n.length === 10){
+
+    return "+91 " +
+      n.substring(0,5) +
+      " " +
+      n.substring(5);
+
+  }
+
+  return phone;
+
+}
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+
+    .replace(/&/g,"&amp;")
+
+    .replace(/</g,"&lt;")
+
+    .replace(/>/g,"&gt;")
+
+    .replace(/"/g,"&quot;")
+
+    .replace(/'/g,"&#039;");
+
+}
+
+</script>
+
+</body>
+</html>
