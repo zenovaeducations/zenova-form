@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenova CRM — Attendance</title>
+    <link rel="stylesheet" href="attendance.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+
+<section id="loginScreen" class="login-screen">
+    <div class="login-card">
+        <div class="logo">ZENOVA</div>
+        <h1>CRM Attendance</h1>
+        <p>Authorized access only</p>
+        <input id="passwordInput" type="password" placeholder="Enter password" autocomplete="current-password">
+        <button id="loginButton">Continue</button>
+        <div id="loginError"></div>
+    </div>
+</section>
+
+<main id="mainPage" class="page">
+
+    <header class="topbar">
+        <div>
+            <div class="eyebrow">ZENOVA EDUCATIONS</div>
+            <h1>Daily Attendance</h1>
+            <p>Mark student attendance in student-code order.</p>
+        </div>
+        <button id="refreshButton" class="secondary-button">
+            <i class="ri-refresh-line"></i> Refresh
+        </button>
+    </header>
+
+    <section class="control-card">
+        <div class="date-block">
+            <label for="attendanceDate">Attendance date</label>
+            <div class="date-input">
+                <i class="ri-calendar-line"></i>
+                <input id="attendanceDate" type="date">
+            </div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="mini-stat">
+                <span>Total</span>
+                <strong id="totalCount">0</strong>
+            </div>
+            <div class="mini-stat present">
+                <span>Present</span>
+                <strong id="presentCount">0</strong>
+            </div>
+            <div class="mini-stat absent">
+                <span>Absent</span>
+                <strong id="absentCount">0</strong>
+            </div>
+            <div class="mini-stat pending">
+                <span>Pending</span>
+                <strong id="pendingCount">0</strong>
+            </div>
+        </div>
+
+        <button id="startButton" class="start-button">
+            <i class="ri-play-circle-line"></i>
+            Start Attendance
+        </button>
+    </section>
+
+    <section id="attendancePanel" class="attendance-panel">
+
+        <div class="progress-wrap">
+            <div class="progress-top">
+                <div>
+                    <span class="label">CURRENT STUDENT</span>
+                    <strong id="progressText">Ready</strong>
+                </div>
+                <div class="live-timer">
+                    <i class="ri-time-line"></i>
+                    <span id="timer">00:00</span>
+                </div>
+            </div>
+            <div class="progress-track">
+                <div id="progressBar"></div>
+            </div>
+        </div>
+
+        <div id="studentCard" class="student-card empty-card">
+            <div class="empty-icon"><i class="ri-user-search-line"></i></div>
+            <h2>Attendance is not started</h2>
+            <p>Select the date and click <b>Start Attendance</b>.</p>
+        </div>
+
+        <div id="attendanceActions" class="actions hidden">
+            <button id="presentButton" class="attendance-button present-button">
+                <i class="ri-checkbox-circle-fill"></i>
+                Present
+            </button>
+            <button id="absentButton" class="attendance-button absent-button">
+                <i class="ri-close-circle-fill"></i>
+                Absent
+            </button>
+        </div>
+
+        <div id="completionCard" class="completion-card hidden">
+            <div class="completion-icon"><i class="ri-checkbox-circle-fill"></i></div>
+            <h2>Attendance completed</h2>
+            <p id="completionText"></p>
+            <button id="restartButton" class="secondary-button">Start Again</button>
+        </div>
+
+    </section>
+
+    <section class="records-section">
+        <div class="section-title">
+            <div>
+                <h2>Today's Attendance</h2>
+                <p>Saved attendance for the selected date.</p>
+            </div>
+            <button id="clearSessionButton" class="text-button">Reset current session</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>CODE</th>
+                        <th>STUDENT</th>
+                        <th>VILLAGE</th>
+                        <th>SCHOOL</th>
+                        <th>STATUS</th>
+                        <th>TIME TAKEN</th>
+                        <th>MARKED AT</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTable">
+                    <tr><td colspan="8" class="loading">Loading attendance...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script type="module" src="attendance.js"></script>
+</body>
+</html>
