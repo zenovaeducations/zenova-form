@@ -1,0 +1,3194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Zenova Midterm Performance</title>
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+    background: #f5f7fb;
+    color: #172033;
+}
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app {
+    min-height: 100vh;
+    padding: 25px 15px 50px;
+}
+
+.container {
+    width: min(720px, 100%);
+    margin: auto;
+}
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.brand {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.logo {
+    width: 52px;
+    height: 52px;
+    margin: auto;
+
+    border-radius: 15px;
+
+    background: #111827;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 800;
+    font-size: 17px;
+}
+
+.brand h1 {
+    margin: 12px 0 5px;
+    font-size: 25px;
+}
+
+.brand p {
+    margin: 0;
+    color: #667085;
+    font-size: 14px;
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 22px;
+
+    padding: 28px;
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+/* =========================================================
+   STEPS
+========================================================= */
+
+.steps {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 25px;
+}
+
+.step-line {
+    height: 4px;
+    flex: 1;
+    background: #e5e7eb;
+    border-radius: 20px;
+}
+
+.step-line.active {
+    background: #111827;
+}
+
+/* =========================================================
+   SCREENS
+========================================================= */
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* =========================================================
+   HEADINGS
+========================================================= */
+
+.screen h2 {
+    margin: 0 0 8px;
+    font-size: 24px;
+}
+
+.subtitle {
+    color: #667085;
+    line-height: 1.6;
+    margin: 0 0 25px;
+}
+
+/* =========================================================
+   GOOGLE LOGIN
+========================================================= */
+
+.google-box {
+    text-align: center;
+    padding: 15px 0;
+}
+
+.google-icon {
+    width: 65px;
+    height: 65px;
+
+    margin: 0 auto 20px;
+
+    border-radius: 50%;
+
+    background: #f3f4f6;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 27px;
+}
+
+.google-btn {
+    width: 100%;
+
+    background: white;
+    color: #172033;
+
+    border: 1px solid #d0d5dd;
+
+    padding: 14px 18px;
+
+    border-radius: 11px;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.google-btn:hover {
+    background: #f9fafb;
+}
+
+.google-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.label {
+    display: block;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    margin-bottom: 8px;
+}
+
+.input {
+    width: 100%;
+
+    padding: 14px 15px;
+
+    border: 1px solid #d0d5dd;
+
+    border-radius: 11px;
+
+    outline: none;
+
+    font-size: 16px;
+
+    background: white;
+
+    transition: .2s;
+}
+
+.input:focus {
+    border-color: #111827;
+
+    box-shadow:
+        0 0 0 3px rgba(17, 24, 39, .08);
+}
+
+.code-input {
+    text-align: center;
+
+    font-size: 25px;
+    font-weight: 800;
+
+    letter-spacing: 3px;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.primary-btn {
+    width: 100%;
+
+    border: 0;
+
+    background: #111827;
+    color: white;
+
+    padding: 14px;
+
+    border-radius: 11px;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.primary-btn:hover {
+    background: #1f2937;
+}
+
+.primary-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.secondary-btn {
+    width: 100%;
+
+    border: 1px solid #d0d5dd;
+
+    background: white;
+    color: #172033;
+
+    padding: 13px;
+
+    border-radius: 11px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    margin-top: 10px;
+}
+
+/* =========================================================
+   STUDENT CONFIRMATION
+========================================================= */
+
+.student-preview {
+    background: #f8fafc;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 15px;
+
+    padding: 20px;
+
+    margin-bottom: 20px;
+
+    text-align: center;
+}
+
+.student-preview .student-name {
+    font-size: 22px;
+    font-weight: 800;
+
+    margin-bottom: 7px;
+}
+
+.student-preview .student-code {
+    font-size: 13px;
+    color: #667085;
+}
+
+/* =========================================================
+   WARNING
+========================================================= */
+
+.warning {
+    background: #fff7ed;
+
+    border: 1px solid #fed7aa;
+
+    color: #9a3412;
+
+    padding: 13px;
+
+    border-radius: 11px;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    margin-bottom: 20px;
+}
+
+.error {
+    background: #fef2f2;
+
+    border: 1px solid #fecaca;
+
+    color: #b91c1c;
+
+    padding: 13px;
+
+    border-radius: 11px;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    margin-bottom: 20px;
+}
+
+.success {
+    background: #f0fdf4;
+
+    border: 1px solid #bbf7d0;
+
+    color: #166534;
+
+    padding: 13px;
+
+    border-radius: 11px;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    margin-bottom: 20px;
+}
+
+/* =========================================================
+   USER
+========================================================= */
+
+.user-bar {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    background: #f8fafc;
+
+    padding: 10px 12px;
+
+    border-radius: 10px;
+}
+
+.user-bar img {
+    width: 35px;
+    height: 35px;
+
+    border-radius: 50%;
+}
+
+.user-info {
+    flex: 1;
+
+    min-width: 0;
+}
+
+.user-email {
+    font-size: 12px;
+
+    color: #667085;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.signout {
+    border: 0;
+    background: transparent;
+
+    color: #667085;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+/* =========================================================
+   MARKS
+========================================================= */
+
+.instruction {
+    background: #eff6ff;
+
+    border: 1px solid #bfdbfe;
+
+    color: #1e40af;
+
+    padding: 14px;
+
+    border-radius: 12px;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+    margin-bottom: 20px;
+}
+
+.subject-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin-bottom: 22px;
+}
+
+.subject-row {
+    border: 1px solid #e5e7eb;
+
+    border-radius: 13px;
+
+    padding: 14px;
+
+    display: grid;
+
+    grid-template-columns: 1fr 130px;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+.subject-name {
+    font-weight: 700;
+
+    margin-bottom: 4px;
+}
+
+.subject-max {
+    font-size: 12px;
+
+    color: #667085;
+}
+
+.mark-input {
+    width: 100%;
+
+    padding: 11px;
+
+    border: 1px solid #d0d5dd;
+
+    border-radius: 9px;
+
+    font-size: 16px;
+
+    text-align: center;
+
+    outline: none;
+}
+
+.mark-input:focus {
+    border-color: #111827;
+}
+
+.total-box {
+    background: #111827;
+
+    color: white;
+
+    border-radius: 15px;
+
+    padding: 18px;
+
+    margin-bottom: 20px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+.total-label {
+    font-size: 13px;
+
+    opacity: .8;
+}
+
+.total-value {
+    font-size: 25px;
+
+    font-weight: 800;
+}
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+.result-top {
+    text-align: center;
+
+    padding: 15px 0 25px;
+}
+
+.result-circle {
+    width: 150px;
+    height: 150px;
+
+    border-radius: 50%;
+
+    margin: 0 auto 18px;
+
+    background: #f3f4f6;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    border: 7px solid #111827;
+}
+
+.result-percent {
+    font-size: 34px;
+    font-weight: 900;
+}
+
+.result-small {
+    font-size: 11px;
+    color: #667085;
+}
+
+.result-title {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.target-box {
+    background: #f8fafc;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 15px;
+
+    padding: 18px;
+
+    margin: 20px 0;
+}
+
+.target-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 9px 0;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.target-row:last-child {
+    border-bottom: 0;
+}
+
+.target-label {
+    color: #667085;
+}
+
+.target-value {
+    font-weight: 800;
+}
+
+/* =========================================================
+   MOTIVATION
+========================================================= */
+
+.motivation {
+    border-radius: 15px;
+
+    padding: 20px;
+
+    line-height: 1.65;
+
+    margin-bottom: 20px;
+}
+
+.motivation strong {
+    display: block;
+
+    font-size: 18px;
+
+    margin-bottom: 8px;
+}
+
+.motivation.excellent {
+    background: #ecfdf3;
+
+    border: 1px solid #a7f3d0;
+
+    color: #065f46;
+}
+
+.motivation.improve {
+    background: #eff6ff;
+
+    border: 1px solid #bfdbfe;
+
+    color: #1e40af;
+}
+
+.motivation.start {
+    background: #fff7ed;
+
+    border: 1px solid #fed7aa;
+
+    color: #9a3412;
+}
+
+/* =========================================================
+   FINAL TARGET
+========================================================= */
+
+.target-input-box {
+    margin-top: 20px;
+
+    background: #f8fafc;
+
+    padding: 18px;
+
+    border-radius: 15px;
+
+    border: 1px solid #e5e7eb;
+}
+
+.target-input-box h3 {
+    margin: 0 0 7px;
+}
+
+.target-input-box p {
+    margin: 0 0 15px;
+
+    color: #667085;
+
+    font-size: 13px;
+}
+
+/* =========================================================
+   FINAL SUCCESS
+========================================================= */
+
+.final-success {
+    text-align: center;
+
+    padding: 20px 0;
+}
+
+.big-check {
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 20px;
+
+    border-radius: 50%;
+
+    background: #dcfce7;
+
+    color: #15803d;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 32px;
+
+    font-weight: 900;
+}
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.loading {
+    text-align: center;
+
+    padding: 20px;
+}
+
+.spinner {
+    width: 28px;
+    height: 28px;
+
+    border: 3px solid #e5e7eb;
+
+    border-top-color: #111827;
+
+    border-radius: 50%;
+
+    animation: spin .7s linear infinite;
+
+    margin: 0 auto 12px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================================================
+   HIDDEN
+========================================================= */
+
+.hidden {
+    display: none !important;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:600px) {
+
+    .app {
+        padding: 15px 10px 35px;
+    }
+
+    .card {
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .subject-row {
+        grid-template-columns: 1fr 100px;
+    }
+
+    .screen h2 {
+        font-size: 22px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="container">
+
+<!-- =====================================================
+     BRAND
+===================================================== -->
+
+<div class="brand">
+
+    <div class="logo">
+        Z
+    </div>
+
+    <h1>Zenova</h1>
+
+    <p>
+        Midterm Performance Analysis
+    </p>
+
+</div>
+
+<div class="card">
+
+<!-- =====================================================
+     PROGRESS STEPS
+===================================================== -->
+
+<div class="steps">
+
+    <div class="step-line active" id="step1"></div>
+
+    <div class="step-line" id="step2"></div>
+
+    <div class="step-line" id="step3"></div>
+
+    <div class="step-line" id="step4"></div>
+
+    <div class="step-line" id="step5"></div>
+
+</div>
+
+<!-- =====================================================
+     USER BAR
+===================================================== -->
+
+<div id="userBar" class="user-bar hidden">
+
+    <img id="userPhoto" src="" alt="">
+
+    <div class="user-info">
+
+        <strong id="userName">
+            Student
+        </strong>
+
+        <div id="userEmail" class="user-email"></div>
+
+    </div>
+
+    <button id="signOutBtn" class="signout">
+        Sign out
+    </button>
+
+</div>
+
+<!-- =====================================================
+     SCREEN 1 — GOOGLE LOGIN
+===================================================== -->
+
+<div id="screenLogin" class="screen active">
+
+    <h2>
+        Welcome, Student 👋
+    </h2>
+
+    <p class="subtitle">
+
+        Sign in with your Google account
+        to begin your Zenova Midterm
+        Performance Analysis.
+
+    </p>
+
+    <div class="google-box">
+
+        <div class="google-icon">
+            G
+        </div>
+
+        <button
+            id="googleBtn"
+            class="google-btn"
+        >
+
+            <span>G</span>
+
+            Continue with Google
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     SCREEN 2 — ZNV CODE
+===================================================== -->
+
+<div id="screenCode" class="screen">
+
+    <h2>
+        Enter Your ZNV Code
+    </h2>
+
+    <p class="subtitle">
+
+        Enter the number at the end of
+        your ZNV student code.
+
+        <br><br>
+
+        Example:
+        <strong>2701</strong>
+
+    </p>
+
+    <div class="form-group">
+
+        <label class="label">
+            ZNV Number
+        </label>
+
+        <input
+            id="znvCode"
+            class="input code-input"
+            type="text"
+            inputmode="numeric"
+            maxlength="12"
+            placeholder="2701"
+            autocomplete="off"
+        >
+
+    </div>
+
+    <div id="codeError" class="error hidden"></div>
+
+    <button
+        id="findStudentBtn"
+        class="primary-btn"
+    >
+
+        Continue
+
+    </button>
+
+</div>
+
+<!-- =====================================================
+     SCREEN 3 — NAME
+===================================================== -->
+
+<div id="screenName" class="screen">
+
+    <h2>
+        Confirm Your Name
+    </h2>
+
+    <p class="subtitle">
+
+        We found a student record
+        matching your ZNV number.
+
+    </p>
+
+    <div class="student-preview">
+
+        <div
+            id="matchedName"
+            class="student-name"
+        >
+            Student Name
+        </div>
+
+        <div
+            id="matchedCode"
+            class="student-code"
+        >
+            ZNV Code
+        </div>
+
+    </div>
+
+    <div class="warning">
+
+        Please check the name carefully.
+        Do not continue if this is not your
+        name.
+
+    </div>
+
+    <button
+        id="nameYesBtn"
+        class="primary-btn"
+    >
+
+        Yes, this is my name
+
+    </button>
+
+    <button
+        id="wrongNameBtn"
+        class="secondary-btn"
+    >
+
+        This is not my name
+
+    </button>
+
+</div>
+
+<!-- =====================================================
+     SCREEN 4 — WRONG NAME
+===================================================== -->
+
+<div id="screenWrongName" class="screen">
+
+    <h2>
+        Student Verification
+    </h2>
+
+    <p class="subtitle">
+
+        If the displayed name is not yours,
+        enter your correct details below.
+        Our admin team will verify and assign
+        your student number.
+
+    </p>
+
+    <div class="form-group">
+
+        <label class="label">
+            Your Name
+        </label>
+
+        <input
+            id="wrongName"
+            class="input"
+            type="text"
+            placeholder="Enter your full name"
+        >
+
+    </div>
+
+    <div class="form-group">
+
+        <label class="label">
+            Your Phone Number
+        </label>
+
+        <input
+            id="wrongPhone"
+            class="input"
+            type="tel"
+            inputmode="tel"
+            placeholder="Enter your phone number"
+        >
+
+    </div>
+
+    <div id="wrongError" class="error hidden"></div>
+
+    <button
+        id="wrongSubmitBtn"
+        class="primary-btn"
+    >
+
+        Submit Verification Request
+
+    </button>
+
+</div>
+
+<!-- =====================================================
+     SCREEN 5 — PHONE
+===================================================== -->
+
+<div id="screenPhone" class="screen">
+
+    <h2>
+        Verify Your Phone Number
+    </h2>
+
+    <p class="subtitle">
+
+        Enter the phone number registered
+        with Zenova for this student.
+
+    </p>
+
+    <div class="student-preview">
+
+        <div
+            id="phoneStudentName"
+            class="student-name"
+        >
+        </div>
+
+        <div
+            id="phoneStudentCode"
+            class="student-code"
+        >
+        </div>
+
+    </div>
+
+    <div class="form-group">
+
+        <label class="label">
+            Registered Phone Number
+        </label>
+
+        <input
+            id="verifyPhone"
+            class="input"
+            type="tel"
+            inputmode="tel"
+            placeholder="Enter 10 digit number"
+            autocomplete="tel"
+        >
+
+    </div>
+
+    <div id="phoneError" class="error hidden"></div>
+
+    <button
+        id="verifyPhoneBtn"
+        class="primary-btn"
+    >
+
+        Verify & Continue
+
+    </button>
+
+</div>
+
+<!-- =====================================================
+     SCREEN 6 — MARKS
+===================================================== -->
+
+<div id="screenMarks" class="screen">
+
+    <h2>
+        Enter Your Midterm Marks
+    </h2>
+
+    <p class="subtitle">
+
+        Enter only your written examination
+        marks. Do <strong>not</strong> add
+        internal assessment marks.
+
+    </p>
+
+    <div class="instruction">
+
+        <strong>Important:</strong>
+
+        Kannada is out of <strong>100</strong>.
+
+        <br>
+
+        English, Hindi, Mathematics, Science
+        and Social Science are each out of
+        <strong>80</strong>.
+
+        <br>
+
+        Internal marks should NOT be added.
+
+    </div>
+
+    <div class="subject-list">
+
+        <!-- KANNADA -->
+
+        <div class="subject-row">
+
+            <div>
+
+                <div class="subject-name">
+                    Kannada
+                </div>
+
+                <div class="subject-max">
+                    Enter marks out of 100
+                </div>
+
+            </div>
+
+            <input
+                id="markKannada"
+                class="mark-input mark"
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                placeholder="0 - 100"
+            >
+
+        </div>
+
+        <!-- ENGLISH -->
+
+        <div class="subject-row">
+
+            <div>
+
+                <div class="subject-name">
+                    English
+                </div>
+
+                <div class="subject-max">
+                    Enter marks out of 80
+                </div>
+
+            </div>
+
+            <input
+                id="markEnglish"
+                class="mark-input mark"
+                type="number"
+                min="0"
+                max="80"
+                step="1"
+                placeholder="0 - 80"
+            >
+
+        </div>
+
+        <!-- HINDI -->
+
+        <div class="subject-row">
+
+            <div>
+
+                <div class="subject-name">
+                    Hindi
+                </div>
+
+                <div class="subject-max">
+                    Enter marks out of 80
+                </div>
+
+            </div>
+
+            <input
+                id="markHindi"
+                class="mark-input mark"
+                type="number"
+                min="0"
+                max="80"
+                step="1"
+                placeholder="0 - 80"
+            >
+
+        </div>
+
+        <!-- MATHEMATICS -->
+
+        <div class="subject-row">
+
+            <div>
+
+                <div class="subject-name">
+                    Mathematics
+                </div>
+
+                <div class="subject-max">
+                    Enter marks out of 80
+                </div>
+
+            </div>
+
+            <input
+                id="markMaths"
+                class="mark-input mark"
+                type="number"
+                min="0"
+                max="80"
+                step="1"
+                placeholder="0 - 80"
+            >
+
+        </div>
+
+        <!-- SCIENCE -->
+
+        <div class="subject-row">
+
+            <div>
+
+                <div class="subject-name">
+                    Science
+                </div>
+
+                <div class="subject-max">
+                    Enter marks out of 80
+                </div>
+
+            </div>
+
+            <input
+                id="markScience"
+                class="mark-input mark"
+                type="number"
+                min="0"
+                max="80"
+                step="1"
+                placeholder="0 - 80"
+            >
+
+        </div>
+
+        <!-- SOCIAL -->
+
+        <div class="subject-row">
+
+            <div>
+
+                <div class="subject-name">
+                    Social Science
+                </div>
+
+                <div class="subject-max">
+                    Enter marks out of 80
+                </div>
+
+            </div>
+
+            <input
+                id="markSocial"
+                class="mark-input mark"
+                type="number"
+                min="0"
+                max="80"
+                step="1"
+                placeholder="0 - 80"
+            >
+
+        </div>
+
+    </div>
+
+    <div class="total-box">
+
+        <div>
+
+            <div class="total-label">
+                Maximum
+            </div>
+
+            <strong>
+                500 Marks
+            </strong>
+
+        </div>
+
+        <div style="text-align:right">
+
+            <div class="total-label">
+                Entered
+            </div>
+
+            <div
+                id="liveTotal"
+                class="total-value"
+            >
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="marksError" class="error hidden"></div>
+
+    <button
+        id="submitMarksBtn"
+        class="primary-btn"
+    >
+
+        Calculate My Result
+
+    </button>
+
+</div>
+
+<!-- =====================================================
+     SCREEN 7 — RESULT / TARGET
+===================================================== -->
+
+<div id="screenResult" class="screen">
+
+    <div class="result-top">
+
+        <div class="result-circle">
+
+            <div
+                id="percentage"
+                class="result-percent"
+            >
+                0%
+            </div>
+
+            <div class="result-small">
+                MIDTERM
+            </div>
+
+        </div>
+
+        <div class="result-title">
+            Your Midterm Result
+        </div>
+
+        <p class="subtitle">
+            Here is your current performance.
+        </p>
+
+    </div>
+
+    <div class="target-box">
+
+        <div class="target-row">
+
+            <span class="target-label">
+                Total Marks
+            </span>
+
+            <span
+                id="resultTotal"
+                class="target-value"
+            >
+                0 / 500
+            </span>
+
+        </div>
+
+        <div class="target-row">
+
+            <span class="target-label">
+                Midterm Percentage
+            </span>
+
+            <span
+                id="resultPercentage"
+                class="target-value"
+            >
+                0%
+            </span>
+
+        </div>
+
+        <div class="target-row">
+
+            <span class="target-label">
+                Conservative Estimate
+            </span>
+
+            <span
+                id="estimatedPercentage"
+                class="target-value"
+            >
+                0%
+            </span>
+
+        </div>
+
+    </div>
+
+    <div
+        id="motivation"
+        class="motivation"
+    >
+    </div>
+
+    <div class="target-input-box">
+
+        <h3>
+            🎯 Set Your Final Target
+        </h3>
+
+        <p>
+            What percentage do you want to
+            achieve in your final examination?
+        </p>
+
+        <div class="form-group">
+
+            <input
+                id="finalTarget"
+                class="input"
+                type="number"
+                min="1"
+                max="100"
+                step="0.1"
+                placeholder="Example: 85"
+            >
+
+        </div>
+
+        <div id="targetError" class="error hidden"></div>
+
+        <button
+            id="saveResultBtn"
+            class="primary-btn"
+        >
+
+            Save My Target
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     SCREEN 8 — COMPLETE
+===================================================== -->
+
+<div id="screenComplete" class="screen">
+
+    <div class="final-success">
+
+        <div class="big-check">
+            ✓
+        </div>
+
+        <h2>
+            Your Performance Has Been Saved
+        </h2>
+
+        <p class="subtitle">
+
+            Great job completing your
+            midterm performance analysis.
+
+        </p>
+
+        <div class="target-box">
+
+            <div class="target-row">
+
+                <span class="target-label">
+                    Midterm Percentage
+                </span>
+
+                <strong
+                    id="finalPercentage"
+                >
+                    0%
+                </strong>
+
+            </div>
+
+            <div class="target-row">
+
+                <span class="target-label">
+                    Your Final Target
+                </span>
+
+                <strong
+                    id="finalTargetDisplay"
+                >
+                    0%
+                </strong>
+
+            </div>
+
+        </div>
+
+        <div class="success">
+
+            <strong>
+                Keep working towards your target! 🚀
+            </strong>
+
+            <br>
+
+            Your midterm result is only a
+            checkpoint. Your final examination
+            is where you can show your real
+            improvement.
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+import { db } from "../firebase-config.js";
+
+import {
+    collection,
+    getDocs,
+    query,
+    where,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+const auth = getAuth();
+
+const googleProvider =
+    new GoogleAuthProvider();
+
+googleProvider.setCustomParameters({
+    prompt: "select_account"
+});
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+let currentUser = null;
+
+let matchedStudent = null;
+
+let currentPercentage = 0;
+
+let currentTotal = 0;
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const screens = {
+
+    login:
+        document.getElementById("screenLogin"),
+
+    code:
+        document.getElementById("screenCode"),
+
+    name:
+        document.getElementById("screenName"),
+
+    wrongName:
+        document.getElementById("screenWrongName"),
+
+    phone:
+        document.getElementById("screenPhone"),
+
+    marks:
+        document.getElementById("screenMarks"),
+
+    result:
+        document.getElementById("screenResult"),
+
+    complete:
+        document.getElementById("screenComplete")
+
+};
+
+const stepLines = [
+
+    document.getElementById("step1"),
+
+    document.getElementById("step2"),
+
+    document.getElementById("step3"),
+
+    document.getElementById("step4"),
+
+    document.getElementById("step5")
+
+];
+
+const userBar =
+    document.getElementById("userBar");
+
+const userPhoto =
+    document.getElementById("userPhoto");
+
+const userName =
+    document.getElementById("userName");
+
+const userEmail =
+    document.getElementById("userEmail");
+
+/* =========================================================
+   SCREEN NAVIGATION
+========================================================= */
+
+function showScreen(name, step = 1) {
+
+    Object.values(screens)
+        .forEach(screen =>
+            screen.classList.remove("active")
+        );
+
+    screens[name]
+        .classList.add("active");
+
+    stepLines.forEach(
+        (line, index) => {
+
+            line.classList.toggle(
+                "active",
+                index < step
+            );
+
+        }
+    );
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+/* =========================================================
+   GOOGLE LOGIN
+========================================================= */
+
+const googleBtn =
+    document.getElementById("googleBtn");
+
+googleBtn.addEventListener(
+    "click",
+    async () => {
+
+        googleBtn.disabled = true;
+
+        googleBtn.textContent =
+            "Signing in...";
+
+        try {
+
+            await signInWithPopup(
+                auth,
+                googleProvider
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Google login failed.\n\n" +
+                error.message
+            );
+
+            googleBtn.disabled = false;
+
+            googleBtn.textContent =
+                "Continue with Google";
+
+        }
+
+    }
+);
+
+/* =========================================================
+   AUTH STATE
+========================================================= */
+
+onAuthStateChanged(
+    auth,
+    user => {
+
+        if (user) {
+
+            currentUser = user;
+
+            userBar.classList.remove(
+                "hidden"
+            );
+
+            userName.textContent =
+                user.displayName ||
+                "Student";
+
+            userEmail.textContent =
+                user.email || "";
+
+            if (user.photoURL) {
+
+                userPhoto.src =
+                    user.photoURL;
+
+            }
+
+            showScreen(
+                "code",
+                1
+            );
+
+        } else {
+
+            currentUser = null;
+
+            userBar.classList.add(
+                "hidden"
+            );
+
+            showScreen(
+                "login",
+                1
+            );
+
+        }
+
+    }
+);
+
+/* =========================================================
+   SIGN OUT
+========================================================= */
+
+document
+    .getElementById("signOutBtn")
+    .addEventListener(
+        "click",
+        async () => {
+
+            await signOut(auth);
+
+        }
+    );
+
+/* =========================================================
+   ZNV CODE
+========================================================= */
+
+const znvCode =
+    document.getElementById("znvCode");
+
+const codeError =
+    document.getElementById("codeError");
+
+const findStudentBtn =
+    document.getElementById(
+        "findStudentBtn"
+    );
+
+findStudentBtn.addEventListener(
+    "click",
+    findStudent
+);
+
+znvCode.addEventListener(
+    "input",
+    () => {
+
+        znvCode.value =
+            znvCode.value.replace(
+                /\D/g,
+                ""
+            );
+
+        codeError.classList.add(
+            "hidden"
+        );
+
+    }
+);
+
+async function findStudent() {
+
+    const entered =
+        znvCode.value.trim();
+
+    codeError.classList.add(
+        "hidden"
+    );
+
+    /*
+       Minimum 4 digits
+    */
+
+    if (
+        !/^\d{4,}$/.test(entered)
+    ) {
+
+        showError(
+            codeError,
+            "Please enter at least 4 digits. Example: 2701"
+        );
+
+        return;
+
+    }
+
+    findStudentBtn.disabled = true;
+
+    findStudentBtn.textContent =
+        "Checking...";
+
+    try {
+
+        /*
+          We read submissions once and
+          compare the numeric portion locally.
+
+          This supports:
+          ZNV/SSLCM+2701
+          ZNV/SSLCM+2798
+          ZNV/SSLCM+27964
+        */
+
+        const snapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "submissions"
+                )
+            );
+
+        let found = null;
+
+        snapshot.forEach(
+            docSnap => {
+
+                if (found) return;
+
+                const data =
+                    docSnap.data();
+
+                const storedCode =
+                    data.studentCode ||
+                    data.student?.studentCode ||
+                    data.code ||
+                    "";
+
+                const storedNumber =
+                    extractCodeNumber(
+                        storedCode
+                    );
+
+                if (
+                    storedNumber ===
+                    entered
+                ) {
+
+                    found = {
+
+                        id:
+                            docSnap.id,
+
+                        ...data
+
+                    };
+
+                }
+
+            }
+        );
+
+        if (!found) {
+
+            showError(
+                codeError,
+                "We could not find a student with this ZNV number. Please check the number and try again."
+            );
+
+            return;
+
+        }
+
+        matchedStudent =
+            found;
+
+        const name =
+            getStudentName(found);
+
+        if (!name) {
+
+            showError(
+                codeError,
+                "This student record does not have a registered name. Please contact Zenova."
+            );
+
+            return;
+
+        }
+
+        document.getElementById(
+            "matchedName"
+        ).textContent = name;
+
+        document.getElementById(
+            "matchedCode"
+        ).textContent =
+            "ZNV/SSLCM+" +
+            entered;
+
+        showScreen(
+            "name",
+            2
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(
+            codeError,
+            "Unable to check your ZNV number. Please try again."
+        );
+
+    } finally {
+
+        findStudentBtn.disabled = false;
+
+        findStudentBtn.textContent =
+            "Continue";
+
+    }
+
+}
+
+/* =========================================================
+   NAME CONFIRMATION
+========================================================= */
+
+document
+    .getElementById("nameYesBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            document.getElementById(
+                "phoneStudentName"
+            ).textContent =
+                getStudentName(
+                    matchedStudent
+                );
+
+            document.getElementById(
+                "phoneStudentCode"
+            ).textContent =
+                "ZNV/SSLCM+" +
+                extractCodeNumber(
+                    matchedStudent.studentCode
+                );
+
+            showScreen(
+                "phone",
+                3
+            );
+
+        }
+    );
+
+document
+    .getElementById("wrongNameBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            document.getElementById(
+                "wrongName"
+            ).value = "";
+
+            document.getElementById(
+                "wrongPhone"
+            ).value = "";
+
+            document.getElementById(
+                "wrongError"
+            ).classList.add(
+                "hidden"
+            );
+
+            showScreen(
+                "wrongName",
+                3
+            );
+
+        }
+    );
+
+/* =========================================================
+   WRONG NAME REQUEST
+========================================================= */
+
+document
+    .getElementById(
+        "wrongSubmitBtn"
+    )
+    .addEventListener(
+        "click",
+        submitWrongNameRequest
+    );
+
+async function submitWrongNameRequest() {
+
+    const name =
+        document.getElementById(
+            "wrongName"
+        ).value.trim();
+
+    const phone =
+        document.getElementById(
+            "wrongPhone"
+        ).value.trim();
+
+    const errorBox =
+        document.getElementById(
+            "wrongError"
+        );
+
+    errorBox.classList.add(
+        "hidden"
+    );
+
+    if (name.length < 2) {
+
+        showError(
+            errorBox,
+            "Please enter your correct name."
+        );
+
+        return;
+
+    }
+
+    if (
+        normalizePhone(phone).length !==
+        10
+    ) {
+
+        showError(
+            errorBox,
+            "Please enter a valid 10 digit phone number."
+        );
+
+        return;
+
+    }
+
+    const button =
+        document.getElementById(
+            "wrongSubmitBtn"
+        );
+
+    button.disabled = true;
+
+    button.textContent =
+        "Submitting...";
+
+    try {
+
+        await addDoc(
+            collection(
+                db,
+                "studentVerificationRequests"
+            ),
+            {
+
+                googleUid:
+                    currentUser.uid,
+
+                googleEmail:
+                    currentUser.email || "",
+
+                googleName:
+                    currentUser.displayName || "",
+
+                enteredZnvCode:
+                    extractCodeNumber(
+                        matchedStudent.studentCode
+                    ),
+
+                matchedStudentId:
+                    matchedStudent.id,
+
+                matchedStudentName:
+                    getStudentName(
+                        matchedStudent
+                    ),
+
+                enteredName:
+                    name,
+
+                enteredPhone:
+                    normalizePhone(phone),
+
+                requestStatus:
+                    "pending",
+
+                createdAt:
+                    serverTimestamp()
+
+            }
+        );
+
+        showScreen(
+            "complete",
+            4
+        );
+
+        document.querySelector(
+            "#screenComplete h2"
+        ).textContent =
+            "Request Submitted";
+
+        document.querySelector(
+            "#screenComplete .subtitle"
+        ).textContent =
+            "Your details have been sent to the Zenova admin team for verification. You will be contacted after your student number is assigned.";
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(
+            errorBox,
+            "Unable to submit your request. Please try again."
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+            "Submit Verification Request";
+
+    }
+
+}
+
+/* =========================================================
+   PHONE VERIFICATION
+========================================================= */
+
+document
+    .getElementById(
+        "verifyPhoneBtn"
+    )
+    .addEventListener(
+        "click",
+        verifyPhone
+    );
+
+async function verifyPhone() {
+
+    const entered =
+        document.getElementById(
+            "verifyPhone"
+        ).value;
+
+    const errorBox =
+        document.getElementById(
+            "phoneError"
+        );
+
+    errorBox.classList.add(
+        "hidden"
+    );
+
+    const normalizedEntered =
+        normalizePhone(entered);
+
+    if (
+        normalizedEntered.length !==
+        10
+    ) {
+
+        showError(
+            errorBox,
+            "Please enter a valid 10 digit phone number."
+        );
+
+        return;
+
+    }
+
+    const button =
+        document.getElementById(
+            "verifyPhoneBtn"
+        );
+
+    button.disabled = true;
+
+    button.textContent =
+        "Verifying...";
+
+    try {
+
+        const storedPhone =
+            getStudentPhone(
+                matchedStudent
+            );
+
+        if (
+            !storedPhone ||
+            normalizePhone(
+                storedPhone
+            ) !== normalizedEntered
+        ) {
+
+            showError(
+                errorBox,
+                "The phone number does not match the number registered with Zenova."
+            );
+
+            return;
+
+        }
+
+        /*
+          Identity verified.
+        */
+
+        showScreen(
+            "marks",
+            4
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(
+            errorBox,
+            "Unable to verify your phone number."
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+            "Verify & Continue";
+
+    }
+
+}
+
+/* =========================================================
+   MARK INPUT
+========================================================= */
+
+const markInputs =
+    document.querySelectorAll(
+        ".mark"
+    );
+
+markInputs.forEach(
+    input => {
+
+        input.addEventListener(
+            "input",
+            updateLiveTotal
+        );
+
+    }
+);
+
+function updateLiveTotal() {
+
+    const marks =
+        getMarks();
+
+    const total =
+        Object.values(marks)
+            .reduce(
+                (sum,value) =>
+                    sum + value,
+                0
+            );
+
+    document.getElementById(
+        "liveTotal"
+    ).textContent =
+        total;
+
+}
+
+/* =========================================================
+   GET MARKS
+========================================================= */
+
+function getMarks() {
+
+    return {
+
+        kannada:
+            Number(
+                document.getElementById(
+                    "markKannada"
+                ).value
+            ) || 0,
+
+        english:
+            Number(
+                document.getElementById(
+                    "markEnglish"
+                ).value
+            ) || 0,
+
+        hindi:
+            Number(
+                document.getElementById(
+                    "markHindi"
+                ).value
+            ) || 0,
+
+        mathematics:
+            Number(
+                document.getElementById(
+                    "markMaths"
+                ).value
+            ) || 0,
+
+        science:
+            Number(
+                document.getElementById(
+                    "markScience"
+                ).value
+            ) || 0,
+
+        socialScience:
+            Number(
+                document.getElementById(
+                    "markSocial"
+                ).value
+            ) || 0
+
+    };
+
+}
+
+/* =========================================================
+   SUBMIT MARKS
+========================================================= */
+
+document
+    .getElementById(
+        "submitMarksBtn"
+    )
+    .addEventListener(
+        "click",
+        calculateResult
+    );
+
+function calculateResult() {
+
+    const errorBox =
+        document.getElementById(
+            "marksError"
+        );
+
+    errorBox.classList.add(
+        "hidden"
+    );
+
+    const marks =
+        getMarks();
+
+    /*
+      Validate exact maximums.
+    */
+
+    if (
+        marks.kannada < 0 ||
+        marks.kannada > 100
+    ) {
+
+        showError(
+            errorBox,
+            "Kannada marks must be between 0 and 100."
+        );
+
+        return;
+
+    }
+
+    const otherSubjects = [
+
+        [
+            "English",
+            marks.english
+        ],
+
+        [
+            "Hindi",
+            marks.hindi
+        ],
+
+        [
+            "Mathematics",
+            marks.mathematics
+        ],
+
+        [
+            "Science",
+            marks.science
+        ],
+
+        [
+            "Social Science",
+            marks.socialScience
+        ]
+
+    ];
+
+    for (
+        const [
+            subject,
+            value
+        ] of otherSubjects
+    ) {
+
+        if (
+            value < 0 ||
+            value > 80
+        ) {
+
+            showError(
+                errorBox,
+                subject +
+                " marks must be between 0 and 80."
+            );
+
+            return;
+
+        }
+
+    }
+
+    /*
+      Make sure every field was entered.
+    */
+
+    const rawInputs =
+        Array.from(
+            document.querySelectorAll(
+                ".mark"
+            )
+        );
+
+    const missing =
+        rawInputs.some(
+            input =>
+                input.value === ""
+        );
+
+    if (missing) {
+
+        showError(
+            errorBox,
+            "Please enter marks for all 6 subjects."
+        );
+
+        return;
+
+    }
+
+    currentTotal =
+        marks.kannada +
+        marks.english +
+        marks.hindi +
+        marks.mathematics +
+        marks.science +
+        marks.socialScience;
+
+    /*
+      Total maximum = 500
+
+      100 + 80 + 80 + 80 + 80 + 80
+    */
+
+    currentPercentage =
+        (currentTotal / 500) * 100;
+
+    currentPercentage =
+        round(
+            currentPercentage,
+            2
+        );
+
+    /*
+      Your requested conservative estimate:
+      Midterm percentage - 10 percentage points.
+
+      Example:
+      70% → 60%
+    */
+
+    let estimated =
+        currentPercentage - 10;
+
+    if (estimated < 0) {
+        estimated = 0;
+    }
+
+    estimated =
+        round(
+            estimated,
+            2
+        );
+
+    document.getElementById(
+        "percentage"
+    ).textContent =
+        currentPercentage + "%";
+
+    document.getElementById(
+        "resultTotal"
+    ).textContent =
+        currentTotal +
+        " / 500";
+
+    document.getElementById(
+        "resultPercentage"
+    ).textContent =
+        currentPercentage +
+        "%";
+
+    document.getElementById(
+        "estimatedPercentage"
+    ).textContent =
+        estimated +
+        "%";
+
+    createMotivation(
+        currentPercentage
+    );
+
+    showScreen(
+        "result",
+        5
+    );
+
+}
+
+/* =========================================================
+   MOTIVATION
+========================================================= */
+
+function createMotivation(
+    percentage
+) {
+
+    const box =
+        document.getElementById(
+            "motivation"
+        );
+
+    box.className =
+        "motivation";
+
+    if (percentage >= 70) {
+
+        box.classList.add(
+            "excellent"
+        );
+
+        box.innerHTML = `
+
+            <strong>
+                🚀 You have a strong foundation!
+            </strong>
+
+            You are currently scoring
+            <b>${percentage}%</b>.
+
+            You have already built a good
+            academic base. Now don't become
+            comfortable with this score.
+
+            <br><br>
+
+            With consistent preparation,
+            you can set an ambitious target
+            of <b>95%</b> for your final
+            examination.
+
+            <br><br>
+
+            <b>
+                Study hard. Work on your weak
+                subjects. Your final result can
+                be much better.
+            </b>
+
+        `;
+
+    } else if (
+        percentage >= 50
+    ) {
+
+        box.classList.add(
+            "improve"
+        );
+
+        box.innerHTML = `
+
+            <strong>
+                🔥 You have a lot of room to improve!
+            </strong>
+
+            Your current midterm score is
+            <b>${percentage}%</b>.
+
+            This is not your final result.
+            With focused preparation and
+            regular revision, you can make
+            a major improvement.
+
+            <br><br>
+
+            A target around <b>85%</b> can be
+            your next major goal.
+
+            <br><br>
+
+            <b>
+                Identify your weak chapters,
+                practise every day and keep
+                improving.
+            </b>
+
+        `;
+
+    } else {
+
+        box.classList.add(
+            "start"
+        );
+
+        box.innerHTML = `
+
+            <strong>
+                💪 This is your starting point — not your final result.
+            </strong>
+
+            Your current midterm score is
+            <b>${percentage}%</b>.
+
+            Don't give up.
+
+            <br><br>
+
+            Your first target should be
+            <b>First Class — 60%+</b>.
+
+            Build your basics, study
+            consistently and improve one
+            subject at a time.
+
+            <br><br>
+
+            <b>
+                Every mark you improve from
+                today will move you closer to
+                your final goal.
+            </b>
+
+        `;
+
+    }
+
+}
+
+/* =========================================================
+   SAVE FINAL TARGET
+========================================================= */
+
+document
+    .getElementById(
+        "saveResultBtn"
+    )
+    .addEventListener(
+        "click",
+        saveResult
+    );
+
+async function saveResult() {
+
+    const input =
+        document.getElementById(
+            "finalTarget"
+        );
+
+    const errorBox =
+        document.getElementById(
+            "targetError"
+        );
+
+    errorBox.classList.add(
+        "hidden"
+    );
+
+    const target =
+        Number(input.value);
+
+    if (
+        !target ||
+        target < 1 ||
+        target > 100
+    ) {
+
+        showError(
+            errorBox,
+            "Please enter a target between 1% and 100%."
+        );
+
+        return;
+
+    }
+
+    const button =
+        document.getElementById(
+            "saveResultBtn"
+        );
+
+    button.disabled = true;
+
+    button.textContent =
+        "Saving...";
+
+    try {
+
+        const marks =
+            getMarks();
+
+        const estimated =
+            Math.max(
+                0,
+                round(
+                    currentPercentage - 10,
+                    2
+                )
+            );
+
+        await addDoc(
+
+            collection(
+                db,
+                "midtermResults"
+            ),
+
+            {
+
+                /*
+                  Student identity
+                */
+
+                studentId:
+                    matchedStudent.id,
+
+                studentCode:
+                    extractCodeNumber(
+                        matchedStudent.studentCode
+                    ),
+
+                studentName:
+                    getStudentName(
+                        matchedStudent
+                    ),
+
+                phone:
+                    normalizePhone(
+                        getStudentPhone(
+                            matchedStudent
+                        )
+                    ),
+
+                /*
+                  Google identity
+                */
+
+                googleUid:
+                    currentUser.uid,
+
+                googleEmail:
+                    currentUser.email || "",
+
+                googleName:
+                    currentUser.displayName || "",
+
+                /*
+                  Marks
+                */
+
+                kannada:
+                    marks.kannada,
+
+                english:
+                    marks.english,
+
+                hindi:
+                    marks.hindi,
+
+                mathematics:
+                    marks.mathematics,
+
+                science:
+                    marks.science,
+
+                socialScience:
+                    marks.socialScience,
+
+                /*
+                  Result
+                */
+
+                totalMarks:
+                    currentTotal,
+
+                maximumMarks:
+                    500,
+
+                percentage:
+                    currentPercentage,
+
+                estimatedFinalPercentage:
+                    estimated,
+
+                finalTargetPercentage:
+                    target,
+
+                /*
+                  Metadata
+                */
+
+                submittedAt:
+                    serverTimestamp(),
+
+                resultType:
+                    "midterm",
+
+                status:
+                    "submitted"
+
+            }
+
+        );
+
+        document.getElementById(
+            "finalPercentage"
+        ).textContent =
+            currentPercentage + "%";
+
+        document.getElementById(
+            "finalTargetDisplay"
+        ).textContent =
+            target + "%";
+
+        showScreen(
+            "complete",
+            5
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(
+            errorBox,
+            "Unable to save your result. Please try again."
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+            "Save My Target";
+
+    }
+
+}
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function extractCodeNumber(
+    code
+) {
+
+    if (!code)
+        return "";
+
+    /*
+      ZNV/SSLCM+2701
+      ZNV/SSLCM+27964
+      2701
+
+      All become:
+      2701 / 27964
+    */
+
+    const text =
+        String(code);
+
+    const match =
+        text.match(
+            /(\d+)$/
+        );
+
+    return match
+        ? match[1]
+        : "";
+
+}
+
+function getStudentName(
+    student
+) {
+
+    return firstValue([
+
+        student.name,
+
+        student.studentName,
+
+        student.fullName,
+
+        student.student?.name,
+
+        student.student?.studentName,
+
+        student.student?.fullName
+
+    ]);
+
+}
+
+function getStudentPhone(
+    student
+) {
+
+    return firstValue([
+
+        student.phone,
+
+        student.mobile,
+
+        student.mobileNumber,
+
+        student.phoneNumber,
+
+        student.student?.phone,
+
+        student.student?.mobile,
+
+        student.student?.mobileNumber,
+
+        student.student?.phoneNumber
+
+    ]);
+
+}
+
+function normalizePhone(
+    value
+) {
+
+    if (!value)
+        return "";
+
+    let digits =
+        String(value)
+            .replace(
+                /\D/g,
+                ""
+            );
+
+    /*
+      +91XXXXXXXXXX
+    */
+
+    if (
+        digits.length === 12 &&
+        digits.startsWith("91")
+    ) {
+
+        digits =
+            digits.substring(2);
+
+    }
+
+    return digits;
+
+}
+
+function firstValue(
+    values
+) {
+
+    for (
+        const value of values
+    ) {
+
+        if (
+            value !== undefined &&
+            value !== null &&
+            String(value).trim() !== ""
+        ) {
+
+            return value;
+
+        }
+
+    }
+
+    return "";
+
+}
+
+function round(
+    number,
+    decimals
+) {
+
+    const factor =
+        Math.pow(
+            10,
+            decimals
+        );
+
+    return Math.round(
+        number * factor
+    ) / factor;
+
+}
+
+function showError(
+    element,
+    message
+) {
+
+    element.textContent =
+        message;
+
+    element.classList.remove(
+        "hidden"
+    );
+
+}
+
+</script>
+
+</body>
+</html>
