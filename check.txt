@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Zenova Midterm Admin</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:#f5f7fb;
+    color:#172033;
+}
+
+.app{
+    min-height:100vh;
+    padding:25px 15px 50px;
+}
+
+.container{
+    width:min(1200px,100%);
+    margin:auto;
+}
+
+/* HEADER */
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.logo{
+    width:50px;
+    height:50px;
+    border-radius:15px;
+    background:#111827;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:18px;
+}
+
+.brand h1{
+    margin:0;
+    font-size:25px;
+}
+
+.brand p{
+    margin:3px 0 0;
+    color:#667085;
+    font-size:13px;
+}
+
+.refresh-btn{
+    border:0;
+    background:#111827;
+    color:white;
+    padding:12px 18px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.refresh-btn:disabled{
+    opacity:.6;
+}
+
+/* STATS */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.stat{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+    padding:20px;
+}
+
+.stat-label{
+    font-size:12px;
+    color:#667085;
+    margin-bottom:8px;
+}
+
+.stat-value{
+    font-size:27px;
+    font-weight:900;
+}
+
+/* CONTROLS */
+
+.panel{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.controls{
+    display:grid;
+    grid-template-columns:1fr 180px 180px;
+    gap:12px;
+}
+
+.input,
+.select{
+    width:100%;
+    padding:13px 14px;
+    border:1px solid #d0d5dd;
+    border-radius:10px;
+    font-size:14px;
+    outline:none;
+    background:white;
+}
+
+.input:focus,
+.select:focus{
+    border-color:#111827;
+}
+
+/* TABLE */
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:1000px;
+}
+
+thead{
+    background:#f8fafc;
+}
+
+th{
+    text-align:left;
+    font-size:12px;
+    color:#667085;
+    padding:14px;
+    border-bottom:1px solid #e5e7eb;
+    white-space:nowrap;
+}
+
+td{
+    padding:14px;
+    border-bottom:1px solid #eef0f3;
+    font-size:13px;
+    white-space:nowrap;
+}
+
+tbody tr:hover{
+    background:#fafafa;
+}
+
+.student-name{
+    font-weight:800;
+}
+
+.code{
+    font-weight:800;
+    color:#344054;
+}
+
+.percentage{
+    font-weight:900;
+}
+
+.good{
+    color:#15803d;
+}
+
+.medium{
+    color:#2563eb;
+}
+
+.low{
+    color:#dc2626;
+}
+
+.target{
+    font-weight:800;
+}
+
+/* BADGES */
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:800;
+}
+
+.badge-yes{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.badge-no{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+/* VIEW BUTTON */
+
+.view-btn{
+    border:1px solid #d0d5dd;
+    background:white;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:700;
+}
+
+.view-btn:hover{
+    background:#f8fafc;
+}
+
+/* EMPTY */
+
+.empty{
+    text-align:center;
+    padding:60px 20px;
+    color:#667085;
+}
+
+.loading{
+    text-align:center;
+    padding:50px;
+}
+
+.spinner{
+    width:30px;
+    height:30px;
+    border:3px solid #e5e7eb;
+    border-top-color:#111827;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    margin:0 auto 12px;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+/* MODAL */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:1000;
+}
+
+.modal.active{
+    display:flex;
+}
+
+.modal-card{
+    width:min(650px,100%);
+    max-height:90vh;
+    overflow-y:auto;
+    background:white;
+    border-radius:20px;
+    padding:25px;
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.modal-header h2{
+    margin:0;
+    font-size:21px;
+}
+
+.close-btn{
+    width:35px;
+    height:35px;
+    border:0;
+    border-radius:50%;
+    background:#f2f4f7;
+    cursor:pointer;
+    font-size:18px;
+}
+
+.profile{
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:15px;
+}
+
+.profile-title{
+    font-size:18px;
+    font-weight:900;
+    margin-bottom:5px;
+}
+
+.profile-code{
+    color:#667085;
+    font-size:13px;
+}
+
+.result-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.result-item{
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:12px;
+}
+
+.result-label{
+    font-size:11px;
+    color:#667085;
+    margin-bottom:4px;
+}
+
+.result-value{
+    font-weight:800;
+}
+
+.total-highlight{
+    background:#111827;
+    color:white;
+    border-radius:14px;
+    padding:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.total-highlight small{
+    opacity:.7;
+}
+
+.total-highlight strong{
+    font-size:25px;
+}
+
+@media(max-width:800px){
+
+    .stats{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .controls{
+        grid-template-columns:1fr;
+    }
+
+    .header{
+        align-items:flex-start;
+    }
+
+}
+
+@media(max-width:500px){
+
+    .app{
+        padding:15px 10px 30px;
+    }
+
+    .stats{
+        gap:10px;
+    }
+
+    .stat{
+        padding:15px;
+    }
+
+    .stat-value{
+        font-size:22px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="container">
+
+<!-- HEADER -->
+
+<div class="header">
+
+    <div class="brand">
+
+        <div class="logo">
+            Z
+        </div>
+
+        <div>
+
+            <h1>
+                Zenova Midterm Admin
+            </h1>
+
+            <p>
+                Student Performance Dashboard
+            </p>
+
+        </div>
+
+    </div>
+
+    <button
+        id="refreshBtn"
+        class="refresh-btn"
+    >
+        ↻ Refresh
+    </button>
+
+</div>
+
+<!-- STATISTICS -->
+
+<div class="stats">
+
+    <div class="stat">
+
+        <div class="stat-label">
+            TOTAL SUBMISSIONS
+        </div>
+
+        <div
+            id="totalStudents"
+            class="stat-value"
+        >
+            0
+        </div>
+
+    </div>
+
+    <div class="stat">
+
+        <div class="stat-label">
+            AVERAGE PERCENTAGE
+        </div>
+
+        <div
+            id="averagePercentage"
+            class="stat-value"
+        >
+            0%
+        </div>
+
+    </div>
+
+    <div class="stat">
+
+        <div class="stat-label">
+            HIGHEST PERCENTAGE
+        </div>
+
+        <div
+            id="highestPercentage"
+            class="stat-value"
+        >
+            0%
+        </div>
+
+    </div>
+
+    <div class="stat">
+
+        <div class="stat-label">
+            AVERAGE FINAL TARGET
+        </div>
+
+        <div
+            id="averageTarget"
+            class="stat-value"
+        >
+            0%
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SEARCH / FILTER -->
+
+<div class="panel">
+
+    <div class="controls">
+
+        <input
+            id="searchInput"
+            class="input"
+            type="text"
+            placeholder="Search name, ZNV code, phone..."
+        >
+
+        <select
+            id="percentageFilter"
+            class="select"
+        >
+
+            <option value="all">
+                All Results
+            </option>
+
+            <option value="70">
+                70% and above
+            </option>
+
+            <option value="50">
+                50% - 69.99%
+            </option>
+
+            <option value="below50">
+                Below 50%
+            </option>
+
+        </select>
+
+        <select
+            id="sortSelect"
+            class="select"
+        >
+
+            <option value="newest">
+                Newest First
+            </option>
+
+            <option value="oldest">
+                Oldest First
+            </option>
+
+            <option value="highest">
+                Highest Percentage
+            </option>
+
+            <option value="lowest">
+                Lowest Percentage
+            </option>
+
+            <option value="targetHighest">
+                Highest Target
+            </option>
+
+        </select>
+
+    </div>
+
+</div>
+
+<!-- TABLE -->
+
+<div class="panel">
+
+    <div
+        id="loading"
+        class="loading"
+    >
+
+        <div class="spinner"></div>
+
+        Loading student results...
+
+    </div>
+
+    <div
+        id="empty"
+        class="empty"
+        style="display:none;"
+    >
+
+        No midterm results found.
+
+    </div>
+
+    <div
+        id="tableContainer"
+        class="table-wrap"
+        style="display:none;"
+    >
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        STUDENT
+                    </th>
+
+                    <th>
+                        ZNV CODE
+                    </th>
+
+                    <th>
+                        PHONE
+                    </th>
+
+                    <th>
+                        TOTAL
+                    </th>
+
+                    <th>
+                        MIDTERM %
+                    </th>
+
+                    <th>
+                        ESTIMATE
+                    </th>
+
+                    <th>
+                        FINAL TARGET
+                    </th>
+
+                    <th>
+                        PARENT VISIT
+                    </th>
+
+                    <th>
+                        SUBMITTED
+                    </th>
+
+                    <th>
+                        ACTION
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="resultsBody">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- MODAL -->
+
+<div
+    id="modal"
+    class="modal"
+>
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h2>
+                Student Performance
+            </h2>
+
+            <button
+                id="closeModal"
+                class="close-btn"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div
+            id="modalContent"
+        ></div>
+
+    </div>
+
+</div>
+
+<script type="module">
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+import { db } from "../firebase-config.js";
+
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let allResults = [];
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const loading =
+    document.getElementById("loading");
+
+const empty =
+    document.getElementById("empty");
+
+const tableContainer =
+    document.getElementById("tableContainer");
+
+const resultsBody =
+    document.getElementById("resultsBody");
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const percentageFilter =
+    document.getElementById(
+        "percentageFilter"
+    );
+
+const sortSelect =
+    document.getElementById(
+        "sortSelect"
+    );
+
+/* =========================================================
+   LOAD RESULTS
+========================================================= */
+
+async function loadResults(){
+
+    loading.style.display = "block";
+
+    empty.style.display = "none";
+
+    tableContainer.style.display = "none";
+
+    const refreshBtn =
+        document.getElementById(
+            "refreshBtn"
+        );
+
+    refreshBtn.disabled = true;
+
+    refreshBtn.textContent =
+        "Loading...";
+
+    try{
+
+        const snapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "midtermResults"
+                )
+            );
+
+        allResults = [];
+
+        snapshot.forEach(
+            docSnap => {
+
+                allResults.push({
+
+                    id:
+                        docSnap.id,
+
+                    ...docSnap.data()
+
+                });
+
+            }
+        );
+
+        updateStatistics();
+
+        renderResults();
+
+    }
+    catch(error){
+
+        console.error(
+            "Unable to load results:",
+            error
+        );
+
+        loading.innerHTML = `
+            <div style="color:#b91c1c;font-weight:700;">
+                Unable to load results.
+            </div>
+
+            <div style="font-size:12px;margin-top:8px;color:#667085;">
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+
+    }
+    finally{
+
+        refreshBtn.disabled = false;
+
+        refreshBtn.textContent =
+            "↻ Refresh";
+
+    }
+
+}
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+function updateStatistics(){
+
+    const count =
+        allResults.length;
+
+    document.getElementById(
+        "totalStudents"
+    ).textContent =
+        count;
+
+    if(count === 0){
+
+        document.getElementById(
+            "averagePercentage"
+        ).textContent =
+            "0%";
+
+        document.getElementById(
+            "highestPercentage"
+        ).textContent =
+            "0%";
+
+        document.getElementById(
+            "averageTarget"
+        ).textContent =
+            "0%";
+
+        return;
+
+    }
+
+    const percentages =
+        allResults.map(
+            item =>
+                Number(
+                    item.percentage
+                ) || 0
+        );
+
+    const targets =
+        allResults.map(
+            item =>
+                Number(
+                    item.finalTargetPercentage
+                ) || 0
+        );
+
+    const average =
+        percentages.reduce(
+            (a,b) => a+b,
+            0
+        ) / count;
+
+    const highest =
+        Math.max(
+            ...percentages
+        );
+
+    const averageTarget =
+        targets.reduce(
+            (a,b) => a+b,
+            0
+        ) / count;
+
+    document.getElementById(
+        "averagePercentage"
+    ).textContent =
+        round(average,2) + "%";
+
+    document.getElementById(
+        "highestPercentage"
+    ).textContent =
+        round(highest,2) + "%";
+
+    document.getElementById(
+        "averageTarget"
+    ).textContent =
+        round(averageTarget,2) + "%";
+
+}
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function renderResults(){
+
+    const search =
+        searchInput.value
+            .trim()
+            .toLowerCase();
+
+    const filter =
+        percentageFilter.value;
+
+    const sort =
+        sortSelect.value;
+
+    let results =
+        allResults.filter(
+            item => {
+
+                const searchable = [
+
+                    item.studentName,
+
+                    item.studentCode,
+
+                    item.phone,
+
+                    item.googleEmail
+
+                ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+                if(
+                    search &&
+                    !searchable.includes(search)
+                ){
+
+                    return false;
+
+                }
+
+                const percentage =
+                    Number(
+                        item.percentage
+                    ) || 0;
+
+                if(filter === "70"){
+
+                    if(
+                        percentage < 70
+                    ){
+
+                        return false;
+
+                    }
+
+                }
+
+                if(filter === "50"){
+
+                    if(
+                        percentage < 50 ||
+                        percentage >= 70
+                    ){
+
+                        return false;
+
+                    }
+
+                }
+
+                if(filter === "below50"){
+
+                    if(
+                        percentage >= 50
+                    ){
+
+                        return false;
+
+                    }
+
+                }
+
+                return true;
+
+            }
+        );
+
+    /* SORT */
+
+    results.sort(
+        (a,b) => {
+
+            if(sort === "highest"){
+
+                return (
+                    Number(b.percentage || 0) -
+                    Number(a.percentage || 0)
+                );
+
+            }
+
+            if(sort === "lowest"){
+
+                return (
+                    Number(a.percentage || 0) -
+                    Number(b.percentage || 0)
+                );
+
+            }
+
+            if(sort === "targetHighest"){
+
+                return (
+                    Number(
+                        b.finalTargetPercentage || 0
+                    ) -
+                    Number(
+                        a.finalTargetPercentage || 0
+                    )
+                );
+
+            }
+
+            const aDate =
+                timestampToMillis(
+                    a.submittedAt
+                );
+
+            const bDate =
+                timestampToMillis(
+                    b.submittedAt
+                );
+
+            if(sort === "oldest"){
+
+                return aDate - bDate;
+
+            }
+
+            return bDate - aDate;
+
+        }
+    );
+
+    resultsBody.innerHTML = "";
+
+    if(results.length === 0){
+
+        loading.style.display = "none";
+
+        tableContainer.style.display =
+            "none";
+
+        empty.style.display =
+            "block";
+
+        return;
+
+    }
+
+    loading.style.display =
+        "none";
+
+    empty.style.display =
+        "none";
+
+    tableContainer.style.display =
+        "block";
+
+    results.forEach(
+        (item,index) => {
+
+            const percentage =
+                Number(
+                    item.percentage
+                ) || 0;
+
+            const percentageClass =
+                percentage >= 70
+                    ? "good"
+                    : percentage >= 50
+                        ? "medium"
+                        : "low";
+
+            const parentVisit =
+                item.parentCampusVisit;
+
+            const date =
+                formatDate(
+                    item.submittedAt
+                );
+
+            const row =
+                document.createElement("tr");
+
+            row.innerHTML = `
+
+                <td>
+                    ${index + 1}
+                </td>
+
+                <td>
+                    <div class="student-name">
+                        ${escapeHtml(
+                            item.studentName || "-"
+                        )}
+                    </div>
+                </td>
+
+                <td>
+                    <span class="code">
+                        ${escapeHtml(
+                            item.studentCode || "-"
+                        )}
+                    </span>
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        item.phone || "-"
+                    )}
+                </td>
+
+                <td>
+                    <strong>
+                        ${Number(
+                            item.totalMarks || 0
+                        )} / 500
+                    </strong>
+                </td>
+
+                <td>
+                    <span class="percentage ${percentageClass}">
+                        ${percentage}%
+                    </span>
+                </td>
+
+                <td>
+                    ${Number(
+                        item.estimatedFinalPercentage || 0
+                    )}%
+                </td>
+
+                <td>
+                    <span class="target">
+                        ${Number(
+                            item.finalTargetPercentage || 0
+                        )}%
+                    </span>
+                </td>
+
+                <td>
+
+                    ${
+                        parentVisit === "yes"
+
+                        ?
+
+                        `<span class="badge badge-yes">
+                            YES
+                        </span>`
+
+                        :
+
+                        `<span class="badge badge-no">
+                            NO
+                        </span>`
+                    }
+
+                </td>
+
+                <td>
+                    ${date}
+                </td>
+
+                <td>
+
+                    <button
+                        class="view-btn"
+                        data-id="${escapeHtml(item.id)}"
+                    >
+                        View
+                    </button>
+
+                </td>
+
+            `;
+
+            row
+                .querySelector(".view-btn")
+                .addEventListener(
+                    "click",
+                    () => {
+
+                        showStudent(
+                            item
+                        );
+
+                    }
+                );
+
+            resultsBody.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+/* =========================================================
+   STUDENT DETAIL
+========================================================= */
+
+function showStudent(item){
+
+    const modal =
+        document.getElementById(
+            "modal"
+        );
+
+    const marks = [
+
+        [
+            "Kannada",
+            item.kannada,
+            "100"
+        ],
+
+        [
+            "English",
+            item.english,
+            "80"
+        ],
+
+        [
+            "Hindi",
+            item.hindi,
+            "80"
+        ],
+
+        [
+            "Mathematics",
+            item.mathematics,
+            "80"
+        ],
+
+        [
+            "Science",
+            item.science,
+            "80"
+        ],
+
+        [
+            "Social Science",
+            item.socialScience,
+            "80"
+        ]
+
+    ];
+
+    const marksHTML =
+        marks.map(
+            mark => `
+
+                <div class="result-item">
+
+                    <div class="result-label">
+                        ${mark[0]}
+                    </div>
+
+                    <div class="result-value">
+                        ${Number(mark[1] || 0)}
+                        / ${mark[2]}
+                    </div>
+
+                </div>
+
+            `
+        ).join("");
+
+    document.getElementById(
+        "modalContent"
+    ).innerHTML = `
+
+        <div class="profile">
+
+            <div class="profile-title">
+                ${escapeHtml(
+                    item.studentName || "-"
+                )}
+            </div>
+
+            <div class="profile-code">
+                ZNV/${escapeHtml(
+                    item.studentCode || "-"
+                )}
+            </div>
+
+        </div>
+
+        <div class="result-grid">
+
+            <div class="result-item">
+
+                <div class="result-label">
+                    PHONE
+                </div>
+
+                <div class="result-value">
+                    ${escapeHtml(
+                        item.phone || "-"
+                    )}
+                </div>
+
+            </div>
+
+            <div class="result-item">
+
+                <div class="result-label">
+                    GOOGLE EMAIL
+                </div>
+
+                <div class="result-value">
+                    ${escapeHtml(
+                        item.googleEmail || "-"
+                    )}
+                </div>
+
+            </div>
+
+            <div class="result-item">
+
+                <div class="result-label">
+                    PARENT CAMPUS VISIT
+                </div>
+
+                <div class="result-value">
+
+                    ${
+                        item.parentCampusVisit === "yes"
+                            ? "Yes"
+                            : "No"
+                    }
+
+                </div>
+
+            </div>
+
+            <div class="result-item">
+
+                <div class="result-label">
+                    SUBMITTED
+                </div>
+
+                <div class="result-value">
+                    ${formatDate(
+                        item.submittedAt
+                    )}
+                </div>
+
+            </div>
+
+        </div>
+
+        <br>
+
+        <h3>
+            Subject Marks
+        </h3>
+
+        <div class="result-grid">
+
+            ${marksHTML}
+
+        </div>
+
+        <br>
+
+        <div class="total-highlight">
+
+            <div>
+
+                <small>
+                    TOTAL MARKS
+                </small>
+
+                <div>
+                    ${Number(
+                        item.totalMarks || 0
+                    )} / 500
+                </div>
+
+            </div>
+
+            <strong>
+                ${Number(
+                    item.percentage || 0
+                )}%
+            </strong>
+
+        </div>
+
+        <div class="result-grid">
+
+            <div class="result-item">
+
+                <div class="result-label">
+                    MIDTERM %
+                </div>
+
+                <div class="result-value">
+                    ${Number(
+                        item.percentage || 0
+                    )}%
+                </div>
+
+            </div>
+
+            <div class="result-item">
+
+                <div class="result-label">
+                    CONSERVATIVE ESTIMATE
+                </div>
+
+                <div class="result-value">
+                    ${Number(
+                        item.estimatedFinalPercentage || 0
+                    )}%
+                </div>
+
+            </div>
+
+            <div class="result-item">
+
+                <div class="result-label">
+                    FINAL TARGET
+                </div>
+
+                <div class="result-value">
+                    ${Number(
+                        item.finalTargetPercentage || 0
+                    )}%
+                </div>
+
+            </div>
+
+            <div class="result-item">
+
+                <div class="result-label">
+                    RESULT TYPE
+                </div>
+
+                <div class="result-value">
+                    ${escapeHtml(
+                        item.resultType || "midterm"
+                    )}
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+    modal.classList.add(
+        "active"
+    );
+
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+document
+    .getElementById("closeModal")
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+                .getElementById("modal")
+                .classList.remove(
+                    "active"
+                );
+
+        }
+    );
+
+document
+    .getElementById("modal")
+    .addEventListener(
+        "click",
+        event => {
+
+            if(
+                event.target.id === "modal"
+            ){
+
+                event.currentTarget
+                    .classList.remove(
+                        "active"
+                    );
+
+            }
+
+        }
+    );
+
+/* =========================================================
+   SEARCH / FILTER
+========================================================= */
+
+searchInput.addEventListener(
+    "input",
+    renderResults
+);
+
+percentageFilter.addEventListener(
+    "change",
+    renderResults
+);
+
+sortSelect.addEventListener(
+    "change",
+    renderResults
+);
+
+/* =========================================================
+   REFRESH
+========================================================= */
+
+document
+    .getElementById("refreshBtn")
+    .addEventListener(
+        "click",
+        loadResults
+    );
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function round(
+    number,
+    decimals
+){
+
+    const factor =
+        Math.pow(
+            10,
+            decimals
+        );
+
+    return Math.round(
+        number * factor
+    ) / factor;
+
+}
+
+function timestampToMillis(
+    timestamp
+){
+
+    if(!timestamp){
+
+        return 0;
+
+    }
+
+    if(
+        typeof timestamp.toMillis ===
+        "function"
+    ){
+
+        return timestamp.toMillis();
+
+    }
+
+    if(
+        timestamp.seconds
+    ){
+
+        return (
+            timestamp.seconds * 1000
+        );
+
+    }
+
+    return 0;
+
+}
+
+function formatDate(
+    timestamp
+){
+
+    const milliseconds =
+        timestampToMillis(
+            timestamp
+        );
+
+    if(!milliseconds){
+
+        return "-";
+
+    }
+
+    const date =
+        new Date(
+            milliseconds
+        );
+
+    return date.toLocaleString(
+        "en-IN",
+        {
+            day:"2-digit",
+            month:"short",
+            year:"numeric",
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+
+}
+
+function escapeHtml(
+    value
+){
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+/* =========================================================
+   START
+========================================================= */
+
+loadResults();
+
+</script>
+
+</body>
+</html>
