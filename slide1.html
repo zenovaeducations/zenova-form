@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zenova - Natural Disasters</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #e9edf4;
+    font-family: "Times New Roman", serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* 16:9 PRESENTATION SLIDE */
+.slide {
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    overflow: hidden;
+    background: #F7F9FC;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.18);
+}
+
+/* BACKGROUND IMAGE */
+.background {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(
+            90deg,
+            rgba(247,249,252,0.98) 0%,
+            rgba(247,249,252,0.94) 39%,
+            rgba(247,249,252,0.25) 64%,
+            rgba(247,249,252,0.02) 100%
+        ),
+        url("slide1-bg.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+/* BLUE TOP ACCENT */
+.top-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 9px;
+    background: #3978E8;
+}
+
+/* CONTENT */
+.content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 62%;
+    height: 100%;
+    padding: 75px 75px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 2;
+}
+
+/* BRAND */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 75px;
+}
+
+.logo {
+    width: 58px;
+    height: 58px;
+    border: 2px solid #3978E8;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #245FC9;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.brand-name {
+    color: #172338;
+    font-family: Arial, sans-serif;
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.brand-sub {
+    margin-top: 5px;
+    color: #7B8799;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+}
+
+/* CHAPTER LABEL */
+.chapter {
+    color: #3978E8;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    margin-bottom: 22px;
+}
+
+/* MAIN TITLE */
+h1 {
+    color: #172338;
+    font-size: 62px;
+    line-height: 1.08;
+    font-weight: bold;
+    max-width: 700px;
+    margin-bottom: 22px;
+}
+
+.kannada {
+    color: #245FC9;
+    font-size: 34px;
+    font-weight: bold;
+    margin-bottom: 35px;
+}
+
+/* DESCRIPTION */
+.description {
+    color: #66758A;
+    font-family: Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    max-width: 490px;
+}
+
+/* BOTTOM FOOTER */
+.footer {
+    position: absolute;
+    bottom: 35px;
+    left: 75px;
+    z-index: 3;
+    color: #7B8799;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.footer span {
+    color: #3978E8;
+    font-weight: bold;
+}
+
+/* CHAPTER NUMBER */
+.chapter-number {
+    position: absolute;
+    right: 55px;
+    bottom: 35px;
+    color: rgba(255,255,255,0.9);
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 3;
+}
+
+/* DECORATIVE BLUE ELEMENT */
+.accent {
+    position: absolute;
+    left: 75px;
+    top: 185px;
+    width: 55px;
+    height: 4px;
+    background: #3978E8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="slide">
+
+    <div class="background"></div>
+    <div class="top-line"></div>
+
+    <div class="content">
+
+        <div class="brand">
+            <div class="logo">Z</div>
+            <div>
+                <div class="brand-name">ZENOVA</div>
+                <div class="brand-sub">EDUCATIONS</div>
+            </div>
+        </div>
+
+        <div class="chapter">CHAPTER 29 · SOCIAL SCIENCE</div>
+
+        <h1>
+            INDIA –<br>
+            NATURAL<br>
+            DISASTERS
+        </h1>
+
+        <div class="kannada">
+            ಭಾರತದ ನೈಸರ್ಗಿಕ ವಿಕೋಪಗಳು
+        </div>
+
+        <p class="description">
+            Understanding the causes, effects and preventive
+            measures of natural disasters in India.
+        </p>
+
+    </div>
+
+    <div class="footer">
+        <span>ZENOVA EDUCATIONS</span>
+        &nbsp; | &nbsp; SSLC 2026–27
+    </div>
+
+    <div class="chapter-number">29</div>
+
+</div>
+
+</body>
+</html>
