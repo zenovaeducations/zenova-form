@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zenova Educations - Natural Disasters</title>
+<title>Zenova Educations | India – Natural Disasters</title>
 
 <style>
 * {
@@ -13,23 +14,39 @@
 }
 
 body {
-    background: #e8edf5;
+    background: #172338;
     font-family: "Times New Roman", serif;
+    overflow: hidden;
+}
+
+.presentation {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .slide {
-    width: 100vw;
+    display: none;
+    width: min(100vw, 177.78vh);
     aspect-ratio: 16 / 9;
     max-height: 100vh;
     position: relative;
     overflow: hidden;
-    background-image: url("1.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
 }
 
-.content {
+.slide.active {
+    display: block;
+}
+
+/* SLIDE 1 */
+
+.cover {
+    background: url("1.png") center / cover no-repeat;
+}
+
+.cover-content {
     position: absolute;
     left: 6%;
     top: 25%;
@@ -39,9 +56,9 @@ body {
 
 .brand {
     font-family: Arial, sans-serif;
-    color: #245fc9;
+    color: #245FC9;
     font-size: clamp(12px, 1.3vw, 20px);
-    font-weight: 700;
+    font-weight: bold;
     letter-spacing: 4px;
     margin-bottom: 28px;
 }
@@ -49,39 +66,207 @@ body {
 .chapter {
     font-family: Arial, sans-serif;
     font-size: clamp(12px, 1.2vw, 18px);
-    font-weight: 600;
+    font-weight: bold;
     letter-spacing: 3px;
-    color: #3978e8;
+    color: #3978E8;
     margin-bottom: 16px;
 }
 
-h1 {
+.cover h1 {
     font-size: clamp(32px, 4.2vw, 66px);
     line-height: 1.08;
-    font-weight: bold;
     margin-bottom: 18px;
+}
+
+.kannada-cover {
+    font-family: "Noto Sans Kannada", "Tunga", sans-serif;
+    font-size: clamp(19px, 2vw, 30px);
+    font-weight: bold;
+    color: #245FC9;
+    margin-bottom: 32px;
+}
+
+.cover-footer {
+    font-family: Arial, sans-serif;
+    font-size: clamp(10px, 1vw, 15px);
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #52627A;
+}
+
+/* SLIDE 2 */
+
+.content-slide {
+    background: #F7F9FC;
+    padding: 5% 6%;
+    color: #172338;
+}
+
+.topline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4%;
+    font-family: Arial, sans-serif;
+}
+
+.top-brand {
+    color: #3978E8;
+    font-weight: bold;
+    letter-spacing: 3px;
+    font-size: clamp(11px, 1vw, 16px);
+}
+
+.slide-no {
+    color: #7B8799;
+    font-size: clamp(11px, 1vw, 15px);
+}
+
+.eyebrow {
+    color: #3978E8;
+    font-family: Arial, sans-serif;
+    font-size: clamp(11px, 1vw, 15px);
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+}
+
+.content-slide h1 {
+    font-size: clamp(30px, 3.2vw, 48px);
+    margin-bottom: 22px;
+}
+
+.definition {
+    background: #EAF2FF;
+    border-left: 6px solid #3978E8;
+    border-radius: 12px;
+    padding: 22px 28px;
+    margin-bottom: 30px;
+}
+
+.definition h2 {
+    font-size: clamp(18px, 1.7vw, 25px);
+    color: #245FC9;
+    margin-bottom: 10px;
+}
+
+.definition p {
+    font-size: clamp(16px, 1.5vw, 22px);
+    line-height: 1.45;
 }
 
 .kannada {
     font-family: "Noto Sans Kannada", "Tunga", sans-serif;
-    font-size: clamp(19px, 2vw, 30px);
-    font-weight: 600;
-    color: #245fc9;
-    margin-bottom: 32px;
+    color: #52627A;
+    font-size: clamp(13px, 1.15vw, 17px);
+    margin-top: 8px;
+}
+
+.section-title {
+    font-family: Arial, sans-serif;
+    font-size: clamp(13px, 1.2vw, 18px);
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+}
+
+.types {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.type-card {
+    background: #FFFFFF;
+    border: 1px solid #E7EDF5;
+    border-radius: 12px;
+    padding: 17px 12px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.symbol {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #EAF2FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+}
+
+.type-name {
+    font-size: clamp(14px, 1.3vw, 19px);
+    font-weight: bold;
+}
+
+.type-kannada {
+    font-family: "Noto Sans Kannada", "Tunga", sans-serif;
+    font-size: clamp(10px, 0.9vw, 13px);
+    color: #7B8799;
+    margin-top: 5px;
 }
 
 .footer {
+    position: absolute;
+    bottom: 3%;
+    left: 6%;
+    right: 6%;
+    display: flex;
+    justify-content: space-between;
+    color: #7B8799;
     font-family: Arial, sans-serif;
-    font-size: clamp(10px, 1vw, 15px);
-    font-weight: 600;
-    letter-spacing: 2px;
-    color: #52627a;
+    font-size: clamp(9px, 0.8vw, 12px);
+    letter-spacing: 1px;
 }
 
-@media (max-aspect-ratio: 16/9) {
-    .slide {
-        width: 100vw;
-        height: 56.25vw;
+/* NAVIGATION */
+
+.controls {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 100;
+    font-family: Arial, sans-serif;
+}
+
+.controls button {
+    background: #3978E8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.controls button:hover {
+    background: #245FC9;
+}
+
+#counter {
+    color: white;
+    font-size: 14px;
+}
+
+@media (max-width: 650px) {
+    .type-card {
+        padding: 10px 6px;
+        gap: 6px;
+    }
+
+    .symbol {
+        width: 30px;
+        height: 30px;
+        font-size: 17px;
     }
 }
 </style>
@@ -89,27 +274,207 @@ h1 {
 
 <body>
 
-<section class="slide">
+<div class="presentation">
 
-    <div class="content">
+    <!-- SLIDE 1: COVER -->
+    <section class="slide cover active">
 
-        <div class="brand">ZENOVA EDUCATIONS</div>
+        <div class="cover-content">
 
-        <div class="chapter">SSLC SOCIAL SCIENCE • CHAPTER 29</div>
+            <div class="brand">ZENOVA EDUCATIONS</div>
 
-        <h1>INDIA –<br>NATURAL DISASTERS</h1>
+            <div class="chapter">
+                SSLC SOCIAL SCIENCE • CHAPTER 29
+            </div>
 
-        <div class="kannada">
-            ಭಾರತದ ನೈಸರ್ಗಿಕ ವಿಕೋಪಗಳು
+            <h1>
+                INDIA –<br>
+                NATURAL DISASTERS
+            </h1>
+
+            <div class="kannada-cover">
+                ಭಾರತದ ನೈಸರ್ಗಿಕ ವಿಕೋಪಗಳು
+            </div>
+
+            <div class="cover-footer">
+                LEARN • UNDERSTAND • PREPARE
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SLIDE 2: MEANING AND TYPES -->
+    <section class="slide content-slide">
+
+        <div class="topline">
+            <div class="top-brand">ZENOVA EDUCATIONS</div>
+            <div class="slide-no">02 / CHAPTER 29</div>
+        </div>
+
+        <div class="eyebrow">
+            UNDERSTANDING THE CONCEPT
+        </div>
+
+        <h1>What Are Natural Disasters?</h1>
+
+        <div class="definition">
+
+            <h2>Meaning of Natural Disasters</h2>
+
+            <p>
+                Natural disasters are destructive natural events beyond
+                human control that cause loss of human life, property
+                and natural resources.
+            </p>
+
+            <div class="kannada">
+                ಮಾನವನ ನಿಯಂತ್ರಣಕ್ಕೆ ಮೀರಿದ, ಜೀವಹಾನಿ, ಆಸ್ತಿಪಾಸ್ತಿ ಹಾಗೂ
+                ನೈಸರ್ಗಿಕ ಸಂಪನ್ಮೂಲಗಳ ನಾಶಕ್ಕೆ ಕಾರಣವಾಗುವ ನೈಸರ್ಗಿಕ ಘಟನೆಗಳೇ
+                ನೈಸರ್ಗಿಕ ವಿಕೋಪಗಳು.
+            </div>
+
+        </div>
+
+        <div class="section-title">
+            MAJOR TYPES OF NATURAL DISASTERS
+        </div>
+
+        <div class="types">
+
+            <div class="type-card">
+                <div class="symbol">🌊</div>
+                <div>
+                    <div class="type-name">Floods</div>
+                    <div class="type-kannada">ಪ್ರವಾಹಗಳು</div>
+                </div>
+            </div>
+
+            <div class="type-card">
+                <div class="symbol">🌀</div>
+                <div>
+                    <div class="type-name">Cyclones</div>
+                    <div class="type-kannada">ಚಂಡಮಾರುತಗಳು</div>
+                </div>
+            </div>
+
+            <div class="type-card">
+                <div class="symbol">🌍</div>
+                <div>
+                    <div class="type-name">Earthquakes</div>
+                    <div class="type-kannada">ಭೂಕಂಪಗಳು</div>
+                </div>
+            </div>
+
+            <div class="type-card">
+                <div class="symbol">⛰️</div>
+                <div>
+                    <div class="type-name">Landslides</div>
+                    <div class="type-kannada">ಭೂಕುಸಿತಗಳು</div>
+                </div>
+            </div>
+
+            <div class="type-card">
+                <div class="symbol">☀️</div>
+                <div>
+                    <div class="type-name">Droughts</div>
+                    <div class="type-kannada">ಬರಗಾಲಗಳು</div>
+                </div>
+            </div>
+
+            <div class="type-card">
+                <div class="symbol">🌊</div>
+                <div>
+                    <div class="type-name">Coastal Erosion</div>
+                    <div class="type-kannada">ಕರಾವಳಿ ಸವೆತ</div>
+                </div>
+            </div>
+
+            <div class="type-card">
+                <div class="symbol">❄️</div>
+                <div>
+                    <div class="type-name">Avalanches</div>
+                    <div class="type-kannada">ಹಿಮಪಾತಗಳು</div>
+                </div>
+            </div>
+
+            <div class="type-card">
+                <div class="symbol">🌧️</div>
+                <div>
+                    <div class="type-name">Cloudbursts</div>
+                    <div class="type-kannada">ಮೋಡಸ್ಫೋಟಗಳು</div>
+                </div>
+            </div>
+
         </div>
 
         <div class="footer">
-            LEARN • UNDERSTAND • PREPARE
+            <span>SSLC SOCIAL SCIENCE</span>
+            <span>INDIA – NATURAL DISASTERS</span>
         </div>
 
-    </div>
+    </section>
 
-</section>
+</div>
+
+
+<!-- PRESENTATION CONTROLS -->
+
+<div class="controls">
+    <button onclick="previousSlide()">← Previous</button>
+    <span id="counter">1 / 2</span>
+    <button onclick="nextSlide()">Next →</button>
+</div>
+
+
+<script>
+const slides = document.querySelectorAll(".slide");
+let currentSlide = 0;
+
+function showSlide(index) {
+
+    if (index < 0 || index >= slides.length) return;
+
+    slides[currentSlide].classList.remove("active");
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add("active");
+
+    document.getElementById("counter").textContent =
+        (currentSlide + 1) + " / " + slides.length;
+}
+
+function nextSlide() {
+    if (currentSlide < slides.length - 1) {
+        showSlide(currentSlide + 1);
+    }
+}
+
+function previousSlide() {
+    if (currentSlide > 0) {
+        showSlide(currentSlide - 1);
+    }
+}
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.key === "ArrowRight" || event.key === " ") {
+        nextSlide();
+    }
+
+    if (event.key === "ArrowLeft") {
+        previousSlide();
+    }
+
+    if (event.key === "F11") {
+        // Browser handles F11 fullscreen
+    }
+
+});
+
+</script>
 
 </body>
 </html>
